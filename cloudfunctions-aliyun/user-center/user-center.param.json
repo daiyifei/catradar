@@ -1,0 +1,39 @@
+// 本文件中的json内容将在云函数【运行】时作为参数传给云函数。
+// 配置教程参考：https://uniapp.dcloud.net.cn/uniCloud/quickstart?id=runparam
+{
+	// "action": "sendSmsCode",
+	// "params": {
+	// 	"mobile": "18810505803",
+	// 	"code": "123456",
+	// 	"type": "login"
+	// }
+	// "action": "loginBySms",
+	// "params": {
+	// 	"mobile": "18810505803",
+	// 	"code": "123456"
+	// }
+	// "action": "sendSmsCode",
+	// "params": {
+	// 	"mobile": "18810505803",
+	// 	"code": "123457",
+	// 	"type": "bind"
+	// }
+	// "action": "bindMobile",
+	// "params": {
+	// 	"uid": "5f1eb0dfbb1edd0001b30a52",
+	// 	"mobile": "18810505803",
+	// 	"code": "123457"
+	// }
+	// "action": "sendSmsCode",
+	// "params": {
+	// 	"mobile": "18810505803",
+	// 	"code": "123458",
+	// 	"type": "unbind"
+	// }
+	// "action": "unbindMobile",
+	// "params": {
+	// 	"uid": "5f1eb0dfbb1edd0001b30a52",
+	// 	"mobile": "18810505803",
+	// 	"code": "123458"
+	// }
+}

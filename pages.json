@@ -1,0 +1,55 @@
+{
+	"pages": [
+		//pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+		{
+			"path": "pages/radar/index",
+			"style": {}
+		}, {
+			"path": "pages/list/index",
+			"style": {}
+		}, {
+			"path": "pages/list/detail",
+			"style": {}
+		}, {
+			"path": "pages/list/edit",
+			"style": {}
+		}, {
+			"path": "pages/mine/index",
+			"style": {}
+		}
+	],
+	"tabBar": {
+	    "color": "#cccccc",
+	    "selectedColor": "#1296db",
+	    "borderStyle": "white",
+	    "backgroundColor": "#ffffff",
+	    "list": [{
+	        "pagePath": "pages/radar/index",
+	        "iconPath": "static/tabbar/icon_radar.png",
+	        "selectedIconPath": "static/tabbar/icon_radar_hl.png",
+	        "text": "雷达"
+	    }, {
+	        "pagePath": "pages/list/index",
+	        "iconPath": "static/tabbar/icon_cats.png",
+	        "selectedIconPath": "static/tabbar/icon_cats_hl.png",
+	        "text": "档案"
+	    }, {
+	        "pagePath": "pages/mine/index",
+	        "iconPath": "static/tabbar/icon_mine.png",
+	        "selectedIconPath": "static/tabbar/icon_mine_hl.png",
+	        "text": "我的"
+	    }]
+	},
+	"globalStyle": {
+		"mp-alipay": {
+			/* 支付宝小程序特有相关 */
+			"transparentTitle": "always",
+			"allowsBounceVertical": "NO"
+		},
+		"navigationBarBackgroundColor": "#0081ff",
+		"navigationBarTitleText": "猫信",
+		"navigationStyle": "custom",
+		"navigationBarTextStyle": "white"
+	},
+	"usingComponts": true
+}
