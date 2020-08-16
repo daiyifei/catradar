@@ -3,9 +3,7 @@
 		<map class="map" :latitude="latitude" :longitude="longitude" :markers="markers" :controls="controls" :scale="scale"
 		 @markertap="showList" @controltap="reset"></map>
 		 
-		 <cover-view class="cover">text</cover-view>
-
-<!-- 		<view class="cu-modal flex justify-center align-center" :class="show?'show':''" @tap="reset">
+		<view class="cu-modal flex justify-center align-center" :class="show?'show':''" @tap="reset">
 			<view class="list">
 				<view class="list-item" :style="[{'animation-delay': ((index)*0.05) + 's'}]" v-for="(item,index) in list" :key="index"
 				 @tap.stop="toDetail(item._id)">
@@ -13,7 +11,7 @@
 					<text class="name">{{item.name}}</text>
 				</view>
 			</view>
-		</view> -->
+		</view>
 		
 	</view>
 </template>
@@ -42,7 +40,7 @@
 			}
 		},
 		onLoad() {
-			// this.fetchData()
+			this.fetchData()
 			const {
 				windowHeight,
 				windowWidth
@@ -150,8 +148,6 @@
 		padding: 4rpx 10rpx;
 		font-size: 28rpx;
 		color: #fff;
-		background-color: rgba(0, 0, 0, .5);
-		border-radius: 10rpx;
 	}
 
 	@keyframes show {

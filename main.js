@@ -1,9 +1,6 @@
 import Vue from 'vue'
 import App from './App'
 
-import 'colorui/main.css'
-import 'colorui/icon.css'
-
 import moment from 'moment'
 
 import db from '@/js_sdk/uni-clientDB/index.js'

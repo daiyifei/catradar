@@ -116,6 +116,6 @@
 </script>
 
 <style>
-/* 	@import "colorui/main.css";
-	@import "colorui/icon.css"; */
+	@import "colorui/main.css";
+	@import "colorui/icon.css";
 </style>
