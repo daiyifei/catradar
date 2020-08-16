@@ -6,7 +6,7 @@
 				<input type="text" :placeholder="loading?'加载中':'在'+total+'只猫咪中搜索'" confirm-type="search" @input="onSearch"></input>
 			</view>
 		</view>
-		<scroll-view scroll-y class="indexes" :scroll-into-view="'indexes-'+ listCurID" :style="[{top:'calc(50px + ' + CustomBar + 'px)'},{height:'calc(100vh - ' + CustomBar + 'px - 50px)'}]"
+		<scroll-view scroll-y class="indexes" :scroll-into-view="'indexes-'+ listCurID" :style="[{top:'calc(50px + ' + CustomBar + 'px)'},{height:'calc(100vh - var(--window-bottom) - ' + CustomBar + 'px - 50px)'}]"
 		 :scroll-with-animation="true" :enable-back-to-top="true" refresher-enabled :refresher-triggered="loading"
 		 @refresherrefresh="onPullDown">
 			<block v-for="(group,index) in list" :key="index" v-if="total">

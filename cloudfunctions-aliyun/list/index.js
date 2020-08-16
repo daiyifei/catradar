@@ -8,13 +8,14 @@ exports.main = async (event, context) => {
 	let payload = {}
 	let res = {}
 	
-	let noCheckAction = ['getList']
+	// 权限检查
+	let noCheckAction = ['getStat','getList']
 
 	if (noCheckAction.indexOf(event.action) === -1) {
 		if (!event.uniIdToken) {
 			return {
 				code: 403,
-				msg: '缺少token'
+				msg: '非法访问'
 			}
 		}
 		payload = await uniID.checkToken(event.uniIdToken)
@@ -23,12 +24,24 @@ exports.main = async (event, context) => {
 		}
 		params.uid = payload.uid
 	}
-
+	
+	// 路由
 	switch (event.action) {
+		case 'getStat':
+			const $ = db.command.aggregate
+			res = await db.collection('list').aggregate()
+			  .group({
+			    _id: '$location',
+			    num: $.sum(1)
+			  })
+			  .end()
+			break
 		case 'getList':
-			const condition = {}
+			let condition = {}
 			if(params.searchKey && params.searchValue) {
 				condition[params.searchKey] = new RegExp('.*' + params.searchValue,'i') 
+			}else if(params.condition) {
+				condition = params.condition
 			}
 			const { data } = await db.collection('list').where(condition).get()
 			res = {

@@ -114,7 +114,7 @@
 						title: '保存成功'
 					})
 					setTimeout(() => {
-						uni.navigateBack()
+						this.updateList()
 					}, 1000)
 				}).catch(err => {
 					if(~err.errMsg.indexOf('duplicate key error')) {
@@ -136,16 +136,24 @@
 							this.$request('list', 'del', {
 								_id: this.id
 							}).then(res => {
-								uni.navigateBack()
+								this.updateList()
 							})
 						}
 					}
 				})
+			},
+			updateList() {
+				const pages = getCurrentPages()
+				if (pages.length > 1) {  
+				    const prevPage = pages[pages.length - 2]  
+				    prevPage.$vm.fetchData()
+						uni.navigateBack()
+				 }  
 			}
 		}
 	}
 </script>
 
 <style>
-
+	
 </style>

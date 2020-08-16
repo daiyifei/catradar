@@ -28,8 +28,10 @@
 				searchValue: ''
 			}
 		},
-		onShow() {
+		onLoad() {
 			this.fetchData()
+		},
+		onShow() {
 			this.editable = false
 			if(uni.getStorageSync('userInfo')) {
 				this.editable = true
