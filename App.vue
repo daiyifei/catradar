@@ -118,4 +118,8 @@
 <style>
 	@import "colorui/main.css";
 	@import "colorui/icon.css";
+	
+	.cu-form-group .title {
+		min-width: calc(4em + 15px);
+	}
 </style>
