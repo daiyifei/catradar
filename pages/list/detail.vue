@@ -1,6 +1,6 @@
 <template>
 	<view>
-		<cu-custom bgColor="bg-gradual-pink" :isBack="true">
+		<cu-custom :bgColor="'bg-gradual-'+(form.male?'pink':'blue')" :isBack="true">
 			<block slot="content">{{form.name}}</block>
 			<block slot="right">
 				<view class="action">

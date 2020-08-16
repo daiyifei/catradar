@@ -47,7 +47,7 @@
 			"allowsBounceVertical": "NO"
 		},
 		"navigationBarBackgroundColor": "#0081ff",
-		"navigationBarTitleText": "猫信",
+		"navigationBarTitleText": "猫雷达",
 		"navigationStyle": "custom",
 		"navigationBarTextStyle": "white"
 	},
