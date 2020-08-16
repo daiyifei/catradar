@@ -22,7 +22,7 @@ Vue.config.productionTip = false
 
 Vue.filter('age', function (value) {
   if (!value) return '年龄不详'
-  return moment().diff(value, 'year') + '岁'
+  return Math.ceil(moment().diff(value, 'year',true)) + '岁'
 })
 
 Vue.filter('color', function (value) {
