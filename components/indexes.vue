@@ -1,12 +1,12 @@
 <template>
 	<view class="container">
-		<view class="cu-bar bg-white fixed" :style="[{top:CustomBar + 'px'}]">
+		<view class="cu-bar bg-white fixed search">
 			<view class="search-form round">
 				<text class="cuIcon-search"></text>
 				<input type="text" :placeholder="loading?'加载中':'在'+total+'只猫咪中搜索'" confirm-type="search" @input="onSearch"></input>
 			</view>
 		</view>
-		<scroll-view scroll-y class="indexes" :scroll-into-view="'indexes-'+ listCurID" :style="[{top:'calc(50px + ' + CustomBar + 'px)'},{height:'calc(100vh - var(--window-bottom) - ' + CustomBar + 'px - 50px)'}]"
+		<scroll-view scroll-y  class="indexes" :scroll-into-view="'indexes-'+ listCurID"
 		 :scroll-with-animation="true" :enable-back-to-top="true" refresher-enabled :refresher-triggered="loading"
 		 @refresherrefresh="onPullDown">
 			<block v-for="(group,index) in list" :key="index" v-if="total">
@@ -38,7 +38,7 @@
 			<view class="flex justify-center margin text-sm text-gray" v-if="!loading&&!list.length">暂无内容</view>
 		</scroll-view>
 		<!--索引列表-->
-		<view class="indexBar" :style="[{height:'calc(100vh - ' + CustomBar + 'px - 50px)'}]">
+		<view class="indexBar padding">
 			<view class="indexBar-box" @touchstart="tStart" @touchend="tEnd" @touchmove.stop="tMove">
 				<view class="indexBar-item" v-for="(item,index) in list" :key="index" :id="index" @touchstart="getCur" @touchend="setCur">
 					{{item.name}}</view>
@@ -69,6 +69,7 @@
 				hidden: true,
 				listCurID: '',
 				listCur: '',
+				slide: false,
 				modalName: null,
 				listTouchStart: 0,
 				listTouchDirection: null
@@ -95,11 +96,13 @@
 			ListTouchMove(e) {
 				if(!this.editable)
 					return
-				if(e.touches[0].pageX - this.listTouchStart < -80) {
+				if(e.touches[0].pageX - this.listTouchStart < -60) {
 					this.listTouchDirection = 'left'
+					this.slide = true
 				}
-				if(e.touches[0].pageX - this.listTouchStart > 80) {
+				if(e.touches[0].pageX - this.listTouchStart > 60) {
 					this.listTouchDirection = 'right'
+					this.slide = false
 				}
 			},
 
@@ -200,15 +203,30 @@
 	}
 </script>
 <style>
+	.search {
+		top: calc(var(--status-bar-height) + var(--window-top) + 50px);
+	}
+	
 	.indexes {
-		position: absolute;
+		position: fixed;
+		top: calc(var(--status-bar-height) + var(--window-top) + 100px);
+		bottom: var(--window-bottom);
+	}
+	
+	.cu-item {
+		padding-right: 80rpx !important;
+	}
+	
+	.indexBar {
+		position: fixed;
+		top: calc(var(--status-bar-height) + var(--window-top) + 100px);
+		bottom: calc(var(--window-bottom) + 64px);
+		right: 0;
+		display: flex;
+		align-items: center;
 	}
 
 	.indexBar .indexBar-box {
-		position: fixed;
-		top: 50%;
-		right: 20rpx;
-		transform: translateY(-50%);
 		background: rgba(255, 255, 255, .5);
 		display: flex;
 		flex-direction: column;
@@ -247,17 +265,17 @@
 	.indexToast {
 		position: fixed;
 		top: 0;
-		right: 80rpx;
+		right: 100rpx;
 		bottom: 0;
 		background: rgba(0, 0, 0, 0.5);
-		width: 100rpx;
-		height: 100rpx;
+		width: 120rpx;
+		height: 120rpx;
 		border-radius: 10rpx;
 		margin: auto;
 		color: #fff;
-		line-height: 100rpx;
+		line-height: 120rpx;
 		text-align: center;
-		font-size: 48rpx;
+		font-size: 52rpx;
 	}
 
 	.gender {

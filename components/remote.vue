@@ -45,6 +45,8 @@
 		watch: {
 			value(val) {
 				this.selected = val
+				this.searchValue = ''
+				this.candidates = []
 			}
 		},
 		methods: {
