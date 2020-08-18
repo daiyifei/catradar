@@ -1877,7 +1877,7 @@ button.cuIcon.lg {
 }
 
 .cu-custom .cu-bar {
-	min-height: 0px;
+	/* min-height: 0px; */
 	/* #ifdef MP-WEIXIN */
 	padding-right: 220upx;
 	/* #endif */

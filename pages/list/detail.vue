@@ -35,7 +35,7 @@
 					<text class="text-ABC text-green">information</text>
 				</view>
 			</view>
-			<view class="basic margin-lr">
+			<view class="basic margin">
 				<view class="birthday">生日: {{form.birthday?form.birthday:'未知'}}</view>
 				<view class="color">花色: {{form.color|color}}</view>
 				<view>绝育: {{form.neuter ? '已绝育' : '未绝育'}}</view>
@@ -43,18 +43,18 @@
 				<view v-if="form.location">位置: {{form.location|location}}</view>
 				<view v-if="form.intro">简介: {{form.intro}}</view>
 			</view>
-			<view class="cu-bar margin-bottom-sm" v-if="form.relation">
+			<view class="cu-bar margin-tb" v-if="form.relation">
 				<view class="action sub-title">
 					<text class="text-xl text-bold text-blue">社会关系</text>
 					<text class="text-ABC text-blue">relationship</text>
 				</view>
 			</view>
-			<view class="flex flex-wrap">
-				<navigator :url="'detail?id='+item.detail._id" class="relation-item margin-left" v-for="(item, index) in form.relation" :key="index">
+			<view class="flex flex-wrap margin-bottom">
+				<navigator :url="'detail?id='+item.detail._id" class="relation-item margin-left margin-bottom" v-for="(item, index) in form.relation" :key="index">
 					<image :src="item.detail.avatar" mode="aspectFill" class="cu-avatar xl round margin-bottom-xs" v-if="item.detail.avatar"></image>
 					<view class="cu-avatar xl round margin-bottom-xs" v-else>{{item.detail.name}}</view>
 					<view class="name">
-						<view class="text-grey margin-bottom-xs">{{item.detail.name}}</view>
+						<view class="text-grey">{{item.detail.name}}</view>
 						<view class="tag cu-tag light bg-blue">{{item.tag}}</view>
 					</view>
 				</navigator>
