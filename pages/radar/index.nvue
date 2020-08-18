@@ -5,7 +5,7 @@
 
 		<view class="modal" :class="show?'show':''" @tap="reset" v-if="show">
 			<view class="list">
-				<view class="list-item" v-for="(item,index) in list" :key="index" @tap.stop="toDetail(item._id)">
+				<view class="list-item" v-for="(item,index) in list" :key="index" @tap="toDetail" :data-id="item._id">
 					<image :src="item.avatar" class="avatar"></image>
 					<text class="name">{{item.name}}</text>
 				</view>
@@ -86,8 +86,9 @@
 				}).then(res => {
 					this.list = res.result.data
 				})
+				e.stopPropagation()
 			},
-			reset() {
+			reset(e) {
 				if (this.latitude == 32.0966 && this.longitude == 118.917) {
 					this.latitude = this.latitude + 0.000001
 					this.longitude = this.longitude + 0.000001
@@ -99,9 +100,10 @@
 				this.show = false
 				this.scale = 17
 			},
-			toDetail(id) {
+			toDetail(e) {
+				e.stopPropagation()
 				uni.navigateTo({
-					url: '/pages/list/detail?id=' + id
+					url: '/pages/list/detail?id=' + e.currentTarget.dataset.id
 				})
 			}
 		}
