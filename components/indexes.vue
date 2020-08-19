@@ -1,14 +1,13 @@
 <template>
-	<view class="container">
-		<view class="cu-bar bg-white fixed search">
+	<view>
+		<view class="cu-bar bg-white search" :style="{top:CustomBar + 'px'}">
 			<view class="search-form round">
 				<text class="cuIcon-search"></text>
 				<input type="text" :placeholder="loading?'加载中':'在'+total+'只猫咪中搜索'" confirm-type="search" @input="onSearch"></input>
 			</view>
 		</view>
-		<scroll-view scroll-y  class="indexes" :scroll-into-view="'indexes-'+ listCurID"
-		 :scroll-with-animation="true" :enable-back-to-top="true" refresher-enabled :refresher-triggered="loading"
-		 @refresherrefresh="onPullDown">
+		<scroll-view scroll-y  class="indexes" :scroll-into-view="'indexes-'+ listCurID" :style="{top: CustomBar + 50 + 'px'}"
+		  scroll-with-animation :scroll-animation-duration="300" enable-back-to-top>
 			<block v-for="(group,index) in list" :key="index" v-if="total">
 				<view :id="'indexes-' + group.name" :data-index="group.name">
 					<view class="padding text-gray">{{group.name}}</view>
@@ -193,9 +192,6 @@
 					}
 				}
 			},
-			onPullDown() {
-				this.$emit('pulldown')
-			},
 			onSearch(e) {
 				this.$emit('search', e.detail.value)
 			}
@@ -204,13 +200,16 @@
 </script>
 <style>
 	.search {
-		top: calc(var(--status-bar-height) + var(--window-top) + 50px);
+		position: fixed;
+		left: 0;
+		right: 0;
 	}
 	
 	.indexes {
 		position: fixed;
-		top: calc(var(--status-bar-height) + var(--window-top) + 100px);
 		bottom: var(--window-bottom);
+		left: 0;
+		right: 0;
 	}
 	
 	.cu-item {

@@ -8,7 +8,7 @@
 				</view>
 			</block>
 		</cu-custom>
-		<indexes :list="list" :total="total" :loading="loading" :editable="editable" @pulldown="fetchData" @search="onSearch" @delete="onDelete"/>
+		<indexes :list="list" :total="total" :loading="loading" :editable="editable" @search="onSearch" @delete="onDelete"/>
 	</view>
 </template>
 
@@ -47,6 +47,7 @@
 					this.total = res.total
 					this.list = res.data
 					this.loading = false
+					uni.stopPullDownRefresh()
 				})
 			},
 			onPullDownRefresh() {

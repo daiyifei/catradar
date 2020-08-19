@@ -1541,6 +1541,10 @@ button.cuIcon.lg {
 	text-align: right;
 	font-weight: 900;
 	font-size: 36upx;
+	/* #ifdef MP-ALIPAY */
+	margin-bottom: 0.7rem;
+	margin-left: -0.25rem;
+	/* #endif */
 }
 
 .cu-bar.justify-center .action.border-title text:last-child,
@@ -1877,7 +1881,7 @@ button.cuIcon.lg {
 }
 
 .cu-custom .cu-bar {
-	/* min-height: 0px; */
+	min-height: 0px;
 	/* #ifdef MP-WEIXIN */
 	padding-right: 220upx;
 	/* #endif */

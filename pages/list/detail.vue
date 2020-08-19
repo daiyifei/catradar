@@ -54,7 +54,7 @@
 					<image :src="item.detail.avatar" mode="aspectFill" class="cu-avatar xl round margin-bottom-xs" v-if="item.detail.avatar"></image>
 					<view class="cu-avatar xl round margin-bottom-xs" v-else>{{item.detail.name}}</view>
 					<view class="name">
-						<view class="text-grey">{{item.detail.name}}</view>
+						<view class="text-grey margin-bottom-xs">{{item.detail.name}}</view>
 						<view class="tag cu-tag light bg-blue">{{item.tag}}</view>
 					</view>
 				</navigator>
