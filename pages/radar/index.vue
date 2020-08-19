@@ -1,8 +1,8 @@
 <template>
 	<view>
-		<map class="map" :latitude="latitude" :longitude="longitude" :markers="markers" :controls="controls" :scale="scale"
-		 @markertap="showList" @controltap="reset"></map>
-		 
+		<map id="map" ref="map" class="map" :latitude="latitude" :longitude="longitude" :markers="markers" :controls="controls"
+		 :scale="scale" @markertap="showList" @controltap="reset" show-location></map>
+
 		<view class="cu-modal flex justify-center align-center" :class="show?'show':''" @tap="reset">
 			<view class="list">
 				<view class="list-item" :style="[{'animation-delay': ((index)*0.05) + 's'}]" v-for="(item,index) in list" :key="index"
@@ -12,7 +12,7 @@
 				</view>
 			</view>
 		</view>
-		
+
 	</view>
 </template>
 
@@ -21,8 +21,12 @@
 	export default {
 		data() {
 			return {
-				latitude: 32.0966,
-				longitude: 118.917,
+				origin: {
+					latitude: 32.096591,
+					longitude: 118.916949,
+				},
+				latitude: 32.096591,
+				longitude: 118.916949,
 				scale: 17,
 				markers: [],
 				controls: [{
@@ -47,6 +51,15 @@
 			} = uni.getSystemInfoSync()
 			this.controls[0].position.top = windowHeight - 50
 			this.controls[0].position.left = windowWidth - 50
+
+			uni.getLocation({
+				success: (res) => {
+					if (res.latitude && res.longitude) {
+						this.origin.latitude = res.latitude
+						this.origin.longitude = res.longitude
+					}
+				}
+			})
 		},
 		methods: {
 			fetchData() {
@@ -68,7 +81,6 @@
 				})
 			},
 			showList(e) {
-		
 				const location = e.detail.markerId
 				this.show = true
 				this.scale = 19
@@ -81,13 +93,8 @@
 				})
 			},
 			reset() {
-				if (this.latitude == 32.0966 && this.longitude == 118.917) {
-					this.latitude = this.latitude + 0.000001
-					this.longitude = this.longitude + 0.000001
-				} else {
-					this.latitude = 32.0966
-					this.longitude = 118.917
-				}
+				const map = uni.createMapContext('map',this)
+				map.moveToLocation(this.origin)
 				this.list = []
 				this.show = false
 				this.scale = 17
@@ -108,7 +115,7 @@
 		left: 200rpx;
 		z-index: 9999999;
 	}
-	
+
 	.map {
 		position: absolute;
 		top: 0;
@@ -118,7 +125,7 @@
 		width: 750rpx;
 		height: 110vh;
 	}
-	
+
 	.list {
 		display: flex;
 		flex-wrap: wrap;

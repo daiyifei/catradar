@@ -1,14 +1,14 @@
 <template>
 	<view>
-		<view class="cu-custom">
-			<view class="cu-bar fixed" :class="[bgImage!=''?'none-bg text-white bg-img':'',bgColor]">
+		<view class="cu-custom" :style="[{height:CustomBar + 'px'}]">
+			<view class="cu-bar fixed" :style="style" :class="[bgImage!=''?'none-bg text-white bg-img':'',bgColor]">
 				<view class="action">
 					<view @tap="BackPage" v-if="isBack">
 						<text class="cuIcon-back"></text>
 						<slot name="backText"></slot>
 					</view>
 				</view>
-				<view class="content">
+				<view class="content" :style="[{top:StatusBar + 'px'}]">
 					<slot name="content"></slot>
 				</view>
 				<slot name="right"></slot>
@@ -21,9 +21,23 @@
 	export default {
 		data() {
 			return {
-			}
+				StatusBar: this.StatusBar,
+				CustomBar: this.CustomBar
+			};
 		},
 		name: 'cu-custom',
+		computed: {
+			style() {
+				var StatusBar= this.StatusBar;
+				var CustomBar= this.CustomBar;
+				var bgImage = this.bgImage;
+				var style = `height:${CustomBar}px;padding-top:${StatusBar}px;`;
+				if (this.bgImage) {
+					style = `${style}background-image:url(${bgImage});`;
+				}
+				return style
+			}
+		},
 		props: {
 			bgColor: {
 				type: String,
@@ -40,23 +54,16 @@
 		},
 		methods: {
 			BackPage() {
-				uni.navigateBack()
+				uni.navigateBack({
+					delta: 1
+				});
 			}
 		}
 	}
 </script>
 
 <style>
- .cu-custom {
-	 height: calc(50px + var(--status-bar-height));
- }
- 
- .cu-bar {
-	 padding-top: var(--status-bar-height);
-	 height: calc(50px + var(--status-bar-height));
- }
- 
- .cu-bar .content {
-	 top: var(--status-bar-height);
- }
+	.cu-custom {
+		
+	}
 </style>

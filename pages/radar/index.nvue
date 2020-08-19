@@ -1,7 +1,7 @@
 <template>
 	<view class="container">
-		<map class="map" :latitude="latitude" :longitude="longitude" :markers="markers" :controls="controls" :scale="scale"
-		 @markertap="showList" @controltap="reset"></map>
+		<map id="map" ref="map" class="map" :latitude="latitude" :longitude="longitude" :markers="markers" :controls="controls"
+		 :scale="scale" @markertap="showList" @controltap="reset" show-location></map>
 
 		<view class="modal" :class="show?'show':''" @tap="reset" v-if="show">
 			<view class="list">
@@ -20,6 +20,10 @@
 	export default {
 		data() {
 			return {
+				origin: {
+					latitude: 32.096591,
+					longitude: 118.916949,
+				},
 				latitude: 32.096591,
 				longitude: 118.916949,
 				scale: 17,
@@ -47,6 +51,16 @@
 			} = uni.getSystemInfoSync()
 			this.controls[0].position.top = windowHeight - 50
 			this.controls[0].position.left = windowWidth - 50
+
+			uni.getLocation({
+				type: 'wgs84',
+				success: (res) => {
+					if(res.latitude && res.longitude) {
+						this.origin.latitude = res.latitude
+						this.origin.longitude = res.longitude
+					}
+				}
+			})
 		},
 		methods: {
 			fetchData() {
@@ -81,7 +95,9 @@
 				uniCloud.callFunction({
 					name: 'uni-clientDB',
 					data: {
-						command: db.collection('list').where({location: parseInt(location)}).get()
+						command: db.collection('list').where({
+							location: parseInt(location)
+						}).get()
 					}
 				}).then(res => {
 					this.list = res.result.data
@@ -89,13 +105,7 @@
 				e.stopPropagation()
 			},
 			reset(e) {
-				if (this.latitude == 32.0966 && this.longitude == 118.917) {
-					this.latitude = this.latitude + 0.000001
-					this.longitude = this.longitude + 0.000001
-				} else {
-					this.latitude = 32.0966
-					this.longitude = 118.917
-				}
+				this.$refs.map.moveToLocation(this.origin)
 				this.list = []
 				this.show = false
 				this.scale = 17
@@ -114,7 +124,7 @@
 	.container {
 		flex: 1;
 	}
-	
+
 	.map {
 		position: absolute;
 		top: 0;
@@ -123,8 +133,8 @@
 		bottom: -30px;
 		flex: 1;
 	}
-	
-	.modal{
+
+	.modal {
 		position: absolute;
 		top: 0;
 		left: 0;
@@ -134,51 +144,51 @@
 		align-items: center;
 		z-index: -1;
 	}
-	
+
 	.show {
-		background-color: rgba(0,0,0,.5);
+		background-color: rgba(0, 0, 0, .5);
 	}
-	
+
 	.list {
 		flex-direction: row;
 		flex-wrap: wrap;
 		margin-left: 50px;
 		margin-right: 50px;
 	}
-	
+
 	.list-item {
 		align-items: center;
 		margin: 10px;
 	}
-	
+
 	.avatar {
 		width: 50px;
 		height: 50px;
 		border-radius: 50%;
 	}
-	
+
 	.name {
 		margin-top: 8px;
 		font-size: 14px;
 		color: #fff;
 	}
-	
+
 	@keyframes fade {
-	    0% {
-	        opacity: 0
-	    }
-	
-	    100% {
-	        opacity: 1
-	    }
+		0% {
+			opacity: 0
+		}
+
+		100% {
+			opacity: 1
+		}
 	}
-	
+
 	@keyframes scale-up {
 		0% {
 			opacity: 0;
 			transform: scale(.2)
 		}
-	
+
 		100% {
 			opacity: 1;
 			transform: scale(1)
