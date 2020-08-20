@@ -51,12 +51,11 @@
 			} = uni.getSystemInfoSync()
 			this.controls[0].position.top = windowHeight - 50
 			this.controls[0].position.left = windowWidth - 50
-
 			uni.getLocation({
 				success: (res) => {
-					if (res.latitude && res.longitude) {
-						this.origin.latitude = res.latitude
-						this.origin.longitude = res.longitude
+					if(res.latitude && res.longitude) {
+						// this.origin.latitude = res.latitude
+						// this.origin.longitude = res.longitude
 					}
 				}
 			})

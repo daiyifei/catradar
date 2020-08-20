@@ -3,12 +3,12 @@
 		<!-- 列表 -->
 		<view class="relation grid col-3 grid-square">
 			<view class="bg-img margin-top-sm" v-for="(item,index) in value" :key="index">
-				<image :src="item.detail.avatar" mode="aspectFill"></image>
+				<image :src="item.detail.avatar" mode="aspectFill" @tap="showModal(item,index)"></image>
 				<view class="name">
 					<view>{{item.tag}} - {{item.detail.name}}</view>
 				</view>
 				<view class="cu-tag bg-red">
-					<text class='cuIcon-close' @tap="delItem(index)"></text>
+					<text class='cuIcon-close' @tap.stop="delItem(index)"></text>
 				</view>
 			</view>
 			<view class="bg-img solids margin-top-sm" @tap="showModal">
@@ -66,16 +66,23 @@
 		data() {
 			return {
 				show: false,
+				index: -1,
 				form: {}
 			}
 		},
 		methods: {
-			showModal() {
-				this.form = {
-					detail: {
-						name: ''
-					},
-					tag: ''
+			showModal(item,index) {
+				if(item) {
+					this.form = JSON.parse(JSON.stringify(item))
+					this.index = index
+				}else {
+					this.form = {
+						detail: {
+							name: ''
+						},
+						tag: ''
+					}
+					this.index = -1
 				}
 				this.show = true
 			},
@@ -93,7 +100,11 @@
 					})
 					return
 				}
-				this.value.push(this.form)
+				if(this.index > -1) {
+					this.value[this.index] = this.form
+				}else {
+					this.value.push(this.form)
+				}
 				this.$emit('change',this.value)
 				this.hideModal()
 			}

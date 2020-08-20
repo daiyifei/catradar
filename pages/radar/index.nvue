@@ -53,11 +53,10 @@
 			this.controls[0].position.left = windowWidth - 50
 
 			uni.getLocation({
-				type: 'wgs84',
 				success: (res) => {
 					if(res.latitude && res.longitude) {
-						this.origin.latitude = res.latitude
-						this.origin.longitude = res.longitude
+						// this.origin.latitude = res.latitude
+						// this.origin.longitude = res.longitude
 					}
 				}
 			})
