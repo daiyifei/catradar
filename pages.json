@@ -12,6 +12,9 @@
 					"pullToRefresh": {
 						"offset": "100px"
 					}
+				},
+				"mp-alipay": {
+					"allowsBounceVertical": "YES"
 				}
 			}
 		}, {
@@ -52,7 +55,7 @@
 		"mp-alipay": {
 			/* 支付宝小程序特有相关 */
 			"transparentTitle": "always",
-			"allowsBounceVertical": "YES"
+			"allowsBounceVertical": "NO"
 		}
 	},
 	"usingComponts": true
