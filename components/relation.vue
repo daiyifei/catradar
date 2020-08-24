@@ -3,7 +3,7 @@
 		<!-- 列表 -->
 		<view class="relation grid col-3 grid-square">
 			<view class="bg-img margin-top-sm" v-for="(item,index) in value" :key="index">
-				<image :src="item.detail.avatar" mode="aspectFill" @tap="showModal(item,index)"></image>
+				<image :src="item.detail.avatar" mode="aspectFill" @tap="showModal" :data-index="index"></image>
 				<view class="name">
 					<view>{{item.tag}} - {{item.detail.name}}</view>
 				</view>
@@ -15,7 +15,7 @@
 				<text class='cuIcon-add'></text>
 			</view>
 		</view>
-		
+
 		<!-- 对话框 -->
 		<view class="cu-modal" :class="show?'show':''">
 			<view class="cu-dialog">
@@ -71,41 +71,40 @@
 			}
 		},
 		methods: {
-			showModal(item,index) {
-				if(item) {
-					this.form = JSON.parse(JSON.stringify(item))
-					this.index = index
-				}else {
-					this.form = {
-						detail: {
-							name: ''
-						},
-						tag: ''
-					}
-					this.index = -1
+			showModal(e) {
+				const { index = -1 } = e.currentTarget.dataset
+				if(index > -1) {
+					this.form = JSON.parse(JSON.stringify(this.value[index]))
 				}
+				this.index = index
 				this.show = true
 			},
 			hideModal() {
 				this.show = false
+				this.form = {
+					detail: {
+						name: ''
+					},
+					tag: ''
+				}
 			},
 			delItem(index) {
-				this.value.splice(index,1)
+				this.value.splice(index, 1)
 			},
 			onConfirm() {
-				if(!this.form.detail || !this.form.tag) {
+				if (!this.form.detail || !this.form.tag) {
 					uni.showToast({
 						title: '请填写完整信息',
 						icon: 'none'
 					})
 					return
 				}
-				if(this.index > -1) {
+				if (this.index > -1) {
 					this.value[this.index] = this.form
-				}else {
+				} else {
 					this.value.push(this.form)
 				}
-				this.$emit('change',this.value)
+				this.$emit('change', this.value)
 				this.hideModal()
 			}
 		}
@@ -117,15 +116,15 @@
 	.relation {
 		width: 100%;
 	}
-	
+
 	.cu-modal {
 		z-index: 99 !important;
 	}
-	
+
 	.cu-dialog {
 		margin-bottom: 50%;
 	}
-	
+
 	.name {
 		position: absolute;
 		left: 0;
@@ -135,6 +134,6 @@
 		font-size: 24rpx;
 		color: #fff;
 		text-align: center;
-		background-color: rgba(0,0,0,.5);
+		background-color: rgba(0, 0, 0, .5);
 	}
 </style>
