@@ -1,15 +1,14 @@
 <template>
 	<view class="container">
 		<view class="grid col-3 grid-square margin-top">
-			<view class="bg-img" v-for="(item,index) in list" :key="index">
-				<image :src="item" mode="aspectFill" @tap="chooseImg" :data-index="index" @load="loading=false"></image>
+			<view class="bg-img" @tap="chooseImg" v-for="(item,index) in list" :key="index">
+				<image :src="item" mode="aspectFill" @load="loading=false"></image>
 				<view class="cu-tag bg-red" @tap.stop="delItem(index)">
 					<text class='cuIcon-close'></text>
 				</view>
-				<text :class="loading===index?'cu-load load-cuIcon loading text-white':''"></text>
 			</view>
 			<view class="solids" @tap="chooseImg" v-if="multiple || !list.length">
-				<text :class="loading===-1?'cu-load load-cuIcon loading text-white':'cuIcon-cameraadd'"></text>
+				<text :class="loading?'cu-load load-cuIcon loading text-white':'cuIcon-cameraadd'"></text>
 			</view>
 		</view>
 	</view>
@@ -31,7 +30,7 @@
 		},
 		data() {
 			return {
-				loading: -2,
+				loading: false,
 				list: []
 			}
 		},
@@ -47,26 +46,21 @@
 		},
 		methods: {
 			chooseImg(e) {
-				const { index = -1 } = e.currentTarget.dataset,
-					count = this.multiple ? 9 : 1
 				uni.chooseImage({
-					count,
+					count: 1,
 					success: (res) => {
-						res.tempFiles.forEach(item => {
-							const filePath = item.path,
-								cloudPath = item.name ? item.name : item.path.substr(item.path.lastIndexOf("/") + 1)
-							this.loading = index
+						if (res.tempFilePaths.length > 0) {
+							let filePath = res.tempFilePaths[0],
+								fileName = res.tempFiles[0].name ? res.tempFiles[0].name : filePath.substr(filePath.lastIndexOf("/") + 1)
+							console.log(fileName)
+							this.loading = true
 							uniCloud.uploadFile({
-								filePath,
-								cloudPath,
-								success: (res) => {
-									this.loading = -2
+								filePath: filePath,
+								cloudPath: fileName,
+								success:(res) => {
+									this.loading = false
 									if(this.multiple) {
-										if(index > -1) {
-											this.list[index] = res.fileID
-										}else {
-											this.list.push(res.fileID)
-										}
+										this.list.push(res.fileID)
 										this.$emit('change',this.list)
 									}else {
 										this.list[0] = res.fileID
@@ -74,7 +68,7 @@
 									}
 								}
 							})
-						})
+						}
 					}
 				})
 			},

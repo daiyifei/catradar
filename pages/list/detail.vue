@@ -24,7 +24,7 @@
 				<view>
 					<text class="text-bold text-xxl">{{form.name}}</text>
 					<view>
-						<text class="gender margin-right-xs" :class="form.male ? 'cuIcon-female female' : 'cuIcon-male'"></text>
+						<text class="gender margin-right-xs" :class="form.female ? 'cuIcon-female female' : 'cuIcon-male'"></text>
 						<text class="text-grey">{{form.birthday|age}}</text>
 					</view>
 				</view>
@@ -36,9 +36,10 @@
 				</view>
 			</view>
 			<view class="basic margin">
-				<view class="birthday">生日: {{form.birthday?form.birthday:'未知'}}</view>
+				<view class="gender">性别: {{form.female|female}}</view>
 				<view class="color">花色: {{form.color|color}}</view>
-				<view>绝育: {{form.neuter ? '已绝育' : '未绝育'}}</view>
+				<view class="birthday">生日: {{form.birthday?form.birthday:'未知'}}</view>
+				<view>绝育: {{form.neuter|neuter}}</view>
 				<view v-if="form.neuterDate">绝育时间: {{form.neuterDate}}</view>
 				<view v-if="form.location">位置: {{form.location|location}}</view>
 				<view v-if="form.intro">简介: {{form.intro}}</view>

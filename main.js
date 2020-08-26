@@ -25,6 +25,16 @@ Vue.filter('age', function (value) {
   return Math.ceil(moment().diff(value, 'year',true)) + '岁'
 })
 
+Vue.filter('female', function (value) {
+  if (value === undefined) return '未知'
+  return value ? '母' : '公'
+})
+
+Vue.filter('neuter', function (value) {
+  if (value === undefined) return '未知'
+  return value ? '已绝育' : '未绝育'
+})
+
 Vue.filter('color', function (value) {
   if (value === undefined) return '未知'
   return ['三花', '橘猫', '奶牛', '白猫', '狸花', '玳瑁'][value]

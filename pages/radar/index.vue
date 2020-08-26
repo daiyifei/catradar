@@ -1,9 +1,8 @@
 <template>
 	<view>
 		<map id="map" ref="map" class="map" :latitude="latitude" :longitude="longitude" :markers="markers" :controls="controls"
-		 :scale="scale" @markertap="showList" @controltap="reset" show-location></map>
-
-		<view class="cu-modal flex justify-center align-center" :class="show?'show':''" @tap="reset">
+		 :scale="scale" @markertap="showList" @controltap="reset"></map>
+		<view class="cu-modal flex justify-center align-center" :class="showModal?'show':''" @tap="reset">
 			<view class="list">
 				<view class="list-item" :style="[{'animation-delay': ((index)*0.05) + 's'}]" v-for="(item,index) in list" :key="index"
 				 @tap.stop="toDetail(item._id)">
@@ -12,13 +11,17 @@
 				</view>
 			</view>
 		</view>
-
+		<radar-loading v-if="loading"></radar-loading>
 	</view>
 </template>
 
 <script>
+	import radarLoading from '@/components/radarLoading.vue'
 	import locations from '@/static/locations.json'
 	export default {
+		components: {
+			radarLoading
+		},
 		data() {
 			return {
 				origin: {
@@ -40,7 +43,8 @@
 					clickable: true
 				}],
 				list: [],
-				show: false
+				showModal: false,
+				loading: false
 			}
 		},
 		onLoad() {
@@ -51,18 +55,13 @@
 			} = uni.getSystemInfoSync()
 			this.controls[0].position.top = windowHeight - 50
 			this.controls[0].position.left = windowWidth - 50
-			uni.getLocation({
-				success: (res) => {
-					if(res.latitude && res.longitude) {
-						// this.origin.latitude = res.latitude
-						// this.origin.longitude = res.longitude
-					}
-				}
-			})
 		},
 		methods: {
 			fetchData() {
-				this.$request('list', 'getStat').then(res => {
+				this.loading = true
+				this.$request('list', 'getStat', {
+					key: 'location'
+				}).then(res => {
 					const markers = []
 					res.data.forEach(item => {
 						if (item._id !== undefined) {
@@ -77,17 +76,20 @@
 						}
 					})
 					this.markers = markers
+					this.loading = false
 				})
 			},
 			showList(e) {
 				const location = e.detail.markerId
-				this.show = true
+				this.loading = true
 				this.scale = 19
 				this.latitude = locations[location].latitude
 				this.longitude = locations[location].longitude
 				this.$get('list', {
 					location: parseInt(location)
 				}).then(res => {
+					this.loading = false
+					this.showModal = true
 					this.list = res.data
 				})
 			},
@@ -95,7 +97,7 @@
 				const map = uni.createMapContext('map',this)
 				map.moveToLocation(this.origin)
 				this.list = []
-				this.show = false
+				this.showModal = false
 				this.scale = 17
 			},
 			toDetail(id) {
@@ -108,13 +110,6 @@
 </script>
 
 <style>
-	.cover {
-		position: absolute;
-		top: 200rpx;
-		left: 200rpx;
-		z-index: 9999999;
-	}
-
 	.map {
 		position: absolute;
 		top: 0;

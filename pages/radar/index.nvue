@@ -2,8 +2,7 @@
 	<view class="container">
 		<map id="map" ref="map" class="map" :latitude="latitude" :longitude="longitude" :markers="markers" :controls="controls"
 		 :scale="scale" @markertap="showList" @controltap="reset" show-location></map>
-
-		<view class="modal" :class="show?'show':''" @tap="reset" v-if="show">
+		<view class="modal" :class="showModal?'show':''" @tap="reset" v-if="showModal">
 			<view class="list">
 				<view class="list-item" v-for="(item,index) in list" :key="index" @tap="toDetail" :data-id="item._id">
 					<image :src="item.avatar" class="avatar"></image>
@@ -40,7 +39,7 @@
 				}],
 				list: [],
 				show: false,
-				animation: null
+				loading: true
 			}
 		},
 		onLoad() {
@@ -51,22 +50,17 @@
 			} = uni.getSystemInfoSync()
 			this.controls[0].position.top = windowHeight - 50
 			this.controls[0].position.left = windowWidth - 50
-
-			uni.getLocation({
-				success: (res) => {
-					if(res.latitude && res.longitude) {
-						// this.origin.latitude = res.latitude
-						// this.origin.longitude = res.longitude
-					}
-				}
-			})
 		},
 		methods: {
 			fetchData() {
+				this.loading = true
 				uniCloud.callFunction({
 					name: 'list',
 					data: {
-						action: 'getStat'
+						action: 'getStat',
+						params: {
+							key: 'location'
+						}
 					}
 				}).then(res => {
 					const markers = []
@@ -83,14 +77,15 @@
 						}
 					})
 					this.markers = markers
+					this.loading = false
 				})
 			},
 			showList(e) {
 				const location = e.detail.markerId
+				this.loading = true
+				this.scale = 19
 				this.latitude = locations[location].latitude
 				this.longitude = locations[location].longitude
-				this.show = true
-				this.scale = 19
 				uniCloud.callFunction({
 					name: 'uni-clientDB',
 					data: {
@@ -99,6 +94,8 @@
 						}).get()
 					}
 				}).then(res => {
+					this.loading = false
+					this.showModal = true
 					this.list = res.result.data
 				})
 				e.stopPropagation()
@@ -106,7 +103,7 @@
 			reset(e) {
 				this.$refs.map.moveToLocation(this.origin)
 				this.list = []
-				this.show = false
+				this.showModal = false
 				this.scale = 17
 			},
 			toDetail(e) {
