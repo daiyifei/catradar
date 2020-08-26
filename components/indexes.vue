@@ -1,11 +1,5 @@
 <template>
 	<view>
-		<view class="cu-bar bg-white search" :style="{top:CustomBar + 'px'}">
-			<view class="search-form round">
-				<text class="cuIcon-search"></text>
-				<input type="text" :placeholder="loading?'加载中':'在'+total+'只猫咪中搜索'" confirm-type="search" @input="onSearch"></input>
-			</view>
-		</view>
 		<scroll-view scroll-y  class="indexes" :scroll-into-view="'indexes-'+ listCurID" :style="{top: CustomBar + 50 + 'px'}"
 		  scroll-with-animation :scroll-animation-duration="300" enable-back-to-top>
 			<block v-for="(group,index) in list" :key="index" v-if="total">
@@ -14,17 +8,17 @@
 					<view class="cu-list menu-avatar no-padding">
 						<view class="cu-item" :class="modalName=='move-box-'+index+'-'+idx?'move-cur':''"
 						  v-for="(item,idx) in group.data" :key="idx" @touchstart="ListTouchStart" @touchmove="ListTouchMove" @touchend="ListTouchEnd" :data-target="'move-box-'+index+'-'+idx">
-							<image :src="item.avatar" mode="aspectFill" class="cu-avatar round lg" @tap="toDetail(item._id)" v-if="item.avatar"></image>
+							<image :src="item.avatar" mode="aspectFill" lazy-load class="cu-avatar round lg" @tap="toDetail(item._id)" v-if="item.avatar"></image>
 							<view class="cu-avatar round lg" @tap="toDetail(item._id)" v-else>{{item.name}}</view>
 							<view class="content" @tap="toDetail(item._id)">
 								<view class="text-xl">{{item.name}}</view>
 								<view class="text-gray text-sm">
-									<text class="gender margin-right-xs" :class="item.male ? 'cuIcon-female female' : 'cuIcon-male'"></text>
+									<text class="gender margin-right-xs" :class="item.female ? 'cuIcon-female female' : 'cuIcon-male'"></text>
 									<text class="age">{{item.birthday|age}}</text>
 								</view>
 							</view>
 							<view class="action margin-right">
-								<view class="cu-tag round light" :class="'bg-'+(item.neuter?'olive':'orange')">{{item.neuter?'已':'未'}}绝育</view>
+								<view class="cu-tag round light" :class="'bg-'+(item.neuter?'olive':'orange')">{{item.neuter|neuter}}</view>
 							</view>
 							<view class="move" v-if="editable">
 								<view class="bg-blue" @tap="toEdit(item._id)">编辑</view>
@@ -34,10 +28,9 @@
 					</view>
 				</view>
 			</block>
-			<view class="flex justify-center margin text-sm text-gray" v-if="!loading&&!list.length">暂无内容</view>
 		</scroll-view>
 		<!--索引列表-->
-		<view class="indexBar padding">
+		<view class="indexBar padding" v-if="!slide">
 			<view class="indexBar-box" @touchstart="tStart" @touchend="tEnd" @touchmove.stop="tMove">
 				<view class="indexBar-item" v-for="(item,index) in list" :key="index" :id="index" @touchstart="getCur" @touchend="setCur">
 					{{item.name}}</view>
@@ -48,7 +41,7 @@
 			{{listCur}}
 		</view>
 		<!--新建按钮-->
-		<navigator url="edit" class="cu-avatar round lg bg-gradual-blue cuIcon-add btn-new margin" v-if="editable"></navigator>
+		<navigator url="edit" class="cu-avatar round lg bg-gradual-blue cuIcon-add btn-new margin" v-if="editable&&!slide"></navigator>
 	</view>
 </template>
 
@@ -66,9 +59,9 @@
 				StatusBar: this.StatusBar,
 				CustomBar: this.CustomBar,
 				hidden: true,
+				slide: false,
 				listCurID: '',
 				listCur: '',
-				slide: false,
 				modalName: null,
 				listTouchStart: 0,
 				listTouchDirection: null
@@ -122,11 +115,13 @@
 				})
 			},
 			toEdit(id) {
+				this.slide = false
 				uni.navigateTo({
 					url: 'edit?id=' + id
 				})
 			},
 			onDelete(id) {
+				this.slide = false
 				this.$emit('delete',id)
 			},
 			//获取高度
@@ -191,20 +186,11 @@
 						return false
 					}
 				}
-			},
-			onSearch(e) {
-				this.$emit('search', e.detail.value)
 			}
 		}
 	}
 </script>
-<style>
-	.search {
-		position: fixed;
-		left: 0;
-		right: 0;
-	}
-	
+<style>	
 	.indexes {
 		position: fixed;
 		bottom: var(--window-bottom);

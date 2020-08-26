@@ -26,6 +26,9 @@
 		}, {
 			"path": "pages/mine/index",
 			"style": {}
+		}, {
+			"path": "pages/stat/index",
+			"style": {}
 		}
 	],
 	"tabBar": {
@@ -43,6 +46,11 @@
 			"iconPath": "static/tabbar/icon_cats.png",
 			"selectedIconPath": "static/tabbar/icon_cats_hl.png",
 			"text": "档案"
+		}, {
+			"pagePath": "pages/stat/index",
+			"iconPath": "static/tabbar/icon_stat.png",
+			"selectedIconPath": "static/tabbar/icon_stat_hl.png",
+			"text": "统计"
 		}, {
 			"pagePath": "pages/mine/index",
 			"iconPath": "static/tabbar/icon_mine.png",

@@ -20,7 +20,7 @@
 			</view>
 			<view class="cu-form-group">
 				<view class="title">性别</view>
-				<form-switch type="switch-sex" v-model="form.male" />
+				<form-switch type="switch-sex" v-model="form.female" />
 			</view>
 			<view class="cu-form-group">
 				<view class="title">绝育</view>
@@ -78,7 +78,10 @@
 		data() {
 			return {
 				id: '',
-				form: {},
+				form: {
+					female: false,
+					neuter: false
+				},
 				loaded: false,
 				saving: false,
 				deleting: false
