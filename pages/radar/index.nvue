@@ -2,7 +2,7 @@
 	<view class="container">
 		<map id="map" ref="map" class="map" :latitude="latitude" :longitude="longitude" :markers="markers" :controls="controls"
 		 :scale="scale" @markertap="showList" @controltap="reset" show-location></map>
-		<view class="modal" :class="showModal?'show':''" @tap="reset" v-if="showModal">
+		<view class="modal" @tap="reset" v-if="showModal">
 			<view class="list">
 				<view class="list-item" v-for="(item,index) in list" :key="index" @tap="toDetail" :data-id="item._id">
 					<image :src="item.avatar" class="avatar"></image>
@@ -86,6 +86,7 @@
 				this.scale = 19
 				this.latitude = locations[location].latitude
 				this.longitude = locations[location].longitude
+				this.showModal = true
 				uniCloud.callFunction({
 					name: 'uni-clientDB',
 					data: {
@@ -95,7 +96,6 @@
 					}
 				}).then(res => {
 					this.loading = false
-					this.showModal = true
 					this.list = res.result.data
 				})
 				e.stopPropagation()
@@ -138,11 +138,7 @@
 		bottom: 0;
 		justify-content: center;
 		align-items: center;
-		z-index: -1;
-	}
-
-	.show {
-		background-color: rgba(0, 0, 0, .5);
+		background-color: rgba(0, 0, 0, .6);
 	}
 
 	.list {

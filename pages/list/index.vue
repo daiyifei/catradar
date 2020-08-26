@@ -9,7 +9,7 @@
 			</block>
 		</cu-custom>
 		<!-- 搜索栏 -->
-		<view class="cu-bar bg-white search">
+		<view class="cu-bar bg-white search fixed" :style="{top:CustomBar+'px'}">
 			<view class="search-form round">
 				<text class="cuIcon-search"></text>
 				<input type="text" :placeholder="loading?'加载中':'在'+total+'只猫咪中搜索'" confirm-type="search" @input="onSearch"></input>
@@ -24,18 +24,20 @@
 		<!-- 空状态 -->
 		<view class="flex justify-center padding text-sm text-gray" v-if="!loading&&!list.length">暂无内容</view>
 		<!-- 侧边抽屉 -->
-		<view class="cu-modal drawer-modal justify-end" :class="showDrawer ? 'show' : ''" @tap="hideFilter">
-			<view class="cu-dialog basis-lg" @tap.stop="" :style="[{top:CustomBar+'px',height:'calc(100vh - ' + CustomBar + 'px)'}]">
-				<view class="padding solid-bottom bg-white" v-for="(filter,index) in filters" :key="index">
-					<view class="text-left padding-bottom-sm text-sm">{{filter.name}}</view>
-					<view class="bg-white text-left">
-						<view class="cu-tag padding radius light margin-right-xs margin-bottom-xs" :class="condition[filter.key]===filter.value[idx]?'bg-orange':''"
-						 v-for="(item,idx) in filter.value" :key="idx" @tap="setFilter(filter.key,item)">{{$root.$options.filters[filter.key](item)}}</view>
+		<view class="cu-modal drawer-modal justify-end" :class="showDrawer ? 'show' : ''" @tap.stop="hideFilter" :style="[{top:CustomBar+'px',height:'calc(100vh - ' + CustomBar + 'px)'}]">
+			<view class="cu-dialog bg-white basis-lg" @tap.stop="">
+				<scroll-view scroll-y :style="{height:'calc(100vh - 60px - ' + CustomBar + 'px)'}">
+					<view class="padding solid-bottom" v-for="(filter,index) in filters" :key="index">
+						<view class="text-left padding-bottom-sm text-sm">{{filter.name}}</view>
+						<view class="bg-white text-left">
+							<view class="cu-tag padding radius light margin-right-xs margin-bottom-xs" :class="condition[filter.key]===filter.value[idx]?'bg-orange':''"
+							 v-for="(item,idx) in filter.value" :key="idx" @tap.stop="setFilter(filter.key,item)">{{$root.$options.filters[filter.key](item)}}</view>
+						</view>
 					</view>
-				</view>
+				</scroll-view>
 				<view class="padding text-left">
-					<button class="cu-btn bg-white margin-right-xs" @tap="clearFilter">清空</button>
-					<button class="cu-btn bg-blue" @tap="applyFilter">确定</button>
+					<button class="cu-btn light bg-red margin-right-xs" @tap.stop="clearFilter">清空</button>
+					<button class="cu-btn light bg-blue" @tap.stop="applyFilter">确定</button>
 				</view>
 			</view>
 		</view>
