@@ -8,7 +8,7 @@
 				{{item.label}}
 			</view>
 		</scroll-view>
-		<swiper class="swiper" circular @change="tabChange">
+		<swiper class="swiper" circular @change="tabChange" :current="currTab">
 			<swiper-item v-for="(item,index) in keys" :key="index">
 				<canvas :canvas-id="'chart'+index" class="chart bg-white" @touchstart="showTip"></canvas>
 			</swiper-item>
@@ -61,10 +61,16 @@
 				})
 			},
 			tabSelect(index) {
-				this.currTab = index
+				this.switchChart(index)
 			},
 			tabChange(e) {
-				this.currTab = e.detail.current
+				this.switchChart(e.detail.current)
+			},
+			switchChart(index) {
+				this.currTab = index
+				this['chart' + index].updateData({
+					animation: true
+				})
 			},
 			showChart(canvasId, series) {
 				this[canvasId] = new uCharts({
