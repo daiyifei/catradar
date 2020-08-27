@@ -87,7 +87,7 @@ async function save(params) {
 		params.updated = new Date().getTime()
 		const _id = params._id
 		delete params._id
-		await db.collection('list').doc(_id).update(params)
+		return await db.collection('list').doc(_id).update(params)
 	} else {
 		// add
 		params.created = new Date().getTime()
