@@ -3,19 +3,13 @@
 		//pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
 		{
 			"path": "pages/radar/index",
-			"style": {}
+			"style": {
+				"disableScroll": true
+			}
 		}, {
 			"path": "pages/list/index",
 			"style": {
-				"enablePullDownRefresh": true,
-				"app-plus": {
-					"pullToRefresh": {
-						"offset": "100px"
-					}
-				},
-				"mp-alipay": {
-					"allowsBounceVertical": "YES"
-				}
+				"disableScroll": true
 			}
 		}, {
 			"path": "pages/list/detail",
@@ -25,10 +19,14 @@
 			"style": {}
 		}, {
 			"path": "pages/mine/index",
-			"style": {}
+			"style": {
+				"disableScroll": true
+			}
 		}, {
 			"path": "pages/stat/index",
-			"style": {}
+			"style": {
+				"disableScroll": true
+			}
 		}
 	],
 	"tabBar": {
@@ -59,6 +57,7 @@
 		}]
 	},
 	"globalStyle": {
+		"navigationBarTitleText":"猫雷达",
 		"navigationStyle": "custom",
 		"mp-alipay": {
 			/* 支付宝小程序特有相关 */
