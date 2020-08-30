@@ -44,33 +44,35 @@
 		},
 		methods: {
 			fetchData() {
-				this.keys.forEach((item, index) => {
+				const { key } = this.keys[this.currTab],
+					chartId = 'chart' + this.currTab
+				if(this[chartId]) {
+					this[chartId].updateData({
+						animation: true
+					})
+				}else {
 					this.$request('list', 'getStat', {
-						key: item.key
+						key
 					}).then(res => {
 						const series = []
 						this.total = res.total
 						res.data.forEach(data => {
 							series.push({
-								name: this.$root.$options.filters[item.key](data._id),
+								name: this.$root.$options.filters[key](data._id),
 								data: data.num
 							})
 						})
-						this.showChart('chart' + index, series)
+						this.showChart(chartId, series)
 					})
-				})
+				}
 			},
 			tabSelect(index) {
-				this.switchChart(index)
+				this.currTab = index
+				this.fetchData()
 			},
 			tabChange(e) {
-				this.switchChart(e.detail.current)
-			},
-			switchChart(index) {
-				this.currTab = index
-				this['chart' + index].updateData({
-					animation: true
-				})
+				this.currTab = e.detail.current
+				this.fetchData()
 			},
 			showChart(canvasId, series) {
 				this[canvasId] = new uCharts({

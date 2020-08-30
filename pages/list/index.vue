@@ -20,7 +20,7 @@
 			</view>
 		</view>
 		<!-- 索引列表 -->
-		<indexes :list="list" :total="total" :loading="loading" :editable="editable" @delete="onDelete" />
+		<indexes :list="list" :total="total" :loading="loading" :editable="editable" @refresh="fetchData" @delete="onDelete" />
 		<!-- 空状态 -->
 		<view class="flex justify-center padding text-sm text-gray" v-if="!loading&&!list.length">暂无内容</view>
 		<!-- 侧边抽屉 -->
@@ -99,11 +99,7 @@
 					this.total = res.total
 					this.list = res.data
 					this.loading = false
-					uni.stopPullDownRefresh()
 				})
-			},
-			onPullDownRefresh() {
-				this.fetchData()
 			},
 			onSearch(e) {
 				this.params.searchValue = e.detail.value

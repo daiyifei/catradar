@@ -1,7 +1,8 @@
 <template>
 	<view>
+		<!--列表主体-->
 		<scroll-view scroll-y  class="indexes" :scroll-into-view="'indexes-'+ listCurID" :style="{top: CustomBar + 50 + 'px'}"
-		  scroll-with-animation :scroll-animation-duration="300" enable-back-to-top>
+		  scroll-with-animation :scroll-animation-duration="300" refresher-enabled :refresher-triggered="loading" @refresherrefresh="onRefresh">
 			<block v-for="(group,index) in list" :key="index" v-if="total">
 				<view :id="'indexes-' + group.name" :data-index="group.name">
 					<view class="padding text-gray">{{group.name}}</view>
@@ -77,6 +78,9 @@
 			}
 		},
 		methods: {
+			onRefresh() {
+				this.$emit('refresh')
+			},
 			// ListTouch触摸开始
 			ListTouchStart(e) {
 				if(!this.editable)
