@@ -14,7 +14,7 @@
 				<text class="cuIcon-search"></text>
 				<input type="text" :placeholder="loading?'加载中':'在'+total+'只猫咪中搜索'" confirm-type="search" @input="onSearch"></input>
 			</view>
-			<view class="action" :class="JSON.stringify(params.condition)!='{}'?'text-orange':''" @tap="showFilter">
+			<view class="action" :class="Object.keys(params.condition).length?'text-orange':''" @tap="showFilter">
 				<text>筛选</text>
 				<text class="cuIcon-filter"></text>
 			</view>
@@ -106,7 +106,7 @@
 				this.fetchData()
 			},
 			showFilter() {
-				this.condition = this.params.condition
+				this.condition = JSON.parse(JSON.stringify(this.params.condition))
 				this.showDrawer = true
 			},
 			hideFilter() {

@@ -54,6 +54,7 @@
 		methods: {
 			fetchData() {
 				this.loading = true
+				plus.nativeUI.showWaiting()
 				uniCloud.callFunction({
 					name: 'list',
 					data: {
@@ -78,11 +79,13 @@
 					})
 					this.markers = markers
 					this.loading = false
+					plus.nativeUI.closeWaiting()
 				})
 			},
 			showList(e) {
 				const location = e.detail.markerId
 				this.loading = true
+				plus.nativeUI.showWaiting()
 				this.scale = 19
 				this.latitude = locations[location].latitude
 				this.longitude = locations[location].longitude
@@ -96,6 +99,7 @@
 					}
 				}).then(res => {
 					this.loading = false
+					plus.nativeUI.closeWaiting()
 					this.list = res.result.data
 				})
 				e.stopPropagation()
@@ -138,9 +142,11 @@
 		bottom: 0;
 		justify-content: center;
 		align-items: center;
+		transition-property: background-color;  
+		transition-duration: 3000; 
 		background-color: rgba(0, 0, 0, .6);
 	}
-
+	
 	.list {
 		flex-direction: row;
 		flex-wrap: wrap;
@@ -163,27 +169,5 @@
 		margin-top: 8px;
 		font-size: 14px;
 		color: #fff;
-	}
-
-	@keyframes fade {
-		0% {
-			opacity: 0
-		}
-
-		100% {
-			opacity: 1
-		}
-	}
-
-	@keyframes scale-up {
-		0% {
-			opacity: 0;
-			transform: scale(.2)
-		}
-
-		100% {
-			opacity: 1;
-			transform: scale(1)
-		}
 	}
 </style>
