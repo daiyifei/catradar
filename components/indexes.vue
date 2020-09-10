@@ -86,6 +86,7 @@
 				if(!this.editable)
 					return
 				this.listTouchStart = e.touches[0].pageX
+				this.slide = false
 			},
 
 			// ListTouch计算方向
