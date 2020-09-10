@@ -38,8 +38,7 @@
 					clickable: true
 				}],
 				list: [],
-				show: false,
-				loading: true
+				show: false
 			}
 		},
 		onLoad() {
@@ -53,8 +52,6 @@
 		},
 		methods: {
 			fetchData() {
-				this.loading = true
-				plus.nativeUI.showWaiting()
 				uniCloud.callFunction({
 					name: 'list',
 					data: {
@@ -79,7 +76,7 @@
 					})
 					this.markers = markers
 					this.loading = false
-					plus.nativeUI.closeWaiting()
+					plus.navigator.closeSplashscreen() 
 				})
 			},
 			showList(e) {
