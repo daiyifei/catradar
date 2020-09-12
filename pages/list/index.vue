@@ -9,7 +9,7 @@
 			</block>
 		</cu-custom>
 		<!-- 搜索栏 -->
-		<view class="cu-bar bg-white search fixed" :style="{top:CustomBar+'px'}">
+		<view class="cu-bar bg-white search" :style="{top:CustomBar+'px'}">
 			<view class="search-form round">
 				<text class="cuIcon-search"></text>
 				<input type="text" :placeholder="loading?'加载中':'在'+total+'只猫咪中搜索'" confirm-type="search" @input="onSearch"></input>
@@ -153,5 +153,9 @@
 <style>
 	.cu-tag+.cu-tag {
 		margin-left: 0;
+	}
+	.search {
+		left: 0;
+		right: 0;
 	}
 </style>
