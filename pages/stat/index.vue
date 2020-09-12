@@ -9,7 +9,7 @@
 			</view>
 		</scroll-view>
 		<swiper class="swiper" circular @change="tabChange" :current="currTab">
-			<swiper-item v-for="(item,index) in keys" :key="index">
+			<swiper-item v-for="(item,index) in keys" :key="index" class="swiper-item">
 				<!-- #ifdef MP-ALIPAY -->
 				<canvas :canvas-id="'chart'+index" :id="'chart'+index" class="chart bg-white" @touchstart="showTip" :style="{'width':cWidth*pixelRatio+'px','height':cHeight*pixelRatio+'px', 'transform': 'scale('+(1/pixelRatio)+')','margin-left':-cWidth*(pixelRatio-1)/2+'px','margin-top':-cHeight*(pixelRatio-1)/2+'px'}"></canvas>
 				<!-- #endif -->
@@ -51,11 +51,7 @@
 			this.cWidth = uni.upx2px(750)
 			this.cHeight = uni.upx2px(750)
 			// #ifdef MP-ALIPAY
-			uni.getSystemInfo().then(({pixelRatio}) => {
-				if(pixelRatio > 1) {
-					this.pixelRatio = 2
-				}
-			})
+			this.pixelRatio = uni.getSystemInfoSync().pixelRatio
 			// #endif
 			this.fetchData()
 		},
@@ -108,7 +104,7 @@
 					dataLabel: true,
 					extra: {
 						pie: {
-							offsetAngle: -45,
+							offsetAngle: 60,
 							ringWidth: 40 * this.pixelRatio,
 							labelWidth: 15
 						}
