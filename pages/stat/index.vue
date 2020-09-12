@@ -51,7 +51,11 @@
 			this.cWidth = uni.upx2px(750)
 			this.cHeight = uni.upx2px(750)
 			// #ifdef MP-ALIPAY
-			this.pixelRatio = uni.getSystemInfoSync().pixelRatio
+			uni.getSystemInfo().then(({pixelRatio}) => {
+				if(pixelRatio > 1) {
+					this.pixelRatio = 2
+				}
+			})
 			// #endif
 			this.fetchData()
 		},
