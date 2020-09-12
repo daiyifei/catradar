@@ -38,7 +38,7 @@
 		top: 50%;
 		transform: translate(-50%, -50%);
 		border-radius: 50%;
-		border: 0.2rem solid #20ff4d;
+		border: 10rpx solid #20ff4d;
 		overflow: hidden;
 	}
 

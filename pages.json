@@ -57,7 +57,6 @@
 		}]
 	},
 	"globalStyle": {
-		"navigationBarTitleText":"猫雷达",
 		"navigationStyle": "custom",
 		"mp-alipay": {
 			/* 支付宝小程序特有相关 */

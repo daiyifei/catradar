@@ -4,7 +4,7 @@
 		<scroll-view scroll-y  class="indexes" :scroll-into-view="'indexes-'+ listCurID" :style="{top: CustomBar + 50 + 'px'}"
 		  scroll-with-animation :scroll-animation-duration="300" refresher-enabled :refresher-triggered="loading" @refresherrefresh="onRefresh">
 			<block v-for="(group,index) in list" :key="index" v-if="total">
-				<view :id="'indexes-' + group.name" :data-index="group.name">
+				<view :id="'indexes-'+group.name" :data-index="group.name" class="group">
 					<view class="padding text-gray">{{group.name}}</view>
 					<view class="cu-list menu-avatar no-padding">
 						<view class="cu-item" :class="modalName=='move-box-'+index+'-'+idx?'move-cur':''"
@@ -65,7 +65,8 @@
 				listCur: '',
 				modalName: null,
 				listTouchStart: 0,
-				listTouchDirection: null
+				listTouchDirection: null,
+				heightArr: []
 			}
 		},
 		watch: {
@@ -81,6 +82,41 @@
 			onRefresh() {
 				this.$emit('refresh')
 			},
+			//获取高度
+			getHeight() {
+				uni.createSelectorQuery().select('.indexBar-box').boundingClientRect(res => {
+					if(res) {
+						this.boxTop = res.top
+					}
+				}).exec();
+				uni.createSelectorQuery().select('.indexes').boundingClientRect(res => {
+					if(res) {
+						this.barTop = res.top
+					}
+				}).exec()
+				uni.createSelectorQuery().select('.indexBar-item').boundingClientRect(res => {
+					if(res) {
+						this.itemHeight = res.height
+					}
+				}).exec()
+				// uni.createSelectorQuery().selectAll('.group').boundingClientRect(res => {
+				// 	let height = 0,
+				// 		result = []
+				// 	res.forEach((item) => {
+				// 		height += item.height
+				// 		result.push(height)
+				// 	})
+				// 	this.heightArr = result
+				// }).exec()
+			},
+			onScroll(e) {
+				const { scrollTop } = e.detail
+				this.heightArr.forEach((height, index) => {
+					if (scrollTop + 10 > (index ? this.heightArr[index - 1] : 0) && scrollTop < height) {
+						this.activeIndex = index
+					}
+				})
+			},
 			// ListTouch触摸开始
 			ListTouchStart(e) {
 				if(!this.editable)
@@ -88,7 +124,6 @@
 				this.listTouchStart = e.touches[0].pageX
 				this.slide = false
 			},
-
 			// ListTouch计算方向
 			ListTouchMove(e) {
 				if(!this.editable)
@@ -102,7 +137,6 @@
 					this.slide = false
 				}
 			},
-
 			// ListTouch计算滚动
 			ListTouchEnd(e) {
 				if(!this.editable)
@@ -129,24 +163,6 @@
 				this.slide = false
 				this.$emit('delete',id)
 			},
-			//获取高度
-			getHeight() {
-				uni.createSelectorQuery().select('.indexBar-box').boundingClientRect(res => {
-					if(res) {
-						this.boxTop = res.top
-					}
-				}).exec();
-				uni.createSelectorQuery().select('.indexes').boundingClientRect(res => {
-					if(res) {
-						this.barTop = res.top
-					}
-				}).exec()
-				uni.createSelectorQuery().select('.indexBar-item').boundingClientRect(res => {
-					if(res) {
-						this.itemHeight = res.height
-					}
-				}).exec()
-			},
 			//获取文字信息
 			getCur(e) {
 				this.hidden = false;
@@ -168,7 +184,6 @@
 					}
 				}
 			},
-
 			//触发全部开始选择
 			tStart() {
 				this.hidden = false
@@ -232,6 +247,9 @@
 		justify-content: center;
 		font-size: 24rpx;
 		color: #888;
+	}
+	.indexBar-item.active {
+		color: #1296db;
 	}
 
 	movable-view.indexBar-item {
