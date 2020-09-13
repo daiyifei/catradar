@@ -60,9 +60,9 @@
 				const { key } = this.keys[this.currTab],
 					chartId = 'chart' + this.currTab
 				if(charts[chartId]) {
-					charts[chartId].updateData({
-						animation: true
-					})
+					// charts[chartId].updateData({
+					// 	animation: true
+					// })
 				}else {
 					this.$request('list', 'getStat', {
 						key
