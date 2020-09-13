@@ -1,7 +1,7 @@
 <template>
 	<view>
 		<map id="map" ref="map" class="map" :latitude="latitude" :longitude="longitude" :markers="markers" :controls="controls"
-		 :scale="scale" @markertap="showList" @controltap="reset" show-location></map>
+		 :scale="scale" @markertap="showList" @controltap="reset"></map>
 		<view class="cu-modal flex justify-center align-center" :class="showModal?'show':''" @tap="reset">
 			<view class="list">
 				<view class="list-item" :style="[{'animation-delay': ((index)*0.05) + 's'}]" v-for="(item,index) in list" :key="index"
