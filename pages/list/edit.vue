@@ -12,7 +12,7 @@
 		<form @submit="onSubmit" v-if="loaded">
 			<view class="cu-form-group margin-top">
 				<view class="title">头像</view>
-				<upload v-model="form.avatar" />
+				<upload v-model="form.avatar" crop />
 			</view>
 			<view class="cu-form-group">
 				<view class="title">姓名</view>
