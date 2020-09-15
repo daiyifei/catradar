@@ -40,19 +40,26 @@
 				uni.showModal({
 					content: '确定要退出登录吗？',
 					showCancel: true,
-					success: (res) => {
+					success: res => {
 						if(res.confirm) {
 							this.loading = true
-							this.$request('user-center','logout').then(res => {
-								uni.clearStorageSync('uniIdToken')
-								uni.clearStorageSync('uni_id_token_expired')
-								uni.clearStorageSync('userInfo')
-								this.loading = false
-								this.userInfo = null
-							})
+							this.$request('user-center','logout')
+								.then(res => {
+									this.doLogout()
+								})
+								.catch(err => {
+									this.doLogout()
+								})
 						}
 					}
 				})
+			},
+			doLogout() {
+				uni.clearStorageSync('uniIdToken')
+				uni.clearStorageSync('uni_id_token_expired')
+				uni.clearStorageSync('userInfo')
+				this.loading = false
+				this.userInfo = ''
 			},
 			onLogin(res) {
 				this.userInfo = res

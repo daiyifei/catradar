@@ -62,7 +62,6 @@ Vue.prototype.$get = (collection,condition = {},limit) => {
 				resolve(result)
 			},
 			fail(err) {
-				console.error(err)
 				reject(err)
 			}
 		})
