@@ -51,18 +51,6 @@ import WeCropper from './weCropper.js'
 export default {
 	props: {
 		src: '', // 选择的图片路径，用于在点击确定时，判断是否选择了图片
-		// 裁剪矩形框的样式，其中可包含的属性为lineWidth-边框宽度(单位rpx)，color: 边框颜色，
-		// mask-遮罩颜色，一般设置为一个rgba的透明度，如"rgba(0, 0, 0, 0.35)"
-		boundStyle: {
-			type: Object,
-			default() {
-				return {
-					lineWidth: 8,
-					borderColor: 'rgb(245, 245, 245)',
-					mask: 'rgba(0, 0, 0, 0.35)'
-				}
-			}
-		},
 		// 裁剪框宽度，单位rpx
 		rectWidth: {
 			type: [String, Number],
@@ -101,7 +89,7 @@ export default {
 			cropperOpt: {
 				id: 'cropper',
 				targetId: 'targetId',
-				pixelRatio: 1,
+				pixelRatio: uni.getSystemInfoSync().pixelRatio,
 				width: 350,
 				height: 350,
 				scale: 2.5,
@@ -113,9 +101,9 @@ export default {
 					height: 200
 				},
 				boundStyle: {
-					lineWidth: uni.upx2px(this.boundStyle.lineWidth),
-					mask: this.boundStyle.mask,
-					color: this.boundStyle.borderColor
+					lineWidth: uni.upx2px(8),
+					color: 'rgb(245, 245, 245)',
+					mask: 'rgba(0, 0, 0, 0.6)'
 				}
 			}
 		}
