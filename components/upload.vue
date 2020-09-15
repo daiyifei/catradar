@@ -12,15 +12,25 @@
 				<text :class="loading===-1?'cu-load load-cuIcon loading text-white':'cuIcon-cameraadd'"></text>
 			</view>
 		</view>
+		
+		 <cropper :src="path"  @confirm="upload"></cropper>
 	</view>
 </template>
 
 <script>
+	import cropper from '@/components/cropper/cropper.vue'
 	export default {
+		components: {
+			cropper
+		},
 		name: 'upload',
 		props: {
 			value: Array | String,
 			multiple: {
+				type: Boolean,
+				default: false
+			},
+			crop: {
 				type: Boolean,
 				default: false
 			}
@@ -31,7 +41,8 @@
 		},
 		data() {
 			return {
-				loading: -2,
+				path: '',
+				loading: false,
 				list: []
 			}
 		},
@@ -51,30 +62,36 @@
 					count = this.multiple ? 9 : 1
 				uni.chooseImage({
 					count,
-					success: (res) => {
+					success: res => {
 						res.tempFiles.forEach(item => {
-							const filePath = item.path,
-								cloudPath = item.name ? item.name : item.path.substr(item.path.lastIndexOf("/") + 1)
-							this.loading = index							
-							uniCloud.uploadFile({
-								filePath,
-								cloudPath,
-								success: (res) => {
-									this.loading = false
-									if(this.multiple) {
-										if(index > -1) {
-											this.list[index] = res.fileID
-										}else {
-											this.list.push(res.fileID)
-										}
-										this.$emit('change',this.list)
-									}else {
-										this.list[0] = res.fileID
-										this.$emit('change',res.fileID)
-									}
-								}
-							})
+							if(this.crop) {
+								this.path = item.path
+							}else {
+								this.upload(item.path, index)
+							}
 						})
+					}
+				})
+			},
+			upload(filePath, index = 0) {
+				this.$set(this.list, index, '')
+				this.loading = index
+				uniCloud.uploadFile({
+					filePath,
+					cloudPath: new Date().getTime() + '.jpg',
+					success: (res) => {
+						this.loading = false
+						if(this.multiple) {
+							if(index > -1) {
+								this.list[index] = res.fileID
+							}else {
+								this.list.push(res.fileID)
+							}
+							this.$emit('change',this.list)
+						}else {
+							this.list[0] = res.fileID
+							this.$emit('change',res.fileID)
+						}
 					}
 				})
 			},
