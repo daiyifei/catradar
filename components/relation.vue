@@ -73,7 +73,7 @@
 		methods: {
 			showModal(item,index) {
 				if(item) {
-					this.form = JSON.parse(JSON.stringify(item))
+					this.form = item
 					this.index = index
 				}else {
 					this.form = {
@@ -100,10 +100,18 @@
 					})
 					return
 				}
+				const form = {
+					tag: this.form.tag,
+					detail: {
+						_id: this.form.detail._id,
+						name: this.form.detail.name,
+						avatar: this.form.detail.avatar
+					}
+				}
 				if(this.index > -1) {
-					this.value[this.index] = this.form
+					this.value[this.index] = form
 				}else {
-					this.value.push(this.form)
+					this.value.push(form)
 				}
 				this.$emit('change',this.value)
 				this.hideModal()

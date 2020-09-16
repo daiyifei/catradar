@@ -1,16 +1,14 @@
 <template>
 	<view>
 		<view class="container skeleton">
-			<view class="skeleton-rect swiper">
-				<swiper class="swiper screen-swiper square-dot" :indicator-dots="true" :circular="true" v-if="form.album">
-					<swiper-item v-for="(item,index) in form.album" :key="index">
-						<view class="swiper-item" @tap="preview(index)">
-							<video :src="item" autoplay loop :show-play-btn="false" :controls="false" objectFit="cover" v-if="item.split('.')[form.album.length]=='mp4'" />
-							<image :src="item" mode="aspectFill" v-else @load="imgLoad"/>
-						</view>
-					</swiper-item>
-				</swiper>
-			</view>
+			<swiper class="skeleton-rect swiper screen-swiper square-dot" :indicator-dots="true" :circular="true" @change="imgChange">
+				<swiper-item v-for="(item,index) in form.album" :key="index">
+					<view class="swiper-item" @tap="preview(index)">
+						<video :src="item" autoplay loop :show-play-btn="false" :controls="false" objectFit="cover" v-if="item.split('.')[form.album.length]=='mp4'" />
+						<image :src="item" mode="aspectFill" v-else @load="imgLoad"/>
+					</view>
+				</swiper-item>
+			</swiper>
 			<view class="padding flex align-center bg-white margin-sm radius">
 				<image :src="form.avatar" class="skeleton-circle cu-avatar xl round margin-right-sm" v-if="form.avatar"></image>
 				<view class="skeleton-circle cu-avatar xl round margin-right-sm" v-else>{{form.name}}</view>
@@ -82,6 +80,7 @@
 				</view>
 			</view>
 		</view>
+		<!-- 骨架屏 -->
 		<skeleton :loading="loading" :animation="true"></skeleton>
 	</view>
 </template>
@@ -94,15 +93,25 @@
 		},
 		data() {
 			return {
-				bgColor: '',
+				current: 0,
 				id: '',
 				form: {},
-				loading: true
+				loading: true,
+				scrolled: false
 			}
 		},
 		onLoad(option) {
 			this.id = option.id
 			this.fetchData()
+		},
+		onPageScroll() {
+			if(!this.scrolled) {
+				uni.setNavigationBarColor({
+					frontColor: '#ffffff',
+					backgroundColor: this.form.female ? '#e03997' : '#0081ff'
+				})
+				this.scrolled = true
+			}
 		},
 		methods: {
 			fetchData() {
@@ -116,6 +125,9 @@
 			imgLoad() {
 				this.loading = false
 			},
+			imgChange(e) {
+				this.current = e.detail.current
+			},
 			preview(index) {
 				uni.previewImage({
 					current: index,
@@ -125,19 +137,15 @@
 			onNavigationBarButtonTap(e) {
 				switch(e.type) {
 					case 'share':
-						uni.shareWithSystem({
+						uni.share({
 							provider: "weixin",
 							scene: "WXSceneSession",
-						  type: 'image',
-						  imageUrl: this.form.album[0],
-						  success() {
-						  },
+						  type: 2,
+						  imageUrl: this.form.album[this.current],
 						  fail(e) {
 								console.log(e)
 						  }
 						})
-						break
-					case 'menu':
 						break
 					default:
 						break
@@ -165,8 +173,8 @@
 		color: #FFC0CB;
 	}
 	
-	/* menu */
-	.menu .action {
+	/* list */
+	.cu-list .action {
 		padding-top: 20rpx;
 		padding-bottom: 20rpx;
 		text-align: left;
