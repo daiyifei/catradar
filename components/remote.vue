@@ -92,6 +92,6 @@
 		top: 50px;
 		width: 100%;
 		min-height: 50px;
-		max-height: 100px;
+		max-height: 75px;
 	}
 </style>

@@ -18,14 +18,7 @@
 				"app-plus": {
 					"titleNView":{
 						"type":"transparent",
-						"padding": "10px",
-						"buttons":[
-							{
-								"type":"menu"
-							}, {
-								"type":"share"
-							}
-						]
+						"padding": "10px"
 					}
 				}
 			}
