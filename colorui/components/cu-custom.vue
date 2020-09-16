@@ -1,10 +1,10 @@
 <template>
 	<view>
-		<view class="cu-custom" :style="[{height:CustomBar + 'px'}]">
+		<view class="cu-custom" :class="bgColor?'':'cu-bar fixed shadow-none'" :style="[{height:CustomBar + 'px'}]">
 			<view class="cu-bar fixed" :style="style" :class="[bgImage!=''?'none-bg text-white bg-img':'',bgColor]">
 				<view class="action">
 					<view @tap="BackPage" v-if="isBack">
-						<text class="cuIcon-back"></text>
+						<text class="cuIcon-back" :class="bgColor?'':'icon-transparent'"></text>
 						<slot name="backText"></slot>
 					</view>
 				</view>
@@ -54,16 +54,26 @@
 		},
 		methods: {
 			BackPage() {
-				uni.navigateBack({
-					delta: 1
-				});
+				uni.navigateBack()
 			}
 		}
 	}
 </script>
 
 <style>
-	.cu-custom {
-		
+	.none-bg {
+		opacity: 0;
+		transition: all 1s;
+	}
+	
+	.shadow-none {
+		box-shadow: none;
+	}
+	
+	.icon-transparent {
+		padding: 20rpx;
+		color: #fff;
+		background-color: rgba(0,0,0,.5);
+		border-radius: 50%;
 	}
 </style>

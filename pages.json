@@ -13,7 +13,22 @@
 			}
 		}, {
 			"path": "pages/list/detail",
-			"style": {}
+			"style": {
+				"navigationBarBackgroundColor": "#1296db",
+				"app-plus": {
+					"titleNView":{
+						"type":"transparent",
+						"padding": "10px",
+						"buttons":[
+							{
+								"type":"menu"
+							}, {
+								"type":"share"
+							}
+						]
+					}
+				}
+			}
 		}, {
 			"path": "pages/list/edit",
 			"style": {}
