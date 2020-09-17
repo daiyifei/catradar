@@ -48,22 +48,20 @@
 			</view>
 			<view class="cu-form-group margin-top">
 				<view class="title">相册</view>
-				<drag-upload :list.sync="form.album" style="width: 100%;"></drag-upload>
-				<!-- <upload v-model="form.album" multiple /> -->
+				<drag :list.sync="form.album"></drag>
 			</view>
 			<view class="cu-form-group margin-top">
 				<view class="title">关系</view>
-				<relation v-model="form.relation" />
+				<relation v-model="form.relation"></relation>
 			</view>
 			<button form-type="submit" class="cu-btn block bg-blue margin lg" :loading="saving">{{id?'更新':'新建'}}</button>
 			<button class="cu-btn block bg-red margin lg" :loading="deleting" v-if="id" @click="onDelete">删除</button>
 		</form>
-
 	</view>
 </template>
 
 <script>
-	import dragUpload from '@/components/dragUpload.vue'
+	import drag from '@/components/drag.vue'
 	import upload from '@/components/upload.vue'
 	import formPicker from '@/components/formPicker.vue'
 	import formSwitch from '@/components/formSwitch.vue'
@@ -71,7 +69,7 @@
 	import relation from '@/components/relation.vue'
 	export default {
 		components: {
-			dragUpload,
+			drag,
 			upload,
 			formPicker,
 			formSwitch,

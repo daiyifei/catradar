@@ -12,7 +12,7 @@
 				<text :class="loading===-1?'cu-load load-cuIcon loading text-white':'cuIcon-cameraadd'"></text>
 			</view>
 		</view>
-		
+		<!-- 裁剪器 -->
 	  <cropper :src="path" @confirm="upload"></cropper>
 	</view>
 </template>
