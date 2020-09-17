@@ -1,5 +1,5 @@
 <template>
-  <view class="con" :style="{ margin: -padding + 'rpx'}">
+  <view class="con" :style="{ margin: -padding + 'rpx' }">
     <movable-area class="area" :style="{ height: areaHeight }" @mouseenter="mouseenter" @mouseleave="mouseleave">
       <block v-for="(item, index) in imageList" :key="item.id">
         <movable-view
@@ -17,7 +17,9 @@
           :style="{ width: viewWidth + 'px', height: viewWidth + 'px', 'z-index': item.zIndex, opacity: item.opacity }"
         >
           <view class="area-con" :style="{ width: childWidth, height: childWidth, transform: 'scale(' + item.scale + ')' }">
-            <image class="pre-image" :src="item.src" mode="aspectFill"></image>
+						<slot :name="'item'+index">
+							<image class="pre-image" :src="item.src" mode="aspectFill"></image>
+						</slot>
             <view class="del-con" @click="delImage(item, index)" @touchstart.stop="delImageMp(item, index)" @touchend.stop="nothing()" @mousedown.stop="nothing()" @mouseup.stop="nothing()">
               <view class="del-wrap">
                 <image
@@ -29,19 +31,20 @@
           </view>
         </movable-view>
       </block>
-      <view
-        class="add"
-        v-if="imageList.length < number"
-        :style="{ top: add.y, left: add.x, width: viewWidth + 'px', height: viewWidth + 'px' }"
-        @click="addImages"
-      >
-        <view class="add-wrap" :style="{ width: childWidth, height: childWidth }">
-          <image
-            class="add-image"
-            src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADYAAAA2CAYAAACMRWrdAAABIUlEQVRoQ+2a2w2DMAxFeQzWrsMUbadAsEw3S1CqVgppKwLX8BEOP4iHTXx8uUgWdVXoVhdaV0VhSmf7vr/H8V3XzY6V3P9iD+nYOI5P7/01LMI596AwoZV0TIBXIUWFXhKLFBWYSFGhhxQN6SFFQ5i4ogITKSr0cEVDekjRECauqMBEigq9U7piOk2yAti27SUe5ljlTfPEQ6KZecTvwl4P3ytvOv06R2HDMNzes7+6aRrvnHvtf50L13Lp50rx88zcvNlS3JpwKQ67XyK04nq2nFbk/LqVjin0TvmBNgQ2S4UUDcliHgpMpKjQwxUN6SFFQ5i4ogITKSr0cEVDekjRECauqMAsVoph+hVPtYr5+03p9tbYQ96xrYtT4ootbAJGVxxVTapVswAAAABJRU5ErkJggg=="
-          ></image>
-        </view>
-      </view>
+			<slot name="add">
+				<view
+					class="add"
+					v-if="imageList.length < number"
+					:style="{ top: add.y, left: add.x, width: viewWidth + 'px', height: viewWidth + 'px' }"
+					@click="addImages">
+					<view class="add-wrap" :style="{ width: childWidth, height: childWidth }">
+						<image
+							class="add-image"
+							src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADYAAAA2CAYAAACMRWrdAAABIUlEQVRoQ+2a2w2DMAxFeQzWrsMUbadAsEw3S1CqVgppKwLX8BEOP4iHTXx8uUgWdVXoVhdaV0VhSmf7vr/H8V3XzY6V3P9iD+nYOI5P7/01LMI596AwoZV0TIBXIUWFXhKLFBWYSFGhhxQN6SFFQ5i4ogITKSr0cEVDekjRECauqMBEigq9U7piOk2yAti27SUe5ljlTfPEQ6KZecTvwl4P3ytvOv06R2HDMNzes7+6aRrvnHvtf50L13Lp50rx88zcvNlS3JpwKQ67XyK04nq2nFbk/LqVjin0TvmBNgQ2S4UUDcliHgpMpKjQwxUN6SFFQ5i4ogITKSr0cEVDekjRECauqMAsVoph+hVPtYr5+03p9tbYQ96xrYtT4ootbAJGVxxVTapVswAAAABJRU5ErkJggg=="
+						></image>
+					</view>
+				</view>
+			</slot>
     </movable-area>
   </view>
 </template>
@@ -374,6 +377,7 @@ export default {
 
 <style lang="scss" scoped>
 .con {
+	width: 100%;
 	padding-top: 20rpx;
 	padding-bottom: 20rpx;
   .area {
@@ -422,6 +426,7 @@ export default {
         align-items: center;
         border: 1px solid #eeeeee;
 				border-radius: 3px;
+				width: 100%;
       }
 			.add-image {
 			  width: 40rpx;

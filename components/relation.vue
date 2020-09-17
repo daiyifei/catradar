@@ -1,20 +1,14 @@
 <template>
 	<view class="container">
 		<!-- 列表 -->
-		<view class="relation grid col-3 grid-square">
-			<view class="bg-img margin-top-sm" v-for="(item,index) in value" :key="index">
-				<image :src="item.detail.avatar" mode="aspectFill" @tap="showModal(item,index)"></image>
+		<drag :list.sync="list" custom @addImage="showModal" ref="drag">
+			<view :slot="'item'+index" v-for="(item,index) in list" :key="index">
+				<image :src="item.detail.avatar" mode="widthFix" @tap="showModal(item,index)"></image>
 				<view class="name">
 					<view>{{item.tag}} - {{item.detail.name}}</view>
 				</view>
-				<view class="cu-tag bg-red">
-					<text class='cuIcon-close' @tap.stop="delItem(index)"></text>
-				</view>
 			</view>
-			<view class="bg-img solids margin-top-sm" @tap="showModal">
-				<text class='cuIcon-add'></text>
-			</view>
-		</view>
+		</drag>
 		
 		<!-- 对话框 -->
 		<view class="cu-modal" :class="show?'show':''">
@@ -47,16 +41,16 @@
 </template>
 
 <script>
+	import drag from '@/components/drag.vue'
 	import remote from '@/components/remote.vue'
 	export default {
-		name: 'relation',
 		components: {
+			drag,
 			remote
 		},
 		props: {
 			value: {
-				type: Array,
-				default: () => []
+				type: Array
 			}
 		},
 		model: {
@@ -65,10 +59,14 @@
 		},
 		data() {
 			return {
+				list: [],
 				show: false,
 				index: -1,
 				form: {}
 			}
+		},
+		created() {
+			this.list = this.value
 		},
 		methods: {
 			showModal(item,index) {
@@ -90,7 +88,7 @@
 				this.show = false
 			},
 			delItem(index) {
-				this.value.splice(index,1)
+				this.list.splice(index,1)
 			},
 			onConfirm() {
 				if(!this.form.detail || !this.form.tag) {
@@ -109,11 +107,11 @@
 					}
 				}
 				if(this.index > -1) {
-					this.value[this.index] = form
+					this.list[this.index] = form
 				}else {
-					this.value.push(form)
+					this.$refs.drag.addProperties(form)
 				}
-				this.$emit('change',this.value)
+				this.$emit('change',this.list)
 				this.hideModal()
 			}
 		}
@@ -121,9 +119,9 @@
 </script>
 
 <style>
-	.container,
-	.relation {
-		width: 100%;
+	.container {
+		flex: 1;
+		margin-right: -20rpx;
 	}
 	
 	.cu-modal {
@@ -139,7 +137,7 @@
 		left: 0;
 		right: 0;
 		bottom: 0;
-		padding: px;
+		padding: 3px;
 		font-size: 24rpx;
 		color: #fff;
 		text-align: center;
