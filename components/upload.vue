@@ -13,7 +13,7 @@
 			</view>
 		</view>
 		
-		 <cropper :src="path"  @confirm="upload"></cropper>
+	  <cropper :src="path" @confirm="upload"></cropper>
 	</view>
 </template>
 
