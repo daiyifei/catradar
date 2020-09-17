@@ -48,7 +48,8 @@
 			</view>
 			<view class="cu-form-group margin-top">
 				<view class="title">相册</view>
-				<upload v-model="form.album" multiple />
+				<drag-upload :list.sync="form.album" style="width: 100%;"></drag-upload>
+				<!-- <upload v-model="form.album" multiple /> -->
 			</view>
 			<view class="cu-form-group margin-top">
 				<view class="title">关系</view>
@@ -62,6 +63,7 @@
 </template>
 
 <script>
+	import dragUpload from '@/components/dragUpload.vue'
 	import upload from '@/components/upload.vue'
 	import formPicker from '@/components/formPicker.vue'
 	import formSwitch from '@/components/formSwitch.vue'
@@ -69,6 +71,7 @@
 	import relation from '@/components/relation.vue'
 	export default {
 		components: {
+			dragUpload,
 			upload,
 			formPicker,
 			formSwitch,
@@ -102,7 +105,7 @@
 					this.loaded = true
 				})
 			},
-			onSubmit(e) {
+			async onSubmit() {
 				if (!this.form.name) {
 					uni.showModal({
 						showCancel: false,
@@ -111,6 +114,29 @@
 					return
 				}
 				this.saving = true
+				
+				// 上传图片
+				try {
+					const { album = [] } = this.form
+					await Promise.all(album.map(async (item, index) => {
+						if(!~item.indexOf('https://')) {
+							const { fileID } = await uniCloud.uploadFile({
+								filePath: item,
+								cloudPath: new Date().getTime() + '.jpg'
+							})
+							this.form.album[index] = fileID
+						}
+					}))
+				}catch (err) {
+					uni.showToast({
+						title: '上传出错',
+						icon: 'none'
+					})
+					this.saving = false
+					return
+				}
+				
+				// 保存表单
 				this.$request('list', 'save', this.form).then(res => {
 					this.saving = false
 					uni.showToast({
