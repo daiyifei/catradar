@@ -23,7 +23,10 @@
 			dragSort
 		},
 		props: {
-			value: Array,
+			value: {
+				type: Array,
+				default: () => []
+			},
 			custom: Boolean
 		},
 		model: {
