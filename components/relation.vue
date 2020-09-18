@@ -125,10 +125,6 @@
 		z-index: 99 !important;
 	}
 	
-	.cu-dialog {
-		margin-bottom: 50%;
-	}
-	
 	.grid,
 	.grid image {
 		width: 100%;

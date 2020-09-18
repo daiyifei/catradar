@@ -83,6 +83,7 @@
 	}
 	
  .grid {
+	 position: relative;
 	 display: flex;
 	 justify-content: center;
 	 align-items: center;
@@ -90,11 +91,12 @@
 	 height: 100%;
 	 color: #666;
 	 font-size: 40rpx;
-	 border-radius: 3px;
+	 border-radius: 6rpx;
 	 overflow: hidden;
  }
  
  .grid image {
+	 display: block;
 	 width: 100%;
 	 height: 100%;
  }
@@ -115,6 +117,6 @@
 	 font-size: 30rpx;
 	 color: #fff;
 	 background: rgba(0,0,0,.5);
-	 border-radius: 3px;
+	 border-radius: 6rpx;
  }
 </style>
