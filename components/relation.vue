@@ -1,14 +1,12 @@
 <template>
 	<view class="container">
 		<!-- 列表 -->
-		<drag :list.sync="list" custom @addImage="showModal" ref="drag">
-			<view :slot="'item'+index" v-for="(item,index) in list" :key="index">
-				<image :src="item.detail.avatar" mode="widthFix" @tap="showModal(item,index)"></image>
-				<view class="name">
-					<view>{{item.tag}} - {{item.detail.name}}</view>
-				</view>
+		<drag-album v-model="list" custom @add="showModal">
+			<view slot-scope="{ item,index }" class="grid" @tap.stop.prevent="showModal(item,index)">
+				<image :src="item.detail.avatar" mode="aspectFill"></image>
+				<view class="name">{{item.tag}} - {{item.detail.name}}</view>
 			</view>
-		</drag>
+		</drag-album>
 		
 		<!-- 对话框 -->
 		<view class="cu-modal" :class="show?'show':''">
@@ -41,11 +39,11 @@
 </template>
 
 <script>
-	import drag from '@/components/drag.vue'
+	import dragAlbum from '@/components/dragAlbum.vue'
 	import remote from '@/components/remote.vue'
 	export default {
 		components: {
-			drag,
+			dragAlbum,
 			remote
 		},
 		props: {
@@ -61,17 +59,20 @@
 			return {
 				list: [],
 				show: false,
-				index: -1,
-				form: {}
+				form: {},
+				index: -1
 			}
 		},
 		created() {
 			this.list = this.value
 		},
 		methods: {
+			delItem(index) {
+				this.list.splice(index,1)
+			},
 			showModal(item,index) {
-				if(item) {
-					this.form = item
+				if(index > -1) {
+					this.form = JSON.parse(JSON.stringify(item))
 					this.index = index
 				}else {
 					this.form = {
@@ -80,15 +81,12 @@
 						},
 						tag: ''
 					}
-					this.index = -1
 				}
 				this.show = true
 			},
 			hideModal() {
+				this.index = -1
 				this.show = false
-			},
-			delItem(index) {
-				this.list.splice(index,1)
 			},
 			onConfirm() {
 				if(!this.form.detail || !this.form.tag) {
@@ -107,9 +105,9 @@
 					}
 				}
 				if(this.index > -1) {
-					this.list[this.index] = form
+					this.$set(this.list,this.index,form)
 				}else {
-					this.$refs.drag.addProperties(form)
+					this.list.push(form)
 				}
 				this.$emit('change',this.list)
 				this.hideModal()
@@ -121,7 +119,6 @@
 <style>
 	.container {
 		flex: 1;
-		margin-right: -20rpx;
 	}
 	
 	.cu-modal {
@@ -130,6 +127,12 @@
 	
 	.cu-dialog {
 		margin-bottom: 50%;
+	}
+	
+	.grid,
+	.grid image {
+		width: 100%;
+		height: 100%;
 	}
 	
 	.name {

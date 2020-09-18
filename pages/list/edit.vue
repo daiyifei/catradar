@@ -48,7 +48,7 @@
 			</view>
 			<view class="cu-form-group margin-top">
 				<view class="title">相册</view>
-				<drag :list.sync="form.album"></drag>
+				<drag-album v-model="form.album"></drag-album>
 			</view>
 			<view class="cu-form-group margin-top">
 				<view class="title">关系</view>
@@ -61,19 +61,19 @@
 </template>
 
 <script>
-	import drag from '@/components/drag.vue'
 	import upload from '@/components/upload.vue'
 	import formPicker from '@/components/formPicker.vue'
 	import formSwitch from '@/components/formSwitch.vue'
 	import datepicker from '@/components/datepicker.vue'
+	import dragAlbum from '@/components/dragAlbum.vue'
 	import relation from '@/components/relation.vue'
 	export default {
 		components: {
-			drag,
 			upload,
 			formPicker,
 			formSwitch,
 			datepicker,
+			dragAlbum,
 			relation
 		},
 		data() {
