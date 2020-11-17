@@ -99,15 +99,6 @@
 						this.itemHeight = res.height
 					}
 				}).exec()
-				// uni.createSelectorQuery().selectAll('.group').boundingClientRect(res => {
-				// 	let height = 0,
-				// 		result = []
-				// 	res.forEach((item) => {
-				// 		height += item.height
-				// 		result.push(height)
-				// 	})
-				// 	this.heightArr = result
-				// }).exec()
 			},
 			onScroll(e) {
 				const { scrollTop } = e.detail
@@ -218,6 +209,10 @@
 		right: 0;
 	}
 	
+	.move {
+		z-index: 99 !important;
+	}
+	
 	.cu-item {
 		padding-right: 80rpx !important;
 	}
@@ -248,6 +243,7 @@
 		font-size: 24rpx;
 		color: #888;
 	}
+	
 	.indexBar-item.active {
 		color: #1296db;
 	}
