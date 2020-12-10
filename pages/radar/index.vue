@@ -11,17 +11,12 @@
 				</view>
 			</view>
 		</view>
-		<radar-loading v-if="loading"></radar-loading>
 	</view>
 </template>
 
 <script>
-	import radarLoading from '@/components/radarLoading.vue'
 	import locations from '@/static/locations.json'
 	export default {
-		components: {
-			radarLoading
-		},
 		data() {
 			return {
 				origin: {
@@ -43,8 +38,7 @@
 					clickable: true
 				}],
 				list: [],
-				showModal: false,
-				loading: false
+				showModal: false
 			}
 		},
 		onLoad() {
@@ -58,7 +52,7 @@
 		},
 		methods: {
 			fetchData() {
-				this.loading = true
+				uni.showLoading()
 				this.$request('list', 'getStat', {
 					key: 'location'
 				}).then(res => {
@@ -76,19 +70,19 @@
 						}
 					})
 					this.markers = markers
-					this.loading = false
+					uni.hideLoading()
 				})
 			},
 			showList(e) {
 				const location = e.detail.markerId
-				this.loading = true
+				uni.showLoading()
 				this.scale = 19
 				this.latitude = locations[location].latitude
 				this.longitude = locations[location].longitude
 				this.$get('list', {
 					location: parseInt(location)
 				}).then(res => {
-					this.loading = false
+					uni.hideLoading()
 					this.showModal = true
 					this.list = res.data
 				})

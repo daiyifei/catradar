@@ -22,8 +22,8 @@
 								<view class="cu-tag round light" :class="'bg-'+(item.neuter?'olive':'orange')">{{item.neuter|neuter}}</view>
 							</view>
 							<view class="move" v-if="editable">
-								<view class="bg-blue" @tap="toEdit(item._id)">编辑</view>
-								<view class="bg-red" @tap="onDelete(item._id)">删除</view>
+								<view class="t bg-blue" @tap="toEdit(item._id)">编辑</view>
+								<view class="t bg-red" @tap="onDelete(item._id)">删除</view>
 							</view>
 						</view>
 					</view>
@@ -207,10 +207,6 @@
 		bottom: var(--window-bottom);
 		left: 0;
 		right: 0;
-	}
-	
-	.move {
-		z-index: 99 !important;
 	}
 	
 	.cu-item {
