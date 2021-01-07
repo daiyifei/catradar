@@ -3,11 +3,11 @@ import App from './App'
 
 import moment from 'moment'
 
+import uView from 'uview-ui'
+Vue.use(uView)
+
 import db from '@/js_sdk/uni-clientDB/index.js'
 const dbCmd = db.command
-
-import cuCustom from './colorui/components/cu-custom.vue'
-Vue.component('cu-custom', cuCustom)
 
 import radar from './pages/radar/index.vue'
 Vue.component('radar', radar)
