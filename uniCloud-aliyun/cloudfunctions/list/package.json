@@ -11,6 +11,6 @@
   "license": "ISC",
   "dependencies": {
     "uni-id": "file:../common/uni-id",
-		"py": "file:../common/py"
+    "py": "file:../common/py"
   }
 }

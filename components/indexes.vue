@@ -1,8 +1,35 @@
 <template>
 	<view>
-		<!--列表主体-->
 		<scroll-view scroll-y  class="indexes" :scroll-into-view="'indexes-'+ listCurID" :style="{top: CustomBar + 50 + 'px'}"
 		  scroll-with-animation :scroll-animation-duration="300" refresher-enabled :refresher-triggered="loading" @refresherrefresh="onRefresh">
+			<!-- 置顶项目 -->
+			<view class="cu-list menu">
+				<view class="cu-item">
+					<view class="content">
+						<text class="cuIcon-presentfill text-green"></text>
+						<text class="text-grey">待领养</text>
+					</view>
+				</view>
+				<view class="cu-item">
+					<view class="content">
+						<text class="cuIcon-crownfill text-orange"></text>
+						<text class="text-grey">已领养</text>
+					</view>
+				</view>
+				<view class="cu-item">
+					<view class="content text-xl">
+						<text class="cuIcon-explorefill text-blue"></text>
+						<text class="text-grey">失踪中</text>
+					</view>
+				</view>
+				<view class="cu-item">
+					<view class="content">
+						<text class="cuIcon-discoverfill text-grey"></text>
+						<text class="text-grey">回喵星</text>
+					</view>
+				</view>
+			</view>
+			<!--列表主体-->
 			<block v-for="(group,index) in list" :key="index" v-if="total">
 				<view :id="'indexes-'+group.name" :data-index="group.name" class="group">
 					<view class="padding text-gray">{{group.name}}</view>
@@ -203,8 +230,7 @@
 </script>
 <style>	
 	.indexes {
-		position: fixed;
-		bottom: var(--window-bottom);
+		/* bottom: var(--window-bottom); */
 		left: 0;
 		right: 0;
 	}

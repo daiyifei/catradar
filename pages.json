@@ -9,7 +9,8 @@
 		}, {
 			"path": "pages/list/index",
 			"style": {
-				"disableScroll": true
+				"navigationBarTitleText": "档案",
+				"enablePullDownRefresh": true
 			}
 		}, {
 			"path": "pages/list/detail",
@@ -65,13 +66,17 @@
 		}]
 	},
 	"globalStyle": {
-		"navigationStyle": "custom",
 		"navigationBarTitleText":"猫雷达",
+		"navigationBarBackgroundColor": "#0081FF",
 		"mp-alipay": {
 			/* 支付宝小程序特有相关 */
 			"transparentTitle": "always",
 			"allowsBounceVertical": "NO"
 		}
 	},
-	"usingComponts": true
+	"usingComponts": true,
+	"easycom": {
+			// 下载安装的方式需要前面的"@/"，npm安装的方式无需"@/"
+			"^u-(.*)": "uview-ui/components/u-$1/u-$1.vue"
+	}
 }
