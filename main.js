@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import App from './App'
+import store from './store'
 
 import moment from 'moment'
 
@@ -22,7 +23,9 @@ Vue.config.productionTip = false
 
 Vue.filter('age', function (value) {
   if (!value) return '年龄不详'
-  return Math.ceil(moment().diff(value, 'year',true)) + '岁'
+	const year = parseInt(moment().diff(value, 'year',true))
+	const month = moment().subtract(year, 'year').diff(value, 'month')
+  return year ? year + '岁' : month + '个月'
 })
 
 Vue.filter('female', function (value) {
@@ -37,7 +40,7 @@ Vue.filter('neuter', function (value) {
 
 Vue.filter('color', function (value) {
   if (value === undefined) return '未知'
-  return ['三花', '橘猫', '奶牛', '白猫', '狸花', '玳瑁'][value]
+  return ['三花', '橘猫', '奶牛', '白猫', '狸花', '玳瑁', '黑猫'][value]
 })
 
 Vue.filter('location', function (value) {
@@ -77,19 +80,7 @@ Vue.prototype.$request = (name, action, params) => {
 				params
 			},
 			success({result}) {
-				if(result.msg) {
-					uni.showToast({
-						icon: 'none',
-						title: result.msg
-					})
-					if(result.code === 0) {
-						resolve(result)
-					}else {
-						reject(result.msg)
-					}
-				}else {
-					resolve(result)
-				}
+				resolve(result)
 			},
 			fail(err) {
 				reject(err)
@@ -98,9 +89,12 @@ Vue.prototype.$request = (name, action, params) => {
 	})
 }
 
+Vue.prototype.$store = store
+
 App.mpType = 'app'
 
 const app = new Vue({
-	...App
+	...App,
+	 store
 })
 app.$mount()

@@ -2,24 +2,23 @@
 	"pages": [
 		//pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
 		{
-			"path": "pages/radar/index",
-			"style": {
-				"disableScroll": true
-			}
-		}, {
 			"path": "pages/list/index",
 			"style": {
-				"navigationBarTitleText": "档案",
-				"enablePullDownRefresh": true
+				"enablePullDownRefresh": true,
+				"navigationBarTitleText": "档案"
 			}
 		}, {
 			"path": "pages/list/detail",
 			"style": {
 				"navigationBarBackgroundColor": "#1296db",
+				"navigationStyle": "custom",
 				"app-plus": {
-					"titleNView":{
-						"type":"transparent",
-						"padding": "10px"
+					"titleNView": {
+						"type": "transparent",
+						"padding": "10px",
+						"buttons": [{
+							"type": "share"
+						}]
 					}
 				}
 			}
@@ -27,15 +26,29 @@
 			"path": "pages/list/edit",
 			"style": {}
 		}, {
+			"path": "pages/dynamic/index",
+			"style": {
+				"navigationBarTitleText": "动态",
+				"enablePullDownRefresh": true
+			}
+		}, {
 			"path": "pages/mine/index",
 			"style": {
+				"navigationBarTitleText": "我的",
 				"disableScroll": true
 			}
 		}, {
-			"path": "pages/stat/index",
+			"path": "pages/dynamic/edit",
 			"style": {
-				"disableScroll": true
+				"navigationBarTitleText": "发布",
+				"enablePullDownRefresh": false
 			}
+		}, {
+			"path": "pages/list/subpage",
+			"style": {
+				"enablePullDownRefresh": true
+			}
+
 		}
 	],
 	"tabBar": {
@@ -44,20 +57,15 @@
 		"borderStyle": "white",
 		"backgroundColor": "#ffffff",
 		"list": [{
-			"pagePath": "pages/radar/index",
-			"iconPath": "static/tabbar/icon_radar.png",
-			"selectedIconPath": "static/tabbar/icon_radar_hl.png",
-			"text": "雷达"
-		}, {
 			"pagePath": "pages/list/index",
 			"iconPath": "static/tabbar/icon_cats.png",
 			"selectedIconPath": "static/tabbar/icon_cats_hl.png",
 			"text": "档案"
 		}, {
-			"pagePath": "pages/stat/index",
-			"iconPath": "static/tabbar/icon_stat.png",
-			"selectedIconPath": "static/tabbar/icon_stat_hl.png",
-			"text": "统计"
+			"pagePath": "pages/dynamic/index",
+			"iconPath": "static/tabbar/icon_dynamic.png",
+			"selectedIconPath": "static/tabbar/icon_dynamic_hl.png",
+			"text": "动态"
 		}, {
 			"pagePath": "pages/mine/index",
 			"iconPath": "static/tabbar/icon_mine.png",
@@ -66,7 +74,12 @@
 		}]
 	},
 	"globalStyle": {
-		"navigationBarTitleText":"猫雷达",
+		"navigationBarTitleText": "猫雷达",
+		"app-plus": {
+			"titleNView": {
+				"backgroundImage": "linear-gradient(to right, #0081ff, #1cbbb4)"
+			}
+		},
 		"navigationBarBackgroundColor": "#0081FF",
 		"mp-alipay": {
 			/* 支付宝小程序特有相关 */
@@ -76,7 +89,10 @@
 	},
 	"usingComponts": true,
 	"easycom": {
+		"autoscan": true,
+		"custom": {
 			// 下载安装的方式需要前面的"@/"，npm安装的方式无需"@/"
 			"^u-(.*)": "uview-ui/components/u-$1/u-$1.vue"
+		}
 	}
 }

@@ -1,0 +1,67 @@
+// 文档教程: https://uniapp.dcloud.net.cn/uniCloud/schema
+{
+	"bsonType": "object",
+	"required": [],
+	"permission": {
+		"read": true,
+		"create": true,
+		"update": "doc.uid == auth.uid",
+		"delete": "doc.uid == auth.uid"
+	},
+	"properties": {
+		"_id": {
+			"description": "ID，系统自动生成"
+		},
+		"name": {
+			"bsonType": "string",
+			"description": "名字"
+		},
+		"py": {
+			"bsonType": "string",
+			"description": "拼音"
+		},
+		"avatar": {
+			"bsonType": "string",
+			"description": "头像"
+		},
+		"female": {
+			"bsonType": "bool",
+			"description": "性别 公:false 母:true"
+		},
+		"state": {
+			"bsonType": "string",
+			"description": "0 流浪中 1 待领养 2 已领养 3 失踪中 4 回喵星"
+		},
+		"neuter": {
+			"bsonType": "bool",
+			"description": "绝育 未绝育:false 已绝育:true"
+		},
+		"album": {
+			"bsonType": "array",
+			"description": "相册"
+		},
+		"uid": {
+			"bsonType": "string",
+			"description": "发布者ID，参考`uni-id-users` 表",
+			"forceDefaultValue": {
+				"$env": "uid"
+			},
+			"foreignKey": "uni-id-users._id"
+		},
+		"intro": {
+			"bsonType": "string",
+			"description": "简介"
+		},
+		"create_date": {
+			"bsonType": "timestamp",
+			"description": "发布时间"
+		},
+		"update_date": {
+			"bsonType": "timestamp",
+			"description": "更新时间",
+			"forceDefaultValue": {
+				"$env": "now"
+			}
+		}
+	}
+}

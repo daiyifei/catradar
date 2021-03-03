@@ -4,9 +4,13 @@
   "description": "<p style=\"text-align: center;\"><img src=\"https://image.weilanwl.com/uni/UniAppReadme.jpg\" alt=\"ColorUI简介\"></img></p>",
   "main": "main.js",
   "dependencies": {
-    "moment": "^2.27.0"
+    "moment": "^2.27.0",
+    "pinyin": "^2.9.1",
+    "uview-ui": "^1.8.3"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "sass-loader": "^11.0.1"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

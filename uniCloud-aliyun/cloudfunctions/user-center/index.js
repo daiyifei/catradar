@@ -10,7 +10,7 @@ exports.main = async (event) => {
 	let params = event.params || {}
 	let payload = {}
 	let noCheckAction = ['register', 'checkToken', 'encryptPwd', 'login', 'loginByWeixin', 'sendSmsCode',
-		'setVerifyCode', 'loginBySms', 'loginByEmail'
+		'setVerifyCode', 'loginBySms', 'loginByEmail', 'code2SessionWeixin', 'code2SessionAlipay'
 	]
 	if (noCheckAction.indexOf(event.action) === -1) {
 		if (!event.uniIdToken) {
@@ -19,7 +19,9 @@ exports.main = async (event) => {
 				msg: '缺少token'
 			}
 		}
-		payload = await uniID.checkToken(event.uniIdToken)
+		payload = await uniID.checkToken(event.uniIdToken, {
+			needPermission: true
+		})
 		if (payload.code && payload.code > 0) {
 			return payload
 		}
@@ -28,62 +30,203 @@ exports.main = async (event) => {
 	let res = {}
 
 	switch (event.action) {
+		case 'getUserInfo':
+			{
+				res = await uniID.getUserInfo(params);
+				break;
+			}
 		case 'register':
-			res = await uniID.register(params);
-			break;
+			{
+				const {
+					username,
+					password,
+					needPermission
+				} = params
+				res = await uniID.register({
+					username,
+					password,
+					needPermission
+				});
+				break;
+			}
 		case 'login':
-			res = await uniID.login({
-				...params,
-				// 不指定queryField的情况下只会查询username
-				queryField: ['username', 'email', 'mobile']
-			});
-			break;
+			{
+				const {
+					username,
+					password,
+					needPermission
+				} = params
+				res = await uniID.login({
+					username,
+					password,
+					needPermission,
+					// 不指定queryField的情况下只会查询username
+					// queryField: ['nickname', 'avatar']
+				});
+				break;
+			}
 		case 'logout':
 			res = await uniID.logout(event.uniIdToken);
 			break;
 		case 'updatePwd':
-			res = await uniID.updatePwd(params);
-			break;
+			{
+				const {
+					uid,
+					oldPassword,
+					newPassword
+				} = params
+				res = await uniID.updatePwd({
+					uid,
+					oldPassword,
+					newPassword
+				});
+				break;
+			}
 		case 'setAvatar':
-			res = await uniID.setAvatar(params);
-			break;
+			{
+				const {
+					uid,
+					avatar
+				} = params
+				res = await uniID.setAvatar({
+					uid,
+					avatar
+				});
+				break;
+			}
 		case 'bindMobile':
-			res = await uniID.bindMobile(params);
-			break;
+			{
+				const {
+					uid,
+					mobile,
+					code
+				} = params
+				res = await uniID.bindMobile({
+					uid,
+					mobile,
+					code
+				});
+				break;
+			}
 		case 'unbindMobile':
-			res = await uniID.unbindMobile(params);
-			break;
+			{
+				const {
+					uid,
+					mobile,
+					code
+				} = params
+				res = await uniID.unbindMobile({
+					uid,
+					mobile,
+					code
+				});
+				break;
+			}
 		case 'bindEmail':
-			res = await uniID.bindEmail(params);
-			break;
+			{
+				const {
+					uid,
+					email,
+					code
+				} = params
+				res = await uniID.bindEmail({
+					uid,
+					email,
+					code
+				});
+				break;
+			}
 		case 'unbindEmail':
-			res = await uniID.unbindEmail(params);
-			break;
+			{
+				const {
+					uid,
+					email,
+					code
+				} = params
+				res = await uniID.unbindEmail({
+					uid,
+					email,
+					code
+				});
+				break;
+			}
+		case 'code2SessionWeixin':
+			{
+				const {
+					code
+				} = params
+				res = await uniID.code2SessionWeixin({
+					code
+				});
+				break;
+			}
 		case 'loginByWeixin':
-			res = await uniID.loginByWeixin(params.code);
-			break;
+			{
+				const {
+					code
+				} = params
+				res = await uniID.loginByWeixin({
+					code
+				});
+				break;
+			}
 		case 'bindWeixin':
-			res = await uniID.bindWeixin(params);
-			break;
+			{
+				const {
+					uid,
+					code
+				} = params
+				res = await uniID.bindWeixin({
+					uid,
+					code
+				});
+				break;
+			}
 		case 'unbindWeixin':
 			res = await uniID.unbindWeixin(params.uid);
 			break;
-		case 'loginByAlipay':
-			res = await uniID.loginByAlipay(params.code);
-			break;
-		case 'bindAlipay':
-			res = await uniID.bindAlipay(params);
-			break;
-		case 'unbindAlipay':
-			res = await uniID.unbindAlipay(params.uid);
-			break;
-		case 'checkToken':
-			// 注意1.1.0版本会返回userInfo，请不要返回全部信息给客户端
-			const checkTokenRes = await uniID.checkToken(event.uniIdToken)
-			res = {
-				code: checkTokenRes.code,
-				msg: checkTokenRes.msg
+		case 'code2SessionAlipay':
+			{
+				const {
+					code
+				} = params
+				res = await uniID.code2SessionAlipay({
+					code
+				});
+				break;
 			}
+		case 'loginByAlipay':
+			{
+				const {
+					code
+				} = params
+				res = await uniID.loginByAlipay({
+					code
+				});
+				break;
+			}
+		case 'bindAlipay':
+			{
+				const {
+					uid,
+					code
+				} = params
+				res = await uniID.bindAlipay({
+					uid,
+					code
+				});
+				break;
+			}
+		case 'unbindAlipay':
+			{
+				res = await uniID.unbindAlipay(params.uid);
+				break;
+			}
+		case 'checkToken':
+			// 注意3.0.0版本取消了checkToken接口返回的用户信息
+			res = await uniID.checkToken(event.uniIdToken, {
+				needPermission: true
+			})
 			break;
 		case 'resetPwd':
 			res = await uniID.resetPwd({
@@ -100,20 +243,196 @@ exports.main = async (event) => {
 			}
 			break;
 		case 'sendSmsCode':
-			res = await uniID.sendSmsCode(params);
-			break;
+			{
+				const {
+					mobile,
+					code,
+					type
+				} = params
+				const templateId = ''
+				if (templateId === '') {
+					throw new Error('sendSmsCode接口需要传入templateId来指定所使用的短信模板')
+				}
+				res = await uniID.sendSmsCode({
+					mobile,
+					code,
+					type,
+					templateId
+				});
+				break;
+			}
 		case 'setVerifyCode':
-			res = await uniID.setVerifyCode(params);
-			break;
+			{
+				const {
+					mobile,
+					code,
+					type
+				} = params
+				res = await uniID.setVerifyCode({
+					mobile,
+					code,
+					type
+				});
+				break;
+			}
 		case 'loginBySms':
-			res = await uniID.loginBySms(params);
-			break;
+			{
+				const {
+					mobile,
+					code
+				} = params
+				res = await uniID.loginBySms({
+					mobile,
+					code
+				});
+				break;
+			}
 		case 'loginByEmail':
-			res = await uniID.loginByEmail(params);
-			break;
+			{
+				const {
+					email,
+					code
+				} = params
+				res = await uniID.loginByEmail({
+					email,
+					code
+				});
+				break;
+			}
 		case 'updateUser':
-			res = await uniID.updateUser(params);
-			break;
+			{
+				const {
+					nickname,
+					avatar,
+					gender
+				} = params
+				res = await uniID.updateUser({
+					uid: payload.uid,
+					nickname,
+					avatar,
+					gender
+				});
+				break;
+			}
+		case 'setUserInviteCode':
+			{
+				const {
+					uid,
+					// myInviteCode 不指定myInviteCode，自动获取
+				} = params
+				res = await uniID.setUserInviteCode({
+					uid
+				});
+				break;
+			}
+		case 'acceptInvite':
+			{
+				const {
+					uid,
+					inviteCode
+				} = params
+				res = await uniID.acceptInvite({
+					uid,
+					inviteCode
+				});
+				break;
+			}
+		case 'addRole':
+			{
+				const {
+					roleID,
+					roleName,
+					comment,
+					permission
+				} = params
+				res = await uniID.addRole({
+					roleID,
+					roleName,
+					comment,
+					permission
+				});
+				break;
+			}
+		case 'getRoleList':
+			{
+				const {
+					offset,
+					limit,
+					needTotal
+				} = params
+				res = await uniID.getRoleList({
+					offset,
+					limit,
+					needTotal
+				});
+				break;
+			}
+		case 'addPermission':
+			{
+				const {
+					permissionID,
+					permissionName,
+					comment
+				} = params
+				res = await uniID.addPermission({
+					permissionID,
+					permissionName,
+					comment
+				});
+				break;
+			}
+		case 'getPermissionList':
+			{
+				const {
+					offset,
+					limit,
+					needTotal
+				} = params
+				res = await uniID.getPermissionList({
+					offset,
+					limit,
+					needTotal
+				});
+				break;
+			}
+		case 'getRoleByUid':
+			{
+				const {
+					uid
+				} = params
+				res = await uniID.getRoleByUid({
+					uid
+				});
+				break;
+			}
+		case 'bindRole':
+			{
+				const {
+					roleList,
+					// 设置reset为true，整体覆盖。设置为false时增量更新role
+					reset,
+				} = params
+				res = await uniID.bindRole({
+					roleList,
+					reset,
+				});
+				break;
+			}
+		case 'bindPermission':
+			{
+				const {
+					roleID,
+					permissionList,
+					// 设置reset为true，整体覆盖。设置为false时增量更新role
+					reset,
+				} = params
+				res = await uniID.bindPermission({
+					roleID,
+					permissionList,
+					reset,
+				});
+				break;
+			}
 		default:
 			res = {
 				code: 403,
