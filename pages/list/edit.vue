@@ -1,14 +1,5 @@
 <template>
 	<view>
-		<cu-custom bgColor="bg-gradual-blue" :isBack="true">
-			<block slot="content">{{id?'更新':'新建'}}档案</block>
-			<block slot="right">
-				<view class="action">
-					<view class="cu-load load-cuIcon" :class="!loaded?'loading':'over'"></view>
-				</view>
-			</block>
-		</cu-custom>
-
 		<form @submit="onSubmit" v-if="loaded">
 			<view class="cu-form-group margin-top">
 				<view class="title">头像</view>
@@ -23,20 +14,24 @@
 				<form-switch type="switch-sex" v-model="form.female" />
 			</view>
 			<view class="cu-form-group">
+				<view class="title">状态</view>
+				<form-picker v-model="form.state" :range="['流浪中','待领养','已领养','失踪中','回喵星']" />
+			</view>
+			<view class="cu-form-group">
 				<view class="title">绝育</view>
 				<form-switch v-model="form.neuter" />
 			</view>
 			<view class="cu-form-group" v-if="form.neuter">
 				<view class="title">绝育时间</view>
-				<datepicker v-model="form.neuterDate" />
+				<date-picker v-model="form.neuterDate" />
 			</view>
 			<view class="cu-form-group">
 				<view class="title">花色</view>
-				<form-picker v-model="form.color" :range="['三花','橘猫','奶牛','白猫','狸花','玳瑁']" />
+				<form-picker v-model="form.color" :range="['三花','橘猫','奶牛','白猫','狸花','玳瑁','黑猫']" />
 			</view>
 			<view class="cu-form-group">
 				<view class="title">生日</view>
-				<datepicker v-model="form.birthday" />
+				<date-picker v-model="form.birthday" />
 			</view>
 			<view class="cu-form-group">
 				<view class="title">位置</view>
@@ -55,27 +50,13 @@
 				<relation v-model="form.relation"></relation>
 			</view>
 			<button form-type="submit" class="cu-btn block bg-blue margin lg" :loading="saving">{{id?'更新':'新建'}}</button>
-			<button class="cu-btn block bg-red margin lg" :loading="deleting" v-if="id" @click="onDelete">删除</button>
+			<button class="cu-btn block bg-red margin lg" :loading="deleting" v-if="id" @tap="onDelete">删除</button>
 		</form>
 	</view>
 </template>
 
 <script>
-	import upload from '@/components/upload.vue'
-	import formPicker from '@/components/formPicker.vue'
-	import formSwitch from '@/components/formSwitch.vue'
-	import datepicker from '@/components/datepicker.vue'
-	import dragAlbum from '@/components/dragAlbum.vue'
-	import relation from '@/components/relation.vue'
 	export default {
-		components: {
-			upload,
-			formPicker,
-			formSwitch,
-			datepicker,
-			dragAlbum,
-			relation
-		},
 		data() {
 			return {
 				id: '',
@@ -173,7 +154,7 @@
 				const pages = getCurrentPages()
 				if (pages.length > 1) {  
 				    const prevPage = pages[pages.length - 2]  
-				    prevPage.$vm.fetchData()
+				    prevPage.$vm.$refs.indexList.fetchData()
 						uni.navigateBack()
 				 }  
 			}

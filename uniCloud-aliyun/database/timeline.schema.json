@@ -1,0 +1,54 @@
+// 文档教程: https://uniapp.dcloud.net.cn/uniCloud/schema
+{
+	"bsonType": "object",
+	"required": [],
+	"permission": {
+		"read": true,
+		"create": true,
+		"update": true,
+		"delete": true
+	},
+	"properties": {
+		"_id": {
+			"description": "ID，系统自动生成"
+		},
+		"cat_id": {
+			"bsonType": "string",
+			"description": "猫咪ID，list 表中的`_id`字段",
+			"foreignKey": "list._id"
+		},
+		"user_id": {
+			"bsonType": "string",
+			"description": "发布者ID，参考`uni-id-users` 表",
+			"forceDefaultValue": {
+				"$env": "uid"
+			},
+			"foreignKey": "uni-id-users._id"
+		},
+		"text": {
+			"bsonType": "string",
+			"description": "文字内容",
+			"title": "文字内容",
+			"trim": "both"
+		},
+		"album": {
+			"bsonType": "array",
+			"description": "相册"
+		},
+		"like_count": {
+			"bsonType": "int",
+			"description": "点赞数"
+		},
+		"content_type": {
+			"bsonType": "int",
+			"description": "内容类型： 0 图片  1 视频"
+		},
+		"create_date": {
+			"bsonType": "timestamp",
+			"description": "发表时间",
+			"forceDefaultValue": {
+				"$env": "now"
+			}
+		}
+	}
+}

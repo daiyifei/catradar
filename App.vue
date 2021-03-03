@@ -1,7 +1,21 @@
 <script>
 	import Vue from 'vue'
+	import { mapMutations } from 'vuex'
 	export default {
+		methods: {
+			...mapMutations(['login'])
+		},
 		onLaunch: function() {
+			// auto login
+			this.$request('user-center','checkToken')
+				.then(res => {
+					this.login(res.userInfo)
+				})
+				.catch(() => {
+					uni.clearStorageSync('uni_id_token')
+					uni.clearStorageSync('uni_id_token_expired')
+				})
+			
 			// check update
 			// #ifdef APP-PLUS
 			plus.runtime.getProperty(plus.runtime.appid, ({
@@ -57,7 +71,7 @@
 	}
 </script>
 
-<style>
+<style lang="scss">
 	/* #ifndef APP-PLUS-NVUE */
 	@import "colorui/main.css";
 	@import "colorui/icon.css";
@@ -65,6 +79,5 @@
 	.cu-form-group .title {
 		min-width: calc(4em + 15px);
 	}
-
 	/* #endif */
 </style>

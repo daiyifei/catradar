@@ -1,70 +1,36 @@
 <template>
 	<view>
-		<cu-custom bgColor="bg-gradual-blue">
-			<block slot="content">我的</block>
-		</cu-custom>
-		<login @login="onLogin" v-if="!userInfo"></login>
-		<view class="user-info" v-else>
-			<view class="bg-white text-center">
-				<view class="solid-bottom text-xsl padding">
-					<text class="cuIcon-my text-gray"></text>
-				</view>
-				<view class="padding">{{userInfo.username}}</view>
-			</view>
-			<button class="cu-btn block bg-red margin lg" :loading="loading" @click="logout">退出</button>
-		</view>
+		<login></login>
 	</view>
 </template>
 
 <script>
-	import login from '@/components/login.vue'
+	let weixinAuthService
+	import {
+		mapState,
+		mapMutations
+	} from 'vuex'
 	export default {
-		components: {
-			login
-		},
 		data() {
 			return {
-				loading: false,
-				logged: false,
-				userInfo: false
+				hasWeixinAuth: false
 			}
 		},
-		mounted() {
-			const expired = uni.getStorageSync('uni_id_token_expired')
-			if(expired && expired > new Date().getTime()) {
-				this.userInfo = uni.getStorageSync('userInfo')
-			}
+		computed: mapState(['hasLogin', 'userInfo']),
+		onLoad() {
+			// #ifdef APP-PLUS
+			plus.oauth.getServices((services) => {
+				weixinAuthService = services.find((service) => {
+					return service.id === 'weixin'
+				})
+				if (weixinAuthService) {
+					this.hasWeixinAuth = true
+				}
+			});
+			// #endif	
 		},
 		methods: {
-			logout() {
-				uni.showModal({
-					content: '确定要退出登录吗？',
-					showCancel: true,
-					success: res => {
-						if(res.confirm) {
-							this.loading = true
-							this.$request('user-center','logout')
-								.then(res => {
-									this.doLogout()
-								})
-								.catch(err => {
-									this.doLogout()
-								})
-						}
-					}
-				})
-			},
-			doLogout() {
-				uni.clearStorageSync('uniIdToken')
-				uni.clearStorageSync('uni_id_token_expired')
-				uni.clearStorageSync('userInfo')
-				this.loading = false
-				this.userInfo = ''
-			},
-			onLogin(res) {
-				this.userInfo = res
-				this.loading = false
-			}
+			
 		}
 	}
 </script>

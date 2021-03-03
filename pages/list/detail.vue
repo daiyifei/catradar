@@ -1,14 +1,17 @@
 <template>
 	<view>
 		<view class="container skeleton">
+			<!-- 封面 -->
 			<swiper class="skeleton-rect swiper screen-swiper square-dot" :indicator-dots="true" :circular="true" @change="imgChange">
 				<swiper-item v-for="(item,index) in form.album" :key="index">
-					<view class="swiper-item" @tap="preview(index)">
+					<view class="swiper-item" @tap="preview(form.album, index)">
 						<video :src="item" autoplay loop :show-play-btn="false" :controls="false" objectFit="cover" v-if="item.split('.')[form.album.length]=='mp4'" />
 						<image :src="item" mode="aspectFill" v-else @load="imgLoad"/>
 					</view>
 				</swiper-item>
 			</swiper>
+			
+			<!-- 头像 -->
 			<view class="padding flex align-center bg-white margin-sm radius">
 				<image :src="form.avatar" class="skeleton-circle cu-avatar xl round margin-right-sm" v-if="form.avatar"></image>
 				<view class="skeleton-circle cu-avatar xl round margin-right-sm" v-else>{{form.name}}</view>
@@ -20,10 +23,12 @@
 					</view>
 				</view>
 			</view>
+			
+			<!-- 信息 -->
 			<view class="skeleton-rect margin-sm bg-white radius">
 				<view class="cu-bar">
 					<view class="action sub-title">
-						<text class="text-xl text-bold text-green">基本信息</text>
+						<text class="text-xl text-bold text-green">信息</text>
 						<text class="text-ABC text-green">information</text>
 					</view>
 				</view>
@@ -59,10 +64,11 @@
 				</view>
 			</view>
 			
+			<!-- 关系 -->
 			<view class="margin-sm bg-white radius radius" v-if="form.relation">
 				<view class="cu-bar">
 					<view class="action sub-title">
-						<text class="text-xl text-bold text-blue">社会关系</text>
+						<text class="text-xl text-bold text-blue">关系</text>
 						<text class="text-ABC text-blue">relationship</text>
 					</view>
 				</view>
@@ -79,17 +85,46 @@
 					</view>
 				</view>
 			</view>
+			
+			<!-- 动态 -->
+			<view class="margin-sm bg-white radius radius">
+				<view class="cu-bar">
+					<view class="action sub-title">
+						<text class="text-xl text-bold text-orange">动态</text>
+						<text class="text-ABC text-orange">timeline</text>
+					</view>
+				</view>
+				<unicloud-db
+					ref="udb"
+					v-slot:default="{data, loading, hasMore, error, options}" 
+					collection="timeline"
+					:where="`cat_id=='${id}'`"
+					orderby="create_date desc">
+					<view v-for="(item,index) in data" class="cu-timeline">
+						<uni-dateformat :date="item.create_date" format="yyyy/M/d" :threshold="[60000, 3600000*24]" class="cu-time margin-left" />
+						<view class="cu-item" :class="index?'':'text-blue'">
+							<view class="content">
+								<view class="text-content">{{item.text}}</view>
+								<view class="grid grid-square col-3 margin-top-sm">
+									<view class="bg-img" v-for="(pic,idx) in item.album" :key="idx">
+										<image :src="pic" mode="aspectFill" @tap.stop="preview(item.album, idx)"></image>
+									</view>
+								</view>
+							</view>
+						</view>
+					</view>
+				</unicloud-db>
+				<view class="text-sm text-gray text-center padding-bottom">暂无更多</view>
+			</view>
 		</view>
-		<!-- 骨架屏 -->
-		<skeleton :loading="loading" :animation="true"></skeleton>
 	</view>
 </template>
 
 <script>
-	import skeleton from '@/components/skeleton.vue'
+	import uniDateformat from "@/components/uni-dateformat/uni-dateformat.vue"
 	export default {
 		components: {
-			skeleton
+			uniDateformat
 		},
 		data() {
 			return {
@@ -128,10 +163,10 @@
 			imgChange(e) {
 				this.current = e.detail.current
 			},
-			preview(index) {
+			preview(urls, current) {
 				uni.previewImage({
-					current: index,
-					urls: this.form.album
+				  urls,
+				  current
 				})
 			},
 			onNavigationBarButtonTap(e) {
