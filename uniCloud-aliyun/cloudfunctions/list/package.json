@@ -8,8 +8,5 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "py": "file:../common/py"
-  }
+  "license": "ISC"
 }

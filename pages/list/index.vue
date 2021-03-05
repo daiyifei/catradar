@@ -43,7 +43,7 @@
 		</index-list>
 		
 		<!--新建按钮-->
-		<btn-new v-if="userInfo&&userInfo.scope===9"/>
+		<btn-new v-if="hasLogin&&userInfo.scope===9"/>
 	</view>
 </template>
 

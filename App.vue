@@ -9,9 +9,20 @@
 			// auto login
 			this.$request('user-center','checkToken')
 				.then(res => {
+					if(res.token) {
+						uni.setStorage({
+							key: 'uni_id_token',
+							data: res.token
+						})
+						uni.setStorage({
+							key: 'uni_id_token',
+							data: res.tokenExpired
+						})
+					}
 					this.login(res.userInfo)
 				})
-				.catch(() => {
+				.catch(e => {
+					console.log(e)
 					uni.clearStorageSync('uni_id_token')
 					uni.clearStorageSync('uni_id_token_expired')
 				})

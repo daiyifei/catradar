@@ -1,7 +1,7 @@
 // 文档教程: https://uniapp.dcloud.net.cn/uniCloud/schema
 {
 	"bsonType": "object",
-	"required": [],
+	"required": ["name"],
 	"permission": {
 		"read": true,
 		"create": true,
@@ -28,17 +28,37 @@
 			"bsonType": "bool",
 			"description": "性别 公:false 母:true"
 		},
+		"color": {
+			"bsonType": "number",
+			"description": "花色: 0 三花 1 橘猫 2 奶牛 3 白猫 4 狸花 5 玳瑁 6 黑猫"
+		},
+		"birthday": {
+			"bsonType": "string",
+			"description": "生日"
+		},
 		"state": {
 			"bsonType": "string",
-			"description": "0 流浪中 1 待领养 2 已领养 3 失踪中 4 回喵星"
+			"description": "状态: 0 流浪中 1 待领养 2 已领养 3 失踪中 4 回喵星"
+		},
+		"location": {
+			"bsonType": "number",
+			"description": "位置"
 		},
 		"neuter": {
 			"bsonType": "bool",
 			"description": "绝育 未绝育:false 已绝育:true"
 		},
+		"neuterDate": {
+			"bsonType": "string",
+			"description": "绝育日期"
+		},
 		"album": {
 			"bsonType": "array",
 			"description": "相册"
+		},
+		"relation": {
+			"bsonType": "array",
+			"description": "关系"
 		},
 		"uid": {
 			"bsonType": "string",
@@ -52,11 +72,14 @@
 			"bsonType": "string",
 			"description": "简介"
 		},
-		"create_date": {
+		"created": {
 			"bsonType": "timestamp",
-			"description": "发布时间"
+			"description": "发布时间",
+			"defaultValue": {
+				"$env": "now"
+			}
 		},
-		"update_date": {
+		"updated": {
 			"bsonType": "timestamp",
 			"description": "更新时间",
 			"forceDefaultValue": {
