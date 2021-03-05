@@ -1,90 +1,98 @@
 <template>
 	<view>
-		<!--列表主体-->
-		<unicloud-db
-			ref="udb"
-			v-slot:default="{data, loading, hasMore, error, options}" 
-			collection="timeline,list,uni-id-users"
-			field="cat_id{_id,name,avatar},user_id{nickname,avatar},text,album,create_date"
-			:page-size="5"
-			orderby="create_date desc">
-			<view class="cu-list menu-avatar comment solids-top">
-				<view class="cu-item" v-for="(item, index) in data" :key="index">
-					<navigator :url="'/pages/list/detail?id='+item.cat_id[0]._id" class="cu-avatar">
-						<image :src="item.cat_id[0].avatar" mode="aspectFill" class="cu-avatar radius"></image>
-					</navigator>
-					<view class="content">
-						<view class="text-grey">{{item.cat_id[0].name}}</view>
-
-						<!-- 内容区域 -->
-						<view class="text-content">{{item.text}}</view>
-						<view class="grid grid-square col-3 margin-top-sm">
-							<view class="bg-img" v-for="(pic,idx) in item.album" :key="idx">
-								<image :src="pic" mode="aspectFill" @tap.stop="preview(item.album, idx)"></image>
-							</view>
+		<view class="fullscreen" v-if="!hasLogin">
+			<u-empty text="请登录后关注动态" mode="data" >
+				<navigator url="/pages/mine/index" class="cu-btn bg-blue margin radius" slot="bottom" open-type="switchTab">去登录</navigator>
+			</u-empty>
+		</view>
+		
+		<view v-else>
+			<!--列表主体-->
+			<unicloud-db
+				ref="timeline"
+				v-slot:default="{data, loading, hasMore, error, options}" 
+				collection="timeline,list,uni-id-users"
+				field="cat_id{_id,name,avatar},user_id{nickname,avatar},text,album,create_date"
+				:page-size="5"
+				orderby="create_date desc">
+				<view class="cu-list menu-avatar comment solids-top">
+					<view class="cu-item" v-for="(item, index) in data" :key="index">
+						<!-- 操作按钮 -->
+						<view 
+							class="btn-more padding cuIcon-moreandroid text-gray"
+							v-if="userInfo.scope==9||userInfo._id==item.user_id[0]._id"
+							@tap="showMenu(item)">
 						</view>
-
-						<!-- 发布信息区域 -->
-						<view class="margin-top-sm flex justify-between">
-							<view class="text-gray">
-								<image :src="item.user_id[0].avatar" mode="aspectFill" class="cu-avatar sm round margin-right-xs"></image>
-								<text>{{item.user_id[0].nickname}} 发布于</text>
-								<uni-dateformat :date="item.create_date" format="yyyy年M月d日" :threshold="[60000, 3600000*24]" />
+						<!-- 头像 -->
+						<navigator :url="'/pages/list/detail?id='+item.cat_id[0]._id" class="cu-avatar">
+							<image :src="item.cat_id[0].avatar" mode="aspectFill" class="cu-avatar radius"></image>
+						</navigator>
+						<view class="content">
+							<view class="text-grey">{{item.cat_id[0].name}}</view>
+							<!-- 内容区域 -->
+							<view class="text-content">{{item.text}}</view>
+							<view class="grid grid-square col-3 margin-top-sm">
+								<view class="bg-img" v-for="(pic,idx) in item.album" :key="idx">
+									<image :src="pic" mode="aspectFill" @tap.stop="preview(item.album, idx)"></image>
+								</view>
 							</view>
-							
+							<!-- 发布信息区域 -->
+							<view class="margin-top-sm flex justify-between">
+								<view class="text-gray">
+									<image :src="item.user_id[0].avatar" mode="aspectFill" class="cu-avatar sm round margin-right-xs"></image>
+									<text>{{item.user_id[0].nickname}} 发布于{{item.create_date|timeFrom}}</text>
+								</view>
+							</view>
+							<!-- 留言区域 -->
+							<message-board :ref="item._id" :id="item._id"></message-board>
 						</view>
-						
-						<message-board :ref="item._id" :id="item._id" @input="showInputArea"></message-board>
 					</view>
 				</view>
-			</view>
-				
-			<view class="cu-item">
-				<view class="content">
-					<text class="cu-load text-gray text-sm loading" v-if="loading"></text>
-					<text class="cu-load text-gray text-sm" v-else>{{hasMore ? '加载更多' : '没有更多了'}}</text>
+				<view class="cu-item">
+					<view class="content">
+						<text class="cu-load text-gray text-sm loading" v-if="loading"></text>
+						<text class="cu-load text-gray text-sm" v-else>{{hasMore ? '加载更多' : '没有更多了'}}</text>
+					</view>
 				</view>
-			</view>
-		</unicloud-db>
-		
-		<!--新建按钮-->
-		<btn-new v-if="userInfo" choose-image/>
+			</unicloud-db>
+			
+			<!--新建按钮-->
+			<btn-new choose-image/>
+			
+			<!--操作菜单-->
+			<u-action-sheet :list="actions" @click="click" v-model="show"></u-action-sheet>
+		</view>
 	</view>
 </template>
 
 <script>
-	import uniDateformat from "@/components/uni-dateformat/uni-dateformat.vue"
 	import {
 		mapState,
 		mapMutations
 	} from 'vuex'
 	export default {
-		components: {
-			uniDateformat
-		},
 		data() {
 			return {
-				showInput: false,
-				reply_username: '',
-				form: {},
-				sending: false
+				actions: [{
+					text: '编辑'
+				},{
+					text: '删除',
+					color: 'red'
+				}],
+				show: false,
+				item: ''
 			}
 		},
 		computed: mapState(['hasLogin', 'userInfo']),
-		onShow() {
-			this.$refs.udb.loadData({
-				clear: true
-			})
-		},
 		onPullDownRefresh() {
-			this.$refs.udb.loadData({
+			this.$refs.timeline.loadData({
 				clear: true
 			}, () => {
 				uni.stopPullDownRefresh()
 			})
 		},
 		onReachBottom() {
-			this.$refs.udb.loadMore()
+			this.$refs.timeline.loadMore()
 		},
 		methods: {
 			preview(urls, current) {
@@ -93,35 +101,35 @@
 				  current
 				})
 			},
-			showInputArea(item) {
-				this.reply_username = ''
-				this.form.timeline_id = item._id
-				this.showInput = true
+			showMenu(item) {
+				this.item = item
+				this.show = true
 			},
-			reply(e) {
-				this.reply_username = e.reply_username
-				this.form.timeline_id = e.timeline_id
-				this.form.reply_user_id = e.reply_user_id
-				this.showInput = true
-			},
-			hideInputArea() {
-				this.form = {}
-				this.showInput = false
-			},
-			addComment() {
-				this.sending = true
-				this.$refs["'" + this.form.timeline_id + "'"].add(this.form)
-				const db = uniCloud.database()
-				db.collection('comments').add(this.form).then(() => {
-					this.sending = false
-					this.showInput = false
-					
-				})
-			}		
+			click(index) {
+				if(index === 0) {
+					uni.navigateTo({
+						url: 'edit?item=' + JSON.stringify(this.item)
+					})
+				}
+				if(index === 1) {
+					this.$refs.udb.remove(this.item._id, {
+						confirmContent: '是否删除该条动态？'
+					})
+				}
+			}
 		}
 	}
 </script>
 
 <style>
-
+.fullscreen {
+	height: 100vh;
+}
+	
+.btn-more {
+	position: absolute;
+	top: 0;
+	right: 0;
+	z-index: 1;
+}
 </style>

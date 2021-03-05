@@ -1,19 +1,17 @@
 <template>
 	<view>
-		<unicloud-db ref="udb" collection="timeline" v-slot:default="{data, loading, error, options}" >
-			<form @submit="onSubmit">
-				<view class="cu-form-group">
-					<remote-input name="cat_id" placeholder="照片中的是谁？" v-model="form.cat_id"/>
-				</view>
-				<view class="cu-form-group">
-					<textarea name="text" placeholder="写点什么吧..." maxlength="140" v-model="form.text"></textarea>
-				</view>
-				<view class="cu-form-group"> 
-					<drag-album name="album" v-model="form.album"></drag-album>
-				</view>
-				<button form-type="submit" class="cu-btn block bg-blue margin lg" :loading="saving" :disabled="!form.cat_id || !form.album.length">发布</button>
-			</form>
-		</unicloud-db>
+		<form @submit="onSubmit">
+			<view class="cu-form-group">
+				<remote-input placeholder="照片中的是谁？" v-model="form.cat_id" :data="data"/>
+			</view>
+			<view class="cu-form-group">
+				<textarea name="text" placeholder="写点什么吧..." maxlength="140" v-model="form.text"></textarea>
+			</view>
+			<view class="cu-form-group"> 
+				<drag-album name="album" v-model="form.album"></drag-album>
+			</view>
+			<button form-type="submit" class="cu-btn block bg-blue margin lg" :loading="saving" :disabled="!form.cat_id||!form.text||!form.album.length">发布</button>
+		</form>
 	</view>
 </template>
 
@@ -22,11 +20,23 @@
 		data() {
 			return {
 				form: {},
+				data: {},
 				saving: false
 			}
 		},
 		onLoad(e) {
-			this.$set(this.form, 'album', JSON.parse(e.paths))
+			if(e.paths) {
+				this.$set(this.form, 'album', JSON.parse(e.paths))
+			}
+			if(e.item) {
+				uni.setNavigationBarTitle({
+					title: "编辑"
+				})
+				const item = JSON.parse(e.item)
+				this.data = item
+				item.cat_id = this.data._id
+				this.form = item
+			}
 		},
 		methods: {
 			async onSubmit(e) {
@@ -52,14 +62,18 @@
 					return
 				}
 				
-				this.$refs.udb.add(this.form, {
+				const pages = getCurrentPages(),
+					prevPage = pages[pages.length - 2]
+				prevPage.$refs.timeline.add(this.form, {
 					toastTitle: '发布成功',
-					success: res => {
+					success: () => {
+						prevPage.$refs.timeline.loadData({
+							clear: true
+						})
 						uni.navigateBack()
 					},
 					fail: err => {
-						const { message } = err
-						uni.showToast(message)
+						uni.showToast(err.message)
 					}
 				})
 			}

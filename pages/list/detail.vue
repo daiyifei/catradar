@@ -101,7 +101,7 @@
 					:where="`cat_id=='${id}'`"
 					orderby="create_date desc">
 					<view v-for="(item,index) in data" class="cu-timeline">
-						<uni-dateformat :date="item.create_date" format="yyyy/M/d" :threshold="[60000, 3600000*24]" class="cu-time margin-left" />
+						<view class="cu-time margin-left">{{item.create_date|timeFrom('yy/mm/dd')}}</view>
 						<view class="cu-item" :class="index?'':'text-blue'">
 							<view class="content">
 								<view class="text-content">{{item.text}}</view>
@@ -121,11 +121,7 @@
 </template>
 
 <script>
-	import uniDateformat from "@/components/uni-dateformat/uni-dateformat.vue"
 	export default {
-		components: {
-			uniDateformat
-		},
 		data() {
 			return {
 				current: 0,

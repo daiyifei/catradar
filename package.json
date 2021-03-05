@@ -1,7 +1,7 @@
 {
   "name": "catradar",
   "version": "1.0.0",
-  "description": "<p style=\"text-align: center;\"><img src=\"https://image.weilanwl.com/uni/UniAppReadme.jpg\" alt=\"ColorUI简介\"></img></p>",
+  "description": "",
   "main": "main.js",
   "dependencies": {
     "moment": "^2.27.0",

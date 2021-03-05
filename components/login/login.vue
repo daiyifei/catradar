@@ -1,6 +1,6 @@
 <template>
 	<view>
-		<view class="user-info" v-if="hasLogin && userInfo">
+		<view class="user-info" v-if="hasLogin">
 			<view class="bg-white text-center" @tap="updateUser">
 				<view class="solid-bottom text-xsl padding">
 					<image v-if="userInfo.avatar" :src="userInfo.avatar" class="cu-avatar round xl"/>

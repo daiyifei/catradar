@@ -1,7 +1,7 @@
 <template>
-	<view style="margin-top: -50rpx;">
+	<view>
 		<!-- 功能按钮 -->
-		<view class="text-right margin-bottom-sm text-grey">
+		<view class="text-right margin-bottom-sm text-grey" style="margin-top: -50rpx;">
 			<text :class="'cuIcon-like'+(likeId?'fill':'')" @tap="like">{{(likeId?'取消':'点赞')}}</text>
 			<text class="cuIcon-message margin-left-sm" @tap="comment">留言</text>
 		</view>
@@ -23,7 +23,13 @@
 				</view>
 			</unicloud-db>
 			
-			<unicloud-db ref="comment" v-slot:default="{data, loading, error, options}" collection="comments,uni-id-users" :where="'timeline_id==\'' + id + '\'&&comment_type==1'" field="content,create_date,user_id{_id,nickname,avatar},reply_user_id{nickname,avatar}" orderby="create_date asc">
+			<unicloud-db 
+				ref="comment"
+				v-slot:default="{data, loading, error, options}" 
+				collection="comments,uni-id-users" 
+				:where="`timeline_id=='${id}'&&comment_type==1`" 
+				field="content,create_date,user_id{_id,nickname,avatar},reply_user_id{nickname,avatar}" 
+				orderby="create_date asc">
 				<!-- 评论列表 -->
 				<view class="padding-sm" v-if="data.length">
 					<view v-for="(item, index) in data" :key="index" @tap="item.user_id[0]._id===userInfo._id?remove(item._id):reply(item.user_id[0])">
@@ -34,7 +40,7 @@
 							<text>: {{item.content}}</text>
 						</view>
 						<view class="text-gray text-xs">
-							<uni-dateformat :date="item.create_date" :threshold="[60000, 3600000*24]" format="yyyy年M月d日" />
+							<text>{{item.create_date|timeFrom}}</text>
 							<text class="margin-left">{{item.user_id[0]._id===userInfo._id?'删除':'回复'}}</text>
 						</view>
 					</view>
@@ -44,31 +50,34 @@
 		
 		<!-- 输入区域 -->
 		<view class="cu-modal bottom-modal" :class="showInput ? 'show' : ''" @tap.stop="hideInput">
-			<view class="cu-dialog padding" @tap.stop.prevent>
-				<form @submit="addComment">
-					<view class="cu-form-group radius">
-						<input class="text-left" :placeholder="reply_nickname?'回复'+reply_nickname:'留言'" :cursor-spacing="30" v-model="form.content"/>
-						<button type="primary" size="mini" class="round" :loading="sending" form-type="submit">发送</button>
-					</view>
-				</form>
+			<view class="cu-dialog" @tap.stop.prevent>
+				<view class="cu-form-group">
+					<u-input
+						:custom-style="{'padding':'10rpx 20rpx','border-radius':'30rpx','background-color':'#f0f0f0'}"
+						v-model="form.content"
+						:height="60"
+						:clearable="false"
+						auto-height
+						type="textarea"
+						:cursor-spacing="10"
+						:placeholder="reply_nickname?'回复'+reply_nickname:'留下你的精彩评论吧'"/>
+					<button type="primary" size="mini" class="round margin-left-sm" :disabled="!form.content" :loading="sending" @tap="addComment">发送</button>
+				</view>
 			</view>
 		</view>
 	</view>
 </template>
 
 <script>
-	import uniDateformat from "@/components/uni-dateformat/uni-dateformat.vue"
 	import {
 		mapState,
 		mapMutations
 	} from 'vuex'
 	export default {
-		components: {
-			uniDateformat
-		},
 		props: {
 			id: String
-		},		data() {
+		},		
+		data() {
 			return {
 				likeId: '',
 				showInput: false,
@@ -140,5 +149,4 @@
 </script>
 
 <style>
-
 </style>

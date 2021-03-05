@@ -80,7 +80,11 @@ Vue.prototype.$request = (name, action, params) => {
 				params
 			},
 			success({result}) {
-				resolve(result)
+				if(result.code === 0) {
+					resolve(result)
+				}else {
+					reject(result)
+				}
 			},
 			fail(err) {
 				reject(err)

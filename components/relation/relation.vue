@@ -20,7 +20,7 @@
 				<view class="form padding-xl">
 					<view class="cu-form-group">
 						<view class="title">猫咪</view>
-						<remote-input placeholder="请输入猫咪姓名" v-model="form.detail" />
+						<remote-input placeholder="请输入猫咪姓名" v-model="form.detail._id" :data="form.detail"/>
 					</view>
 					<view class="cu-form-group">
 						<view class="title">关系</view>
@@ -53,7 +53,9 @@
 			return {
 				list: [],
 				show: false,
-				form: {},
+				form: {
+					detail: {}
+				},
 				index: -1
 			}
 		},
@@ -70,9 +72,7 @@
 					this.index = index
 				}else {
 					this.form = {
-						detail: {
-							name: ''
-						},
+						detail: {},
 						tag: ''
 					}
 				}
@@ -117,6 +117,10 @@
 	
 	.cu-modal {
 		z-index: 99 !important;
+	}
+	
+	.form {
+		padding-bottom: 350rpx;
 	}
 	
 	.grid,
