@@ -1,8 +1,11 @@
 <template>
 	<view>
-		<view class="container skeleton">
+		<!-- #ifdef MP-WEIXIN -->
+		<u-navbar :background="background" :title="title" back-icon-color="#fff" :title-color="titleColor"></u-navbar>
+		<!-- #endif -->
+		<view class="container">
 			<!-- 封面 -->
-			<swiper class="skeleton-rect swiper screen-swiper square-dot" :indicator-dots="true" :circular="true" @change="imgChange">
+			<swiper class="swiper screen-swiper square-dot" :indicator-dots="true" :circular="true" @change="imgChange">
 				<swiper-item v-for="(item,index) in form.album" :key="index">
 					<view class="swiper-item" @tap="preview(form.album, index)">
 						<video :src="item" autoplay loop :show-play-btn="false" :controls="false" objectFit="cover" v-if="item.split('.')[form.album.length]=='mp4'" />
@@ -13,9 +16,9 @@
 			
 			<!-- 头像 -->
 			<view class="padding flex align-center bg-white margin-sm radius">
-				<image :src="form.avatar" class="skeleton-circle cu-avatar xl round margin-right-sm" v-if="form.avatar"></image>
-				<view class="skeleton-circle cu-avatar xl round margin-right-sm" v-else>{{form.name}}</view>
-				<view class="skeleton-rect">
+				<image :src="form.avatar" class="cu-avatar xl round margin-right-sm" v-if="form.avatar"></image>
+				<view class="cu-avatar xl round margin-right-sm" v-else>{{form.name}}</view>
+				<view>
 					<text class="text-xxl">{{form.name}}</text>
 					<view>
 						<text class="gender margin-right-xs" :class="form.female ? 'cuIcon-female female' : 'cuIcon-male'"></text>
@@ -25,7 +28,7 @@
 			</view>
 			
 			<!-- 信息 -->
-			<view class="skeleton-rect margin-sm bg-white radius">
+			<view class="margin-sm bg-white radius">
 				<view class="cu-bar">
 					<view class="action sub-title">
 						<text class="text-xl text-bold text-green">信息</text>
@@ -94,26 +97,19 @@
 						<text class="text-ABC text-orange">timeline</text>
 					</view>
 				</view>
-				<unicloud-db
-					ref="udb"
-					v-slot:default="{data, loading, hasMore, error, options}" 
-					collection="timeline"
-					:where="`cat_id=='${id}'`"
-					orderby="create_date desc">
-					<view v-for="(item,index) in data" class="cu-timeline">
-						<view class="cu-time margin-left">{{item.create_date|timeFrom('yy/mm/dd')}}</view>
-						<view class="cu-item" :class="index?'':'text-blue'">
-							<view class="content">
-								<view class="text-content">{{item.text}}</view>
-								<view class="grid grid-square col-3 margin-top-sm">
-									<view class="bg-img" v-for="(pic,idx) in item.album" :key="idx">
-										<image :src="pic" mode="aspectFill" @tap.stop="preview(item.album, idx)"></image>
-									</view>
+				<view v-for="(item,index) in timeline" :key="index" class="cu-timeline">
+					<view class="cu-time margin-left">{{item.create_date|timeFrom('yy/mm/dd')}}</view>
+					<view class="cu-item" :class="index?'':'text-blue'">
+						<view class="content">
+							<view class="text-content">{{item.text}}</view>
+							<view class="grid grid-square col-3 margin-top-sm">
+								<view class="bg-img" v-for="(pic,idx) in item.album" :key="idx">
+									<image :src="pic" mode="aspectFill" @tap.stop="preview(item.album, idx)"></image>
 								</view>
 							</view>
 						</view>
 					</view>
-				</unicloud-db>
+				</view>
 				<view class="text-sm text-gray text-center padding-bottom">暂无更多</view>
 			</view>
 		</view>
@@ -127,30 +123,39 @@
 				current: 0,
 				id: '',
 				form: {},
+				timeline: [],
 				loading: true,
-				scrolled: false
+				background: {
+					background: ''
+				},
+				title: '',
+				titleColor: ''
 			}
 		},
 		onLoad(option) {
 			this.id = option.id
 			this.fetchData()
 		},
-		onPageScroll() {
-			if(!this.scrolled) {
-				uni.setNavigationBarColor({
-					frontColor: '#ffffff',
-					backgroundColor: this.form.female ? '#e03997' : '#0081ff'
-				})
-				this.scrolled = true
-			}
+		onPageScroll(e) {
+			const opacity = e.scrollTop/100
+			this.title = this.form.name
+			this.titleColor = `rgba(255,255,255,${opacity})`
+			this.background.background = this.form.female ? 
+				`rgba(224,57,151,${opacity})` : `rgba(0,129,255,${opacity})`
 		},
 		methods: {
 			fetchData() {
-				this.$get('list', this.id).then(res => {
-					this.form = res.data[0]
+				const db = uniCloud.database()
+				db.collection('list').doc(this.id).get().then(res => {
+					this.form = res.result.data[0]
 					uni.setNavigationBarTitle({
 						title: this.form.name
 					})
+				})
+				db.collection('timeline').where({
+					cat_id: this.id
+				}).get().then(res => {
+					this.timeline = res.result.data
 				})
 			},
 			imgLoad() {
@@ -187,6 +192,11 @@
 </script>
 
 <style>
+	.container {
+		position: absolute;
+		top: 0;
+	}
+	
 	/* swiper */
 	.swiper,
 	.swiper-item {
@@ -204,7 +214,6 @@
 		color: #FFC0CB;
 	}
 	
-	/* list */
 	.cu-list .action {
 		padding-top: 20rpx;
 		padding-bottom: 20rpx;

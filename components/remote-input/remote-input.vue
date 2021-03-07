@@ -4,7 +4,7 @@
 			ref="udb" 
 			v-slot="{data, loading, hasMore, error, options}" 
 			collection="list"
-			:page-size="5"
+			:page-size="limit"
 			:where="`/${searchValue||'.*'}/.test(name)||/${searchValue||'.*'}/.test(py)`"
 			orderby="py asc">
 			<view class="selected flex justify-between align-center" v-if="selected.name">
@@ -14,7 +14,7 @@
 				</view>
 				<text class="cuIcon-roundclose text-gray padding-tb" @tap="onClear"></text>
 			</view>
-			<input type="text" v-model="searchValue" :placeholder="placeholder" @focus="showCandidates=true" v-else>
+			<input type="text" v-model="searchValue" :placeholder="placeholder" @focus="showCandidates=true" @blur="onBlur" v-else>
 			<view class="candidates" v-if="showCandidates">
 				<scroll-view scroll-y show-scrollbar class="scroll-list">
 					<view class="cu-list menu sm-border">
@@ -42,13 +42,14 @@
 		behaviors: ['uni://form-field'],
 		props: {
 			value: String,
-			data: {
-				type: Object,
-				default: () => {} 
-			},
+			data: Object,
 			placeholder: {
 				type: String,
 				default: '请输入'
+			},
+			limit: {
+				type: Number,
+				default: 10
 			}
 		},
 		model: {
@@ -62,10 +63,9 @@
 				selected: {}
 			}
 		},
-		watch: {
-			data(val) {
-				console.log(val)
-				this.selected = val
+		created() {
+			if(this.value && this.data) {
+				this.selected = this.data
 			}
 		},
 		methods: {
@@ -73,6 +73,11 @@
 				this.selected = {}
 				this.searchValue = ''
 				this.$emit('change', '')
+			},
+			onBlur() {
+				setTimeout(() => {
+					this.showCandidates = false
+				},100)
 			},
 			onSelect(item) {
 				this.$set(this.selected, 'name', item.name)

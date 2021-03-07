@@ -89,6 +89,6 @@
 
 <style>
 	.cu-tag {
-		margin-left: 0;
+		margin-left: 0 !important;
 	}
 </style>

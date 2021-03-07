@@ -55,10 +55,10 @@
 				this.keys.forEach(item => {
 					this.$request('list', 'getStat', {
 						key: item.key
-					}).then(res => {
-						this.total = res.total
+					}).then(({data}) => {
+						this.total = data.total
 						const series = []
-						res.data.forEach(data => {
+						data.data.forEach(data => {
 							series.push({
 								name: this.$root.$options.filters[item.key](data._id),
 								data: data.num

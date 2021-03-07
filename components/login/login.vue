@@ -8,10 +8,10 @@
 				</view>
 				<view class="padding">{{userInfo.nickname}}</view>
 			</view>
-			<template v-if="hasWeixinAuth">
+			<!-- #ifdef APP-PLUS -->
 				<button class="cu-btn block bg-green margin lg" @tap="bindWeixin" v-if="!userInfo.wx_openid">绑定微信</button>
 				<button class="cu-btn block bg-white margin lg" @tap="unbindWeixin" v-else>解绑微信</button>
-			</template>
+			<!-- #endif -->
 			<button class="cu-btn block bg-red margin lg" @tap="doLogout">退出登录</button>
 		</view>
 		
@@ -29,7 +29,9 @@
 			</form>
 			
 			<!-- 微信登录 -->
-			<view class="weixin cuIcon-weixin text-green" @tap="loginByWeixin" v-if="hasWeixinAuth"></view>
+			<!-- #ifdef APP-PLUS || MP-WEIXIN -->
+			<view class="weixin cuIcon-weixin text-green" @tap="loginByWeixin"></view>
+			<!-- #endif -->
 		</template>
 	</view>
 </template>
@@ -49,18 +51,6 @@
 			}
 		},
 		computed: mapState(['hasLogin', 'userInfo']),
-		created() {
-			// #ifdef APP-PLUS
-			plus.oauth.getServices((services) => {
-				weixinAuthService = services.find((service) => {
-					return service.id === 'weixin'
-				})
-				if (weixinAuthService) {
-					this.hasWeixinAuth = true
-				}
-			});
-			// #endif	
-		},
 		methods: {
 			...mapMutations(['login','logout']),
 			register(e) {
