@@ -20,11 +20,11 @@
 				<view class="form padding-xl">
 					<view class="cu-form-group">
 						<view class="title">猫咪</view>
-						<remote-input placeholder="请输入猫咪姓名" v-model="form.detail._id" :data="form.detail"/>
+						<remote-input placeholder="请输入猫咪姓名" v-model="form.detail._id" ref="remote" :limit="5" class="text-left"/>
 					</view>
 					<view class="cu-form-group">
 						<view class="title">关系</view>
-						<input placeholder="请输入和本猫咪的关系" name="relation" v-model="form.tag"></input>
+						<input placeholder="请输入和本猫咪的关系" class="text-left" v-model="form.tag"></input>
 					</view>
 				</view>
 				<view class="cu-bar bg-white justify-end">
@@ -42,7 +42,8 @@
 	export default {
 		props: {
 			value: {
-				type: Array
+				type: Array,
+				default: () => []
 			}
 		},
 		model: {
@@ -51,7 +52,7 @@
 		},
 		data() {
 			return {
-				list: [],
+				list: this.value,
 				show: false,
 				form: {
 					detail: {}
@@ -59,16 +60,13 @@
 				index: -1
 			}
 		},
-		created() {
-			this.list = this.value
-		},
 		methods: {
 			delItem(index) {
 				this.list.splice(index,1)
 			},
 			showModal(item,index) {
 				if(index > -1) {
-					this.form = JSON.parse(JSON.stringify(item))
+					this.form = this.$u.deepClone(item)
 					this.index = index
 				}else {
 					this.form = {
@@ -90,12 +88,13 @@
 					})
 					return
 				}
+				const { _id, name, avatar } = this.$refs.remote.selected
 				const form = {
 					tag: this.form.tag,
 					detail: {
-						_id: this.form.detail._id,
-						name: this.form.detail.name,
-						avatar: this.form.detail.avatar
+						_id,
+						name,
+						avatar
 					}
 				}
 				if(this.index > -1) {
@@ -120,7 +119,7 @@
 	}
 	
 	.form {
-		padding-bottom: 350rpx;
+		padding-bottom: 500rpx;
 	}
 	
 	.grid,

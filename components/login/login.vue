@@ -213,13 +213,12 @@
 		position: absolute;
 		left: 50%;
 		transform: translateX(-50%);
-		display: flex;
-		justify-content: center;
-		align-items: center;
 		bottom: 50rpx;
 		width: 100rpx;
 		height: 100rpx;
-		font-size: 60rpx;
+		line-height: 90rpx;
+		text-align: center;
+		font-size: 50rpx;
 		background-color: #fff;
 		border-radius: 50%;
 		border: 1px solid #eee;
