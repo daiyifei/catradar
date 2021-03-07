@@ -10,7 +10,7 @@
 </template>
 
 <script>
-	import uCharts from '@/js_sdk/u-charts/u-charts/u-charts.js'
+	import uCharts from '@/uni_modules/u-charts/u-charts/u-charts.js'
 	export default {
 		props: {
 			width: {
@@ -34,7 +34,7 @@
 			}
 		},
 		created() {
-			this.id = Number(Math.random().toString().substr(3, 3) + Date.now()).toString(36)
+			this.id = Date.now().toString()
 			this.cWidth = uni.upx2px(this.width)
 			this.cHeight = uni.upx2px(this.height ? this.height : this.width)
 			// #ifdef MP-ALIPAY

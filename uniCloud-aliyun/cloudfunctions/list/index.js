@@ -53,7 +53,10 @@ async function getStat(params) {
 		})
 		.end()
 	return {
-		total,
-		data
+		code: 0,
+		data: {
+			total,
+			data
+		}
 	}
 }

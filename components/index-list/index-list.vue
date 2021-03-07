@@ -1,18 +1,16 @@
 <template>
 	<view>
 		<view class="cu-load loading text-gray" v-if="loading"></view>
-		
-		<view class="cu-load text-gray" v-else-if="!data.length">暂无结果</view>
-		
+		<view class="cu-load text-gray" v-else-if="!list.length">暂无结果</view>
 		<u-index-list :scrollTop="scrollTop" :indexList="indexList" v-else>
 			<!-- 置顶项目 -->
 			<slot name="top"></slot>
 			
 			<!-- 常规项目 -->
-			<view v-for="(item, index) in data" :key="index">
-				<u-index-anchor :index="item.name" />
+			<view v-for="(group, index) in indexData" :key="index">
+				<u-index-anchor :index="group.name" />
 				<view class="cu-list menu-avatar no-padding">
-					<navigator class="cu-item" :url="'detail?id='+item._id" @longpress="showMenu(item._id)" v-for="(item,idx) in item.data" :key="idx">
+					<navigator class="cu-item" :url="'detail?id='+item._id" @longpress="showMenu(item._id)" v-for="(item,idx) in group.data" :key="idx">
 						<image :src="item.avatar" mode="aspectFill" lazy-load class="cu-avatar round lg"></image>
 						<view class="content">
 							<view class="text-xl">{{item.name}}</view>
@@ -29,11 +27,17 @@
 			</view>
 		</u-index-list>
 		
+		<!-- 操作菜单 -->
 		<u-action-sheet :list="actions" @click="click" v-model="show"></u-action-sheet>
 	</view>
 </template>
 
 <script>	
+	const db = uniCloud.database()
+	import {
+		mapState,
+		mapMutations
+	} from 'vuex'
 	export default {
 		props: {
 			scrollTop: Number,
@@ -42,8 +46,9 @@
 		data() {
 			return {
 				loading: false,
-				data: [],
+				list: [],
 				indexList: [],
+				indexData: [],
 				total: 0,
 				actions: [{
 					text: '编辑',
@@ -52,6 +57,7 @@
 				id: ''
 			}
 		},
+		computed: mapState(['hasLogin', 'userInfo']),
 		created() {
 			this.fetchData()
 		},
@@ -61,40 +67,42 @@
 			},
 			condition(val) {
 				this.fetchData()
-			}
-		},
-		methods: {
-			async fetchData() {
-				this.loading = true
-				this.indexList = []
-				this.data = []
-				
-				const db = uniCloud.database()
-				const { result:{ data } } = await db.collection('list').where(this.condition||{}).orderBy('py,desc').get()
-				
+			},
+			list(val) {
 				let letters = 'abcdefghijklmnopqrstuvwxyz'.split('')
+				this.indexList = []
+				this.indexData = []
 				letters.map(letter => {
 					let cur = {
 						name: letter.toUpperCase(),
 						data: []
 					}
-					data.map(item => {
+					val.map(item => {
 						if (item.py.substr(0,1) === letter) {
 							cur.data.push(item)
 						}
 					})
 					if(cur.data.length) {
 						this.indexList.push(cur.name)
-						this.data.push(cur)
+						this.indexData.push(cur)
 					}
 				})
-				
+			}
+		},
+		methods: {
+			async fetchData() {
+				this.loading = true
+				this.list = []
+				const { result:{ data } } = await db.collection('list').where(this.condition||{}).orderBy('py,desc').get()
+				this.list = data
 				this.loading = false
 				uni.stopPullDownRefresh()
 			},
 			showMenu(id) {
-				this.show = true
-				this.id = id
+				if(this.hasLogin || this.userInfo.scope) {
+					this.show = true
+					this.id = id
+				}
 			},
 			click(index) {
 				uni.navigateTo({

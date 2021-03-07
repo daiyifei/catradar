@@ -7,9 +7,6 @@ import moment from 'moment'
 import uView from 'uview-ui'
 Vue.use(uView)
 
-import db from '@/js_sdk/uni-clientDB/index.js'
-const dbCmd = db.command
-
 import radar from './pages/radar/index.vue'
 Vue.component('radar', radar)
 
@@ -47,29 +44,6 @@ Vue.filter('location', function (value) {
   if (value === undefined) return '未知'
   return Array.from(Array(19),(v,k)=>k+17+'幢')[value]
 })
-
-Vue.prototype.$get = (collection,condition = {},limit) => {
-	return new Promise((resolve, reject) => {
-		let query = typeof(condition)==='string' ?
-						db.collection(collection).doc(condition) :
-						db.collection(collection).where(condition)
-		if(limit) {
-			query = query.limit(limit)
-		}
-		uniCloud.callFunction({
-			name: 'uni-clientDB',
-			data: {
-				command: query.get()
-			},
-			success({result}) {
-				resolve(result)
-			},
-			fail(err) {
-				reject(err)
-			}
-		})
-	})
-}
 
 Vue.prototype.$request = (name, action, params) => {
 	return new Promise((resolve, reject) => {

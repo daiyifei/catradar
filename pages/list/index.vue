@@ -61,7 +61,7 @@
 		},
 		computed: mapState(['hasLogin', 'userInfo']),
 		onPageScroll(e) {
-			this.scrollTop = e.scrollTop;
+			this.scrollTop = e.scrollTop
 		},
 		onPullDownRefresh() {
 			this.$refs.indexList.fetchData()

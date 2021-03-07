@@ -7,11 +7,12 @@
 		</view>
 		
 		<view class="bg-gray radius">
-			<unicloud-db ref="like" 
+			<unicloud-db ref="udb" 
 				v-slot:default="{data, loading, error, options}" 
 				collection="comments,uni-id-users" 
-				:where="`timeline_id=='${id}'&&comment_type==0`" 
-				field="user_id{_id,nickname}" 
+				:where="`timeline_id=="${timelineId}"`"
+				groupby="comment_type"
+				groupField="push(content,create_date,user_id) as data"
 				orderby="create_date asc" 
 				@load="likeLoad">
 				<!-- 点赞列表 -->
@@ -20,30 +21,6 @@
 					<text v-for="(item, index) in data" :key="index" class="margin-left-xs">
 						{{index?' , ':''+item.user_id[0].nickname}}
 					</text>
-				</view>
-			</unicloud-db>
-			
-			<unicloud-db 
-				ref="comment"
-				v-slot:default="{data, loading, error, options}" 
-				collection="comments,uni-id-users" 
-				:where="`timeline_id=='${id}'&&comment_type==1`" 
-				field="content,create_date,user_id{_id,nickname,avatar},reply_user_id{nickname,avatar}" 
-				orderby="create_date asc">
-				<!-- 评论列表 -->
-				<view class="padding-sm" v-if="data.length">
-					<view v-for="(item, index) in data" :key="index" @tap="item.user_id[0]._id===userInfo._id?remove(item._id):reply(item.user_id[0])">
-						<view>
-							<image :src="item.user_id[0].avatar" mode="aspectFill" class="cu-avatar sm round margin-right-xs"></image>
-							<text>{{item.user_id[0].nickname}}</text>
-							<text v-if="item.reply_user_id.length">回复{{item.reply_user_id[0].nickname}}</text>
-							<text>: {{item.content}}</text>
-						</view>
-						<view class="text-gray text-xs">
-							<text>{{item.create_date|timeFrom}}</text>
-							<text class="margin-left">{{item.user_id[0]._id===userInfo._id?'删除':'回复'}}</text>
-						</view>
-					</view>
 				</view>
 			</unicloud-db>
 		</view>
@@ -75,7 +52,7 @@
 	} from 'vuex'
 	export default {
 		props: {
-			id: String
+			timelineId: String
 		},		
 		data() {
 			return {
@@ -89,6 +66,9 @@
 		computed: mapState(['hasLogin', 'userInfo']),
 		methods: {
 			likeLoad(data) {
+				console.log(data)
+				return
+				
 				this.likeId = ''
 				data.forEach(item => {
 					if(item.user_id[0]._id === this.userInfo._id) {
@@ -101,7 +81,7 @@
 				const query = this.likeId ?
 					db.collection('comments').doc(this.likeId).remove() :
 					db.collection('comments').add({
-						timeline_id: this.id,
+						timeline_id: this.timelineId,
 						comment_type: 0
 					})
 				query.then(() => {
@@ -113,7 +93,7 @@
 			comment() {
 				this.form = {}
 				this.reply_nickname = ''
-				this.form.timeline_id = this.id
+				this.form.timeline_id = this.timelineId
 				this.form.comment_type = 1
 				this.showInput = true
 			},
@@ -123,7 +103,7 @@
 			},
 			reply(user) {
 				this.reply_nickname = user.nickname
-				this.form.timeline_id = this.id
+				this.form.timeline_id = this.timelineId
 				this.form.reply_user_id = user._id
 				this.form.comment_type = 1
 				this.showInput = true

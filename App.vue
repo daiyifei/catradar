@@ -7,6 +7,9 @@
 		},
 		onLaunch: function() {
 			// auto login
+			if(!uni.getStorageSync('uni_id_token'))
+				return
+			
 			this.$request('user-center','checkToken')
 				.then(res => {
 					if(res.token) {

@@ -9,19 +9,19 @@
 		<view v-else>
 			<!--列表主体-->
 			<unicloud-db
-				ref="timeline"
+				ref="udb"
 				v-slot:default="{data, loading, hasMore, error, options}" 
 				collection="timeline,list,uni-id-users"
 				field="cat_id{_id,name,avatar},user_id{nickname,avatar},text,album,create_date"
 				:page-size="5"
 				orderby="create_date desc">
-				<view class="cu-list menu-avatar comment solids-top">
+				<view class="cu-list menu-avatar comment solids-top" v-if="data">
 					<view class="cu-item" v-for="(item, index) in data" :key="index">
 						<!-- 操作按钮 -->
 						<view 
 							class="btn-more padding cuIcon-moreandroid text-gray"
 							v-if="userInfo.scope==9||userInfo._id==item.user_id[0]._id"
-							@tap="showMenu(item)">
+							@tap="showMenu(item._id)">
 						</view>
 						<!-- 头像 -->
 						<navigator :url="'/pages/list/detail?id='+item.cat_id[0]._id" class="cu-avatar">
@@ -44,7 +44,7 @@
 								</view>
 							</view>
 							<!-- 留言区域 -->
-							<message-board :ref="item._id" :id="item._id"></message-board>
+							<message-board :ref="item._id" :timeline-id="item._id"></message-board>
 						</view>
 					</view>
 				</view>
@@ -80,19 +80,21 @@
 					color: 'red'
 				}],
 				show: false,
-				item: ''
+				id: ''
 			}
 		},
 		computed: mapState(['hasLogin', 'userInfo']),
 		onPullDownRefresh() {
-			this.$refs.timeline.loadData({
+			this.$refs.udb.loadData({
 				clear: true
 			}, () => {
 				uni.stopPullDownRefresh()
 			})
 		},
 		onReachBottom() {
-			this.$refs.timeline.loadMore()
+			if(this.$refs.udb) {
+				this.$refs.udb.loadMore()
+			}
 		},
 		methods: {
 			preview(urls, current) {
@@ -101,18 +103,18 @@
 				  current
 				})
 			},
-			showMenu(item) {
-				this.item = item
+			showMenu(id) {
+				this.id = id
 				this.show = true
 			},
 			click(index) {
 				if(index === 0) {
 					uni.navigateTo({
-						url: 'edit?item=' + JSON.stringify(this.item)
+						url: 'edit?id=' + this.id
 					})
 				}
 				if(index === 1) {
-					this.$refs.udb.remove(this.item._id, {
+					this.$refs.udb.remove(this.id, {
 						confirmContent: '是否删除该条动态？'
 					})
 				}

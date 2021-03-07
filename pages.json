@@ -12,6 +12,7 @@
 			"style": {
 				"navigationBarBackgroundColor": "#1296db",
 				"navigationStyle": "custom",
+				"navigationBarTextStyle": "white",
 				"app-plus": {
 					"titleNView": {
 						"type": "transparent",

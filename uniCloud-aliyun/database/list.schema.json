@@ -37,7 +37,7 @@
 			"description": "生日"
 		},
 		"state": {
-			"bsonType": "string",
+			"bsonType": "number",
 			"description": "状态: 0 流浪中 1 待领养 2 已领养 3 失踪中 4 回喵星"
 		},
 		"location": {

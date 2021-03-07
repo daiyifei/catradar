@@ -1,15 +1,5 @@
 <template>
 	<view>
-		<unicloud-db
-			ref="udb"
-			v-slot:default="{data, loading, error, options}" 
-			collection="list"
-			getone
-			manual
-			:where="`_id=='${id}'`"
-			@load="loaded">
-		</unicloud-db>
-		
 		<view class="cu-load loading text-gray" v-if="loading"></view>
 		<form @submit="onSubmit" v-else>
 			<view class="cu-form-group required">
@@ -54,55 +44,41 @@
 			</view>
 			<view class="cu-form-group margin-top">
 				<view class="title">相册</view>
-				<drag-album v-model="form.album"></drag-album>
+				<drag-album v-model="form.album" ref="album"></drag-album>
 			</view>
 			<view class="cu-form-group margin-top">
 				<view class="title">关系</view>
 				<relation v-model="form.relation"></relation>
 			</view>
 			<button form-type="submit" class="cu-btn block bg-blue margin lg" :disabled="!form.name" :loading="saving">保存</button>
-			<button class="cu-btn block bg-red margin lg" :loading="deleting" v-if="id" @tap="onDelete">删除</button>
+			<button class="cu-btn block bg-red margin lg" v-if="id" @tap="onDelete">删除</button>
 		</form>
 	</view>
 </template>
 
 <script>
+	const db = uniCloud.database()
 	import pinyin from 'pinyin'
 	export default {
 		data() {
 			return {
 				id: '',
 				form: {},
-				loading: true,
-				saving: false,
-				deleting: false,
-				finish: {
-					success: () => {
-						setTimeout(() => {
-							uni.navigateBack()
-						}, 500)
-					},
-					complete: () => {
-						this.saving = false
-					}
-				}
+				loading: false,
+				saving: false
 			}
 		},
 		onLoad(option) {
-			this.id = option.id || ''
-		},
-		mounted() {
-			if(this.id) {
-				this.$refs.udb.loadData()
-			}else {
-				this.loading = false
+			if(option.id) {
+				this.id = option.id
+				this.loading = true
+				db.collection('list').doc(this.id).get().then(res => {
+					this.form = res.result.data[0]
+					this.loading = false
+				})
 			}
 		},
 		methods: {
-			loaded(data) {
-				this.loading = false
-				this.form = data || {}
-			},
 			async onSubmit() {
 				this.saving = true
 				
@@ -111,52 +87,59 @@
 					style: pinyin.STYLE_NORMAL
 				}).join('')
 				
-				// 上传图片
+				this.saving = true
+				
 				try {
-					const { album = [] } = this.form
-					await Promise.all(album.map(async (item, index) => {
-						if(!~item.indexOf('https://')) {
-							const { fileID } = await uniCloud.uploadFile({
-								filePath: item,
-								cloudPath: new Date().getTime() + '.jpg'
+					await this.$refs.album.upload()
+					if(this.id) {
+						// 编辑
+						delete this.form._id
+						await db.collection('list').doc(this.id).update(this.form)
+					}else {
+						// 新建
+						const { result: { data } }= await db.collection('list').where({
+							name: this.form.name
+						}).get()
+						// 重名
+						if(data.length) {
+							throw({
+								message: '名字已存在'
 							})
-							this.form.album[index] = fileID
 						}
-					}))
-				}catch (err) {
+						await db.collection('list').add(this.form)
+					}
 					uni.showToast({
-						title: '上传出错',
+						title: '保存成功'
+					})
+					setTimeout(() => {
+						uni.navigateBack()
+					}, 500)
+				}catch(e) {
+					uni.showToast({
+						title: e.message || '错误',
 						icon: 'none'
 					})
-					this.saving = false
-					return
 				}
-				
-				if(this.id) {
-					// 编辑
-					delete this.form._id
-					this.$refs.udb.update(this.id, this.form, this.finish) 
-				}else {
-					// 新建
-					const { data } = await this.$get('list',{
-						name: this.form.name
-					})
-					
-					// 重名
-					if(data.length) {
-						uni.showToast({
-							title: '名字已存在',
-							icon: 'none'
-						})
-						this.saving = false
-						return
-					}
-					
-					this.$refs.udb.add(this.form, this.finish) 
-				}
+				this.saving = false
 			},
 			onDelete() {
-				this.$refs.udb.remove(this.id, this.finish)
+				uni.showModal({
+					confirmColor: '#e54d42',
+					confirmText: '删除',
+					content: '确定要删除吗？',
+					success: res => {
+						if(res.confirm) {
+							db.collection('list').doc(this.id).remove().then(() => {
+								uni.showToast({
+									title: '删除成功'
+								})
+								setTimeout(() => {
+									uni.navigateBack()
+								}, 500)
+							})
+						}
+					}
+				})
 			}
 		}
 	}
