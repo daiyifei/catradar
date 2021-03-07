@@ -1,48 +1,41 @@
 <template>
 	<view class="container">
-		<unicloud-db 
-			ref="udb" 
-			v-slot="{data, loading, hasMore, error, options}" 
-			collection="list"
-			:page-size="limit"
-			:where="`/${searchValue||'.*'}/.test(name)||/${searchValue||'.*'}/.test(py)`"
-			orderby="py asc">
-			<view class="selected flex justify-between align-center" v-if="selected.name">
-				<view class="content">
-					<image class="cu-avatar sm round" :src="selected.avatar"></image>
-					<text class="text-grey margin-left-sm">{{selected.name}}</text>
-				</view>
-				<text class="cuIcon-roundclose text-gray padding-tb" @tap="onClear"></text>
+		<view class="selected flex justify-between align-center" v-if="selected.name">
+			<view class="content">
+				<image class="cu-avatar sm round" :src="selected.avatar"></image>
+				<text class="text-grey margin-left-sm">{{selected.name}}</text>
 			</view>
-			<input type="text" v-model="searchValue" :placeholder="placeholder" @focus="showCandidates=true" @blur="onBlur" v-else>
-			<view class="candidates" v-if="showCandidates">
-				<scroll-view scroll-y show-scrollbar class="scroll-list">
-					<view class="cu-list menu sm-border">
-						<view class="cu-item" v-for="(item,index) in data" :key="index" @tap="onSelect(item)">
-							<view class="content">
-								<image class="cu-avatar sm round" :src="item.avatar"></image>
-								<text class="text-grey margin-left-sm">{{item.name}}</text>
-							</view>
+			<text class="cuIcon-roundclose text-gray padding-tb" @tap="onClear"></text>
+		</view>
+		<view class="cu-load text-gray text-sm loading" v-else-if="loading"></view>
+		<input type="text" v-model="searchValue" :placeholder="placeholder" @focus="showCandidates=true" @blur="onBlur" v-else>
+		<view class="candidates" v-if="showCandidates">
+			<scroll-view scroll-y show-scrollbar style="max-height:500rpx">
+				<view class="cu-list menu sm-border">
+					<view class="cu-item" v-for="(item,index) in candidates" :key="index" @tap="onSelect(item)">
+						<view class="content">
+							<image class="cu-avatar sm round" :src="item.avatar"></image>
+							<text class="text-grey margin-left-sm">{{item.name}}</text>
 						</view>
 					</view>
-				</scroll-view>
-				<view class="cu-item">
-					<view class="content">
-						<text class="cu-load text-gray text-sm loading" v-if="loading"></text>
-						<text class="cu-load text-gray text-sm" v-else>{{hasMore ? '输入名字以显示更多结果' : '没有更多了'}}</text>
-					</view>
+				</view>
+			</scroll-view>
+			<view class="cu-item">
+				<view class="content">
+					<text class="cu-load text-gray text-sm loading" v-if="loadingCandidates"></text>
+					<text class="cu-load text-gray text-sm" v-else>{{searchValue?'暂无更多':'输入名字显示更多结果'}}</text>
 				</view>
 			</view>
-		</unicloud-db>
+		</view>
 	</view>
 </template>
 
 <script>
+	const db = uniCloud.database()
 	export default {
 		behaviors: ['uni://form-field'],
 		props: {
 			value: String,
-			data: Object,
 			placeholder: {
 				type: String,
 				default: '请输入'
@@ -59,16 +52,60 @@
 		data() {
 			return {
 				showCandidates: false,
+				candidates: [],
 				searchValue: '',
-				selected: {}
+				selected: {},
+				loading: false,
+				loadingCandidates: false
 			}
 		},
 		created() {
-			if(this.value && this.data) {
-				this.selected = this.data
+			this.init()
+		},
+		watch: {
+			value(val) {
+				this.init()
+			},
+			showCandidates(val) {
+				if(val) {
+					this.fetchCandidates()
+				}
+			},
+			searchValue(val) {
+				this.fetchCandidates()
 			}
 		},
 		methods: {
+			init() {
+				if(this.value) {
+					this.loading = true
+					db.collection('list').doc(this.value).get().then(res => {
+						this.selected = res.result.data[0]
+						this.loading = false
+					})
+				}else {
+					this.selected = {}
+				}
+			},
+			fetchCandidates() {
+				this.loadingCandidates = true
+				const reg = new RegExp('.*'+ this.searchValue, 'i')
+				db.collection('list')
+					.where(
+						db.command.or([{
+							name: reg,
+						},{
+							py: reg
+						}])
+					)
+					.limit(this.limit)
+					.orderBy('py desc')
+					.get()
+					.then(res => {
+						this.candidates = res.result.data
+						this.loadingCandidates = false
+					})
+			},
 			onClear() {
 				this.selected = {}
 				this.searchValue = ''
@@ -76,14 +113,15 @@
 			},
 			onBlur() {
 				setTimeout(() => {
+					this.searchValue = ''
 					this.showCandidates = false
 				},100)
 			},
 			onSelect(item) {
 				this.$set(this.selected, 'name', item.name)
 				this.$set(this.selected, 'avatar', item.avatar)
-				this.showCandidates = false
 				this.$emit('change', item._id)
+				this.showCandidates = false
 			}
 		}
 	}
@@ -120,11 +158,12 @@
 		z-index: -1;
 	}
 	
-	.cu-list.menu>.cu-item {
+	.content {
+		background: #fff;
 		border-radius: 10rpx;
 	}
 	
-	.scroll-list {
-		height: 300rpx;
+	.cu-item {
+		border-radius: 10rpx;
 	}
 </style>

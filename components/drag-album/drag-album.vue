@@ -36,11 +36,8 @@
 		},
 		data() {
 			return {
-				list: []
+				list: this.value
 			}
-		},
-		created() {
-			this.list = this.value
 		},
 		watch: {
 			list(val) {

@@ -27,7 +27,7 @@
 			"path": "pages/list/edit",
 			"style": {}
 		}, {
-			"path": "pages/dynamic/index",
+			"path": "pages/timeline/index",
 			"style": {
 				"navigationBarTitleText": "动态",
 				"enablePullDownRefresh": true
@@ -39,7 +39,7 @@
 				"disableScroll": true
 			}
 		}, {
-			"path": "pages/dynamic/edit",
+			"path": "pages/timeline/edit",
 			"style": {
 				"navigationBarTitleText": "发布",
 				"enablePullDownRefresh": false
@@ -63,7 +63,7 @@
 			"selectedIconPath": "static/tabbar/icon_cats_hl.png",
 			"text": "档案"
 		}, {
-			"pagePath": "pages/dynamic/index",
+			"pagePath": "pages/timeline/index",
 			"iconPath": "static/tabbar/icon_dynamic.png",
 			"selectedIconPath": "static/tabbar/icon_dynamic_hl.png",
 			"text": "动态"

@@ -43,7 +43,10 @@
 		</index-list>
 		
 		<!--新建按钮-->
-		<btn-new v-if="hasLogin&&userInfo.scope===9"/>
+		<navigator 
+			class="cu-avatar round lg bg-gradual-blue cuIcon-add btn-new margin"
+			url="edit"
+			v-if="hasLogin&&userInfo.scope===9"></navigator>
 	</view>
 </template>
 
@@ -80,5 +83,11 @@
 </script>
 
 <style>
-	
+	.btn-new {
+		position: fixed;
+		right: 0;
+		bottom: var(--window-bottom);
+		opacity: .9;
+		line-height: 80rpx;
+	}
 </style>

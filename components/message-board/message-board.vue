@@ -2,27 +2,33 @@
 	<view>
 		<!-- 功能按钮 -->
 		<view class="text-right margin-bottom-sm text-grey" style="margin-top: -50rpx;">
-			<text :class="'cuIcon-like'+(likeId?'fill':'')" @tap="like">{{(likeId?'取消':'点赞')}}</text>
+			<text :class="'cuIcon-like'+(likeId?'fill':'')" @tap="like">{{(likeId?'取消':'赞')}}</text>
 			<text class="cuIcon-message margin-left-sm" @tap="comment">留言</text>
 		</view>
 		
 		<view class="bg-gray radius">
-			<unicloud-db ref="udb" 
-				v-slot:default="{data, loading, error, options}" 
-				collection="comments,uni-id-users" 
-				:where="`timeline_id=="${timelineId}"`"
-				groupby="comment_type"
-				groupField="push(content,create_date,user_id) as data"
-				orderby="create_date asc" 
-				@load="likeLoad">
-				<!-- 点赞列表 -->
-				<view class="flex padding-sm text-grey text-bold" v-if="data.length">
-					<text class="cuIcon-like"></text>
-					<text v-for="(item, index) in data" :key="index" class="margin-left-xs">
-						{{index?' , ':''+item.user_id[0].nickname}}
-					</text>
+			<!-- 点赞列表 -->
+			<view class="flex padding-sm text-grey text-bold" v-if="likeList.length">
+				<text class="cuIcon-like"></text>
+				<text v-for="(item, index) in likeList" :key="index" class="margin-left-xs">
+					{{index?' , ':''+item.user[0].nickname}}
+				</text>
+			</view>
+			<!-- 评论列表 -->
+			<view class="padding-sm" 
+				v-for="(item, index) in commentList" :key="index" 
+				@tap="item.user_id===userInfo._id?remove(item._id):reply(item.user_id)">
+				<view>
+					<image :src="item.user[0].avatar" mode="aspectFill" class="cu-avatar sm round margin-right-xs"></image>
+					<text>{{item.user[0].nickname}}</text>
+					<text v-if="item.reply_user.length">回复{{item.reply_user[0].nickname}}</text>
+					<text>: {{item.content}}</text>
 				</view>
-			</unicloud-db>
+				<view class="text-gray text-xs">
+					<text>{{item.create_date|timeFrom}}</text>
+					<text class="margin-left">{{item.user_id===userInfo._id?'删除':'回复'}}</text>
+				</view>
+			</view>
 		</view>
 		
 		<!-- 输入区域 -->
@@ -46,16 +52,22 @@
 </template>
 
 <script>
+	const db = uniCloud.database()
 	import {
 		mapState,
 		mapMutations
 	} from 'vuex'
 	export default {
 		props: {
+			list: {
+				type: Array,
+				default: () => []
+			},
 			timelineId: String
 		},		
 		data() {
 			return {
+				data: this.list,
 				likeId: '',
 				showInput: false,
 				reply_nickname: '',
@@ -63,32 +75,86 @@
 				sending: false
 			}
 		},
-		computed: mapState(['hasLogin', 'userInfo']),
-		methods: {
-			likeLoad(data) {
-				console.log(data)
-				return
-				
+		computed: {
+			...mapState(['hasLogin', 'userInfo']),
+			likeList() {
+				const likeList = this.data.filter(item => {
+					return item.comment_type === 0
+				})
 				this.likeId = ''
-				data.forEach(item => {
-					if(item.user_id[0]._id === this.userInfo._id) {
+				likeList.forEach(item => {
+					if(item.user_id === this.userInfo._id) {
 						this.likeId = item._id
 					}
 				})
+				return likeList
 			},
-			like() {
-				const db = uniCloud.database()
-				const query = this.likeId ?
-					db.collection('comments').doc(this.likeId).remove() :
-					db.collection('comments').add({
+			commentList() {
+				return this.data.filter(item => {
+					return item.comment_type === 1
+				})
+			}
+		},
+		methods: {
+			async refresh() {
+				const $ = db.command.aggregate
+				const _ = db.command
+				const res = await db.collection('comments').aggregate()
+					.match({
+						timeline_id: this.timelineId
+					})
+					.lookup({
+						from: 'uni-id-users',
+						let: {
+							id: '$user_id'
+						},
+						pipeline: $.pipeline()
+							.match(_.expr(
+								$.eq(['$_id', '$$id'])
+							))
+							.project({
+								_id: 1,
+								nickname: 1,
+								avatar: 1
+							})
+							.done(),
+						as: 'user',
+					})
+					.lookup({
+						from: 'uni-id-users',
+						let: {
+							id: '$reply_user_id'
+						},
+						pipeline: $.pipeline()
+							.match(_.expr(
+								$.eq(['$_id', '$$id'])
+							))
+							.project({
+								_id: 1,
+								nickname: 1,
+								avatar: 1
+							})
+							.done(),
+						as: 'reply_user',
+					})
+					.sort({
+						create_date: -1
+					})
+					.end()
+				this.data = res.result.data
+			},
+			async like() {
+				uni.showLoading()
+				if(this.likeId) {
+					await db.collection('comments').doc(this.likeId).remove()
+				}else {
+					await db.collection('comments').add({
 						timeline_id: this.timelineId,
 						comment_type: 0
 					})
-				query.then(() => {
-					this.$refs.like.loadData({
-						clear: true
-					})
-				})
+				}
+				await this.refresh()
+				uni.hideLoading()
 			},
 			comment() {
 				this.form = {}
@@ -108,20 +174,25 @@
 				this.form.comment_type = 1
 				this.showInput = true
 			},
-			addComment() {
+			async addComment() {
 				this.sending = true
-				const db = uniCloud.database()
-				db.collection('comments').add(this.form).then(() => {
-					this.sending = false
-					this.showInput = false
-					this.$refs.comment.loadData({
-						clear: true
-					})
-				})
+				const { result: { id } } = await db.collection('comments').add(this.form)
+				const { result: { data }} = await db.collection('comments').doc(id).get()
+				this.sending = false
+				this.showInput = false
+				this.refresh()
 			},
 			remove(id) {
-				this.$refs.comment.remove(id, {
-					confirmContent: '是否删除该条留言？'
+				uni.showModal({
+					content: '是否删除？',
+					success: async res => {
+						if(res.confirm) {
+							uni.showLoading()
+							await db.collection('comments').doc(id).remove()
+							await this.refresh()
+							uni.hideLoading()
+						}
+					}
 				})
 			}
 		}
