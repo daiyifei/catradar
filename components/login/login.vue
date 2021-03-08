@@ -1,22 +1,7 @@
 <template>
 	<view>
-		<view class="user-info" v-if="hasLogin">
-			<view class="bg-white text-center" @tap="updateUser">
-				<view class="solid-bottom text-xsl padding">
-					<image v-if="userInfo.avatar" :src="userInfo.avatar" class="cu-avatar round xl"/>
-					<text class="cuIcon-my text-gray" v-else></text>
-				</view>
-				<view class="padding">{{userInfo.nickname}}</view>
-			</view>
-			<!-- #ifdef APP-PLUS -->
-				<button class="cu-btn block bg-green margin lg" @tap="bindWeixin" v-if="!userInfo.wx_openid">绑定微信</button>
-				<button class="cu-btn block bg-white margin lg" @tap="unbindWeixin" v-else>解绑微信</button>
-			<!-- #endif -->
-			<button class="cu-btn block bg-red margin lg" @tap="doLogout">退出登录</button>
-		</view>
-		
-		<template v-else>
-			<form @submit="loginByPwd" class="margin">
+		<template v-if="!hasLogin">
+			<form @submit="loginByPwd" class="cu-list menu card-menu margin-top-xl margin-bottom-xl shadow-lg radius">
 				<view class="cu-form-group">
 					<view class="title">用户名</view>
 					<input placeholder="请输入用户名" name="username"></input>
@@ -25,7 +10,9 @@
 					<view class="title">密码</view>
 					<input placeholder="请输入密码" name="password" type="password"></input>
 				</view>
-				<button form-type="submit" class="cu-btn block bg-blue margin lg" :loading="loading">登录</button>
+				<view class="cu-form-group">
+					<button form-type="submit" class="cu-btn block bg-blue" style="width: 100%;">登录</button>
+				</view>
 			</form>
 			
 			<!-- 微信登录 -->
@@ -51,6 +38,18 @@
 			}
 		},
 		computed: mapState(['hasLogin', 'userInfo']),
+		created() {
+			// #ifdef APP-PLUS
+			plus.oauth.getServices((services) => {
+				weixinAuthService = services.find((service) => {
+					return service.id === 'weixin'
+				})
+				if (weixinAuthService) {
+					this.hasWeixinAuth = true
+				}
+			});
+			// #endif	
+		},
 		methods: {
 			...mapMutations(['login','logout']),
 			register(e) {
@@ -173,7 +172,7 @@
 									gender
 								}).then(res => {
 									uni.showToast({
-										title: res.msg,
+										title: '头像昵称已同步',
 										icon: 'none'
 									})
 									this.refresh()

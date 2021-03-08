@@ -1,12 +1,11 @@
 {
 	"bsonType": "object",
-	"bsonType": "object",
 	"required": [],
 	"permission": {
 		"read": true,
 		"create": true,
-		"update": true,
-		"delete": true
+		"update": "doc.uid == auth.uid",
+		"delete": "doc.uid == auth.uid"
 	},
 	"properties": {
 		"_id": {

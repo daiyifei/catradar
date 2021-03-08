@@ -1,7 +1,7 @@
 {
 	"passwordSecret": "passwordSecret",
 	"tokenSecret": "tokenSecret",
-	"tokenExpiresIn": 7200,
+	"tokenExpiresIn": 604800,
 	"tokenExpiresThreshold": 600,
 	"passwordErrorLimit": 6,
 	"bindTokenToDevice": true,
@@ -9,7 +9,7 @@
 	"autoSetInviteCode": false,
 	"forceInviteCode": false,
 	"app-plus": {
-		"tokenExpiresIn": 2592000,
+		"tokenExpiresIn": 86400,
 		"oauth" : {
 			"weixin" : {
 				"appid" : "wx8834217bd9666010",

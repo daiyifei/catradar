@@ -1,14 +1,16 @@
 <template>
 	<view class="container">
 		<drag-sort v-model="list" :showDelete="false">
-			<view slot-scope="{ item,index }" class="grid" @tap.stop="preview(item)">
-				<slot :item="item" :index="index">
-					<image :src="item" mode="aspectFill"></image>
-				</slot>
-				<view class="close" @tap.stop="delItem(index)">
-					<text class='cuIcon-close'></text>
+			<template v-slot="{ item,index }">
+				<view class="grid" @tap="preview(item)">
+					<slot :item="item" :index="index">
+						<image :src="item" mode="aspectFill" />
+					</slot>
+					<view class="close" @tap="delItem(index)">
+						<text class='cuIcon-close'></text>
+					</view>
 				</view>
-			</view>
+			</template>
 			<view slot="append" class="grid solid" @tap="addItem">
 				<text class="cuIcon-add icon"></text>
 			</view>

@@ -30,9 +30,6 @@ exports.main = async (event, context) => {
 		case 'getList':
 			return getList(params)
 			break
-		case 'getItem':
-			return getItem(params)
-			break
 		default:
 			return {
 				code: 403,
@@ -41,6 +38,7 @@ exports.main = async (event, context) => {
 			break
 	}
 }
+
 
 async function getList(params) {
 	const { limit = 20, page = 1 } = params
@@ -143,38 +141,4 @@ async function getList(params) {
 		total,
 		data
 	}	
-}
-
-async function getItem(params) {
-	const { id } = params
-	if(!id) {
-		throw('参数不正确')
-	}
-	const { data } = await db.collection('timeline').aggregate()
-		.match({
-			_id: id
-		})
-		.lookup({
-			from: 'list',
-			let: {
-				id: '$cat_id'
-			},
-			pipeline: $.pipeline()
-				.match(_.expr(
-					$.eq(['$_id', '$$id'])
-				))
-				.project({
-					_id: 1,
-					name: 1,
-					avatar: 1
-				})
-				.done(),
-			as: 'cat',
-		})
-		.end()
-		
-	return {
-		code: 0,
-		data: data.length ? data[0] : {}
-	}
 }

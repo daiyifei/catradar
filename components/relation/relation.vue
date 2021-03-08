@@ -1,16 +1,18 @@
 <template>
 	<view class="container">
 		<!-- 列表 -->
-		<drag-album v-model="list" custom @add="showModal">
-			<view slot-scope="{ item,index }" class="grid" @tap.stop.prevent="showModal(item,index)">
-				<image :src="item.detail.avatar" mode="aspectFill"></image>
-				<view class="name">{{item.tag}} - {{item.detail.name}}</view>
-			</view>
+		<drag-album v-model="list" custom @add="showModal" style="width: 100%;">
+			<template v-slot="{ item,index }">
+				<view class="grid" @tap.stop.prevent="showModal(item,index)">
+					<image :src="item.detail.avatar" mode="aspectFill"></image>
+					<view class="name">{{item.tag}} - {{item.detail.name}}</view>
+				</view>
+			</template>
 		</drag-album>
 		
 		<!-- 对话框 -->
 		<view class="cu-modal" :class="show?'show':''">
-			<view class="cu-dialog">
+			<view class="cu-dialog" v-if="show">
 				<view class="cu-bar bg-white justify-end">
 					<view class="content">关系</view>
 					<view class="action" @tap="hideModal">
@@ -20,7 +22,7 @@
 				<view class="form padding-xl">
 					<view class="cu-form-group">
 						<view class="title">猫咪</view>
-						<remote-input placeholder="请输入猫咪姓名" v-model="form.detail._id" ref="remote" :limit="5" class="text-left"/>
+						<remote-input placeholder="请输入猫咪姓名" v-model="form.detail._id" ref="remote" :limit="5" class="text-left" style="width: 100%;"/>
 					</view>
 					<view class="cu-form-group">
 						<view class="title">关系</view>
@@ -58,6 +60,11 @@
 					detail: {}
 				},
 				index: -1
+			}
+		},
+		watch: {
+			list(val) {
+				this.$emit('change', this.list)
 			}
 		},
 		methods: {
@@ -102,7 +109,6 @@
 				}else {
 					this.list.push(form)
 				}
-				this.$emit('change',this.list)
 				this.hideModal()
 			}
 		}

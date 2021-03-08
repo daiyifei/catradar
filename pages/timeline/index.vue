@@ -42,7 +42,7 @@
 				</view>
 			</view>
 			<view class="cu-load loading text-gray" v-if="loading"></view>
-			<view class="cu-load text-gray" v-if="!hasMore">没有更多了</view>
+			<view class="cu-load text-gray text-sm" v-if="!hasMore">没有更多了</view>
 			
 			<!--新建按钮-->
 			<view class="cu-avatar round lg bg-gradual-blue cuIcon-camera btn-new margin" @tap="add"></view>
@@ -81,6 +81,19 @@
 		computed: mapState(['hasLogin', 'userInfo']),
 		onLoad() {
 			this.fetchData()
+		},
+		onShow() {
+			uni.$on('refresh', data => {
+				if(data) {
+					const index = this.list.findIndex(item => {
+						return item._id === data._id
+					})
+					data.user = this.list[index].user
+					this.list.splice(index, 1, data)
+				}else {
+					this.fetchData()
+				}
+			})
 		},
 		async onPullDownRefresh() {
 			await this.fetchData()

@@ -36,7 +36,9 @@
 			"path": "pages/mine/index",
 			"style": {
 				"navigationBarTitleText": "我的",
-				"disableScroll": true
+				"navigationStyle": "custom",
+				"navigationBarTextStyle": "white",
+				"titleNView": false
 			}
 		}, {
 			"path": "pages/timeline/edit",
