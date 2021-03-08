@@ -11,7 +11,7 @@
 		</view>
 		
 		<!-- 列表 -->
-		<index-list :scrollTop="scrollTop" :condition="condition" ref="indexList">
+		<index-list :scrollTop="scrollTop" :list="list">
 			<view slot="top">
 				<view class="cu-list menu">
 					<navigator class="cu-item" url="subpage?state=1">
@@ -51,6 +51,7 @@
 </template>
 
 <script>
+	const db = uniCloud.database()
 	import {
 		mapState,
 		mapMutations
@@ -58,20 +59,38 @@
 	export default {
 		data() {
 			return {
-				scrollTop: 0,
-				condition: {}
+				list: [],
+				condition: {},
+				scrollTop: 0
 			}
 		},
 		computed: mapState(['hasLogin', 'userInfo']),
+		watch: {
+			condition(val) {
+				this.fetchData()
+			}
+		},
+		onLoad() {
+			this.fetchData()
+		},
+		onShow() {
+			uni.$on('refresh',() => {
+				this.fetchData()
+			})
+		},
 		onPageScroll(e) {
 			this.scrollTop = e.scrollTop
 		},
-		onPullDownRefresh() {
-			this.$refs.indexList.fetchData()
+		async onPullDownRefresh() {
+			await this.fetchData()
+			uni.stopPullDownRefresh()
 		},
 		methods: {
+			async fetchData() {
+				const {result:{ data }} = await db.collection('list').where(this.condition).orderBy('py desc').get()
+				this.list = data
+			},
 			onSearch(e) {
-				const db = uniCloud.database()
 				this.condition = db.command.or({
 					name: new RegExp('.*' + e.detail.value,'i')
 				},{

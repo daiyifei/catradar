@@ -35,7 +35,10 @@
 	export default {
 		behaviors: ['uni://form-field'],
 		props: {
-			value: String,
+			value: {
+				type: String,
+				default: ''
+			},
 			placeholder: {
 				type: String,
 				default: '请输入'
@@ -60,33 +63,29 @@
 			}
 		},
 		created() {
-			this.init()
+			if(this.value) {
+				this.loading = true
+				db.collection('list').doc(this.value).field('_id,name,avatar').get().then(res => {
+					this.selected = res.result.data[0]
+					this.loading = false
+				})
+			}else {
+				this.selected = {}
+			}
 		},
 		watch: {
-			value(val) {
-				this.init()
-			},
 			showCandidates(val) {
 				if(val) {
 					this.fetchCandidates()
 				}
 			},
 			searchValue(val) {
-				this.fetchCandidates()
+				if(val && this.showCandidates) {
+					this.fetchCandidates()
+				}
 			}
 		},
 		methods: {
-			init() {
-				if(this.value) {
-					this.loading = true
-					db.collection('list').doc(this.value).get().then(res => {
-						this.selected = res.result.data[0]
-						this.loading = false
-					})
-				}else {
-					this.selected = {}
-				}
-			},
 			fetchCandidates() {
 				this.loadingCandidates = true
 				const reg = new RegExp('.*'+ this.searchValue, 'i')
@@ -99,7 +98,7 @@
 						}])
 					)
 					.limit(this.limit)
-					.orderBy('py desc')
+					.orderBy('py asc')
 					.get()
 					.then(res => {
 						this.candidates = res.result.data
@@ -115,13 +114,12 @@
 				setTimeout(() => {
 					this.searchValue = ''
 					this.showCandidates = false
-				},100)
+				}, 100)
 			},
 			onSelect(item) {
 				this.$set(this.selected, 'name', item.name)
 				this.$set(this.selected, 'avatar', item.avatar)
 				this.$emit('change', item._id)
-				this.showCandidates = false
 			}
 		}
 	}
@@ -130,7 +128,6 @@
 <style>
 	.container {
 		position: relative;
-		width: 100%;
 	}
 	
 	.candidates {

@@ -25,6 +25,8 @@
 					</navigator>
 				</view>
 			</view>
+			<!-- 计数 -->
+			<view class="cu-load text-gray">共{{list.length}}只</view>
 		</u-index-list>
 		
 		<!-- 操作菜单 -->
@@ -41,12 +43,13 @@
 	export default {
 		props: {
 			scrollTop: Number,
-			condition: Object
+			list: {
+				type: Array,
+				default: () => {}
+			}
 		},
 		data() {
 			return {
-				loading: false,
-				list: [],
 				indexList: [],
 				indexData: [],
 				total: 0,
@@ -57,16 +60,15 @@
 				id: ''
 			}
 		},
-		computed: mapState(['hasLogin', 'userInfo']),
-		created() {
-			this.fetchData()
+		computed: {
+			...mapState(['hasLogin', 'userInfo']),
+			loading() {
+				return !this.list.length
+			}
 		},
 		watch: {
 			scrollTop(val) {
 				this.scrollTop = val
-			},
-			condition(val) {
-				this.fetchData()
 			},
 			list(val) {
 				let letters = 'abcdefghijklmnopqrstuvwxyz'.split('')
@@ -90,14 +92,6 @@
 			}
 		},
 		methods: {
-			async fetchData() {
-				this.loading = true
-				this.list = []
-				const { result:{ data } } = await db.collection('list').where(this.condition||{}).orderBy('py,desc').get()
-				this.list = data
-				this.loading = false
-				uni.stopPullDownRefresh()
-			},
 			showMenu(id) {
 				if(this.hasLogin || this.userInfo.scope) {
 					this.show = true

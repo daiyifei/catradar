@@ -3,9 +3,9 @@
 	"required": ["name"],
 	"permission": {
 		"read": true,
-		"create": false,
-		"update": false,
-		"delete": false
+		"create": true,
+		"update": "doc.uid == auth.uid",
+		"delete": "doc.uid == auth.uid"
 	},
 	"properties": {
 		"_id": {

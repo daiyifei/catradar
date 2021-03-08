@@ -1,6 +1,6 @@
 <template>
 	<view id="sort-box">
-		<view :style="[areaStyle]" class="sort-wrap" @touchend="onEnd">
+		<view :style="[areaStyle]" class="sort-wrap" @touchend.stop.prevent="onEnd">
 			<template v-for="item in sortList" >
 				<view 
 					@touchmove.stop.prevent="onMove($event, item)"
@@ -235,18 +235,12 @@
 		},
 		mounted() {
 			this.$nextTick(() => {
-				uni.createSelectorQuery().select('#sort-box').boundingClientRect(({ width }) => {
-					this.areaWidth = width
+				uni.createSelectorQuery().in(this).select('#sort-box').boundingClientRect(res => {
+					if(res) {
+						this.areaWidth = res.width
+					}
 				}).exec()	
 			})
-		},
-		ready() {
-			console.log('ready')
-			uni.createSelectorQuery().select('#sort-box').boundingClientRect(({ width }) => {
-				this.areaWidth = width
-				this.removeAnimation()
-			}).exec()	
-
 		}
 	}
 </script>

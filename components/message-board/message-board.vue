@@ -3,7 +3,7 @@
 		<!-- 功能按钮 -->
 		<view class="text-right margin-bottom-sm text-grey" style="margin-top: -50rpx;">
 			<text :class="'cuIcon-like'+(likeId?'fill':'')" @tap="like">{{(likeId?'取消':'赞')}}</text>
-			<text class="cuIcon-message margin-left-sm" @tap="comment">留言</text>
+			<text class="cuIcon-message margin-left-sm" @tap="comment">评论</text>
 		</view>
 		
 		<view class="bg-gray radius">
@@ -17,7 +17,7 @@
 			<!-- 评论列表 -->
 			<view class="padding-sm" 
 				v-for="(item, index) in commentList" :key="index" 
-				@tap="item.user_id===userInfo._id?remove(item._id):reply(item.user_id)">
+				@tap="replyOrRemove(item)">
 				<view>
 					<image :src="item.user[0].avatar" mode="aspectFill" class="cu-avatar sm round margin-right-xs"></image>
 					<text>{{item.user[0].nickname}}</text>
@@ -34,17 +34,12 @@
 		<!-- 输入区域 -->
 		<view class="cu-modal bottom-modal" :class="showInput ? 'show' : ''" @tap.stop="hideInput">
 			<view class="cu-dialog" @tap.stop.prevent>
-				<view class="cu-form-group">
-					<u-input
-						:custom-style="{'padding':'10rpx 20rpx','border-radius':'30rpx','background-color':'#f0f0f0'}"
-						v-model="form.content"
-						:height="60"
-						:clearable="false"
-						auto-height
-						type="textarea"
-						:cursor-spacing="10"
-						:placeholder="reply_nickname?'回复'+reply_nickname:'留下你的精彩评论吧'"/>
-					<button type="primary" size="mini" class="round margin-left-sm" :disabled="!form.content" :loading="sending" @tap="addComment">发送</button>
+				<view class="cu-bar input">
+					<input :placeholder="reply_nickname?'回复'+reply_nickname:'评论'" v-model="content" cursor-spacing="10" class="bg-gray round text-left padding-lr" />
+					<!-- <view class="action">
+						<text class="cuIcon-emojifill text-grey"></text>
+					</view> -->
+					<button class="cu-btn bg-blue round" :disabled="!content" :loading="sending" @tap="addComment">发送</button>
 				</view>
 			</view>
 		</view>
@@ -67,6 +62,7 @@
 		},		
 		data() {
 			return {
+				content: '',
 				data: this.list,
 				likeId: '',
 				showInput: false,
@@ -167,33 +163,39 @@
 				this.form = {}
 				this.showInput = false
 			},
-			reply(user) {
-				this.reply_nickname = user.nickname
-				this.form.timeline_id = this.timelineId
-				this.form.reply_user_id = user._id
-				this.form.comment_type = 1
-				this.showInput = true
-			},
 			async addComment() {
 				this.sending = true
+				this.form.content = this.content
 				const { result: { id } } = await db.collection('comments').add(this.form)
 				const { result: { data }} = await db.collection('comments').doc(id).get()
 				this.sending = false
 				this.showInput = false
 				this.refresh()
 			},
-			remove(id) {
-				uni.showModal({
-					content: '是否删除？',
-					success: async res => {
-						if(res.confirm) {
-							uni.showLoading()
-							await db.collection('comments').doc(id).remove()
-							await this.refresh()
-							uni.hideLoading()
+			replyOrRemove(item) {
+				if(item.user_id === this.userInfo._id) {
+					uni.showModal({
+						content: '是否删除？',
+						success: async res => {
+							if(res.confirm) {
+								uni.showLoading()
+								await db.collection('comments').doc(item._id).remove()
+								await this.refresh()
+								uni.hideLoading()
+							}
 						}
-					}
-				})
+					})
+				}else {
+					const { _id, nickname, avatar } = item.user[0]
+					this.reply_nickname = nickname
+					this.form.timeline_id = this.timelineId
+					this.form.reply_user_id = _id
+					this.form.comment_type = 1
+					this.showInput = true
+				}
+			},
+			remove(id) {
+				
 			}
 		}
 	}

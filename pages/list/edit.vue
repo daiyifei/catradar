@@ -4,7 +4,7 @@
 		<form @submit="onSubmit" v-else>
 			<view class="cu-form-group required">
 				<view class="title">头像</view>
-				<upload v-model="form.avatar" crop />
+				<upload v-model="form.avatar" crop style="width: 100%;"/>
 			</view>
 			<view class="cu-form-group required">
 				<view class="title">名字</view>
@@ -44,11 +44,11 @@
 			</view>
 			<view class="cu-form-group margin-top">
 				<view class="title">相册</view>
-				<drag-album v-model="form.album" ref="album"></drag-album>
+				<drag-album v-model="form.album" ref="album" style="width: 100%;"></drag-album>
 			</view>
 			<view class="cu-form-group margin-top">
 				<view class="title">关系</view>
-				<relation v-model="form.relation"></relation>
+				<relation v-model="form.relation" style="width: 100%;"></relation>
 			</view>
 			<button form-type="submit" class="cu-btn block bg-blue margin lg" :disabled="!form.name" :loading="saving">保存</button>
 			<button class="cu-btn block bg-red margin lg" v-if="id" @tap="onDelete">删除</button>
@@ -95,9 +95,10 @@
 						// 编辑
 						delete this.form._id
 						await db.collection('list').doc(this.id).update(this.form)
+						this.form._id = this.id
 					}else {
 						// 新建
-						const { result: { data } }= await db.collection('list').where({
+						const { result: { data } } = await db.collection('list').where({
 							name: this.form.name
 						}).get()
 						// 重名
@@ -111,12 +112,13 @@
 					uni.showToast({
 						title: '保存成功'
 					})
+					uni.$emit('refresh')
 					setTimeout(() => {
 						uni.navigateBack()
 					}, 500)
-				}catch(e) {
+				}catch(err) {
 					uni.showToast({
-						title: e.message || '错误',
+						title: err.message,
 						icon: 'none'
 					})
 				}
@@ -133,6 +135,7 @@
 								uni.showToast({
 									title: '删除成功'
 								})
+								uni.$emit('refresh')
 								setTimeout(() => {
 									uni.navigateBack()
 								}, 500)
