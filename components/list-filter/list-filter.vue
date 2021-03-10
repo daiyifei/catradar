@@ -7,11 +7,6 @@
 		<view class="cu-modal drawer-modal justify-end" :class="show ? 'show' : ''" @tap.stop="hideDrawer" @touchmove.stop.prevent>
 				<view class="cu-dialog bg-white basis-lg" @tap.stop.prevent>
 					<scroll-view scroll-y @touchmove.stop.prevent style="height: 100vh;">
-						<view class="cu-bar bg-white solid-bottom">
-							<view class="action">
-								<text class="cuIcon-title text-blue"></text>筛选
-							</view>
-						</view>
 						<view class="padding solid-bottom" v-for="(filter,index) in filters" :key="index">
 							<view class="text-left padding-bottom-sm text-sm">{{filter.name}}</view>
 							<view class="bg-white text-left">
@@ -88,6 +83,10 @@
 </script>
 
 <style>
+	.cu-dialog {
+		padding-top: var(--status-bar-height);
+	}
+	
 	.cu-tag {
 		margin-left: 0 !important;
 	}

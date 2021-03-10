@@ -5,23 +5,16 @@
 			"path": "pages/list/index",
 			"style": {
 				"enablePullDownRefresh": true,
-				"navigationBarTitleText": "档案"
+				"navigationStyle": "custom",
+				"navigationBarTextStyle": "black",
+				"titleNView": false
 			}
 		}, {
 			"path": "pages/list/detail",
 			"style": {
-				"navigationBarBackgroundColor": "#1296db",
 				"navigationStyle": "custom",
-				"navigationBarTextStyle": "white",
-				"app-plus": {
-					"titleNView": {
-						"type": "transparent",
-						"padding": "10px",
-						"buttons": [{
-							"type": "share"
-						}]
-					}
-				}
+				"titleNView": false,
+				"navigationBarTextStyle": "white"
 			}
 		}, {
 			"path": "pages/list/edit",
@@ -29,8 +22,11 @@
 		}, {
 			"path": "pages/timeline/index",
 			"style": {
-				"navigationBarTitleText": "动态",
-				"enablePullDownRefresh": true
+				"navigationBarTitleText": "情报",
+				"enablePullDownRefresh": true,
+				"navigationStyle": "custom",
+				"navigationBarTextStyle": "white",
+				"titleNView": false
 			}
 		}, {
 			"path": "pages/mine/index",
@@ -67,7 +63,7 @@
 			"pagePath": "pages/timeline/index",
 			"iconPath": "static/tabbar/icon_dynamic.png",
 			"selectedIconPath": "static/tabbar/icon_dynamic_hl.png",
-			"text": "动态"
+			"text": "情报"
 		}, {
 			"pagePath": "pages/mine/index",
 			"iconPath": "static/tabbar/icon_mine.png",

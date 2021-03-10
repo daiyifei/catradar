@@ -34,7 +34,7 @@
 			}
 		},
 		created() {
-			this.id = Date.now().toString()
+			this.id = Math.ceil(Math.random()*1000000) + ''
 			this.cWidth = uni.upx2px(this.width)
 			this.cHeight = uni.upx2px(this.height ? this.height : this.width)
 			// #ifdef MP-ALIPAY
@@ -86,5 +86,4 @@
 </script>
 
 <style>
-
 </style>

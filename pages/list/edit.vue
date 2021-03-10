@@ -12,7 +12,7 @@
 			</view>
 			<view class="cu-form-group required">
 				<view class="title">性别</view>
-				<form-switch type="switch-sex" v-model="form.female" @change="onChange('female', $event)"/>
+				<form-switch type="gender" v-model="form.female" @change="onChange('female', $event)"/>
 			</view>
 			<view class="cu-form-group">
 				<view class="title">状态</view>
@@ -99,16 +99,12 @@
 				this.form[name] = value
 			},
 			async onSubmit(e) {
-				console.log(this.form)
-				return
 				this.saving = true
 				
 				// 拼音
 				this.form.py = pinyin(this.form.name, {
 					style: pinyin.STYLE_NORMAL
 				}).join('')
-				
-				this.saving = true
 				
 				try {
 					this.form.avatar = await this.$upload(this.form.avatar)
@@ -178,19 +174,5 @@
 		margin-left: 6rpx;
 		color: #e54d42;
 		font-size: 34rpx;
-	}
-	.grid .close {
-		 position: absolute;
-		 top: 0;
-		 right: 0;
-		 display: flex;
-		 justify-content: center;
-		 align-items: center;
-		 width: 40rpx;
-		 height: 40rpx;
-		 font-size: 30rpx;
-		 color: #fff;
-		 background: rgba(0,0,0,.5);
-		 border-radius: 6rpx;
 	}
 </style>
