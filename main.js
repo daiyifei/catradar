@@ -67,6 +67,30 @@ Vue.prototype.$request = (name, action, params) => {
 	})
 }
 
+Vue.prototype.$upload = data => {
+	return new Promise(async (resolve, reject) => {
+		try {
+			const list = data instanceof Array ? data : [data]
+			await Promise.all(list.map(async (item, index) => {
+				if(item && !~item.indexOf('https://')) {
+					const { fileID } = await uniCloud.uploadFile({
+						filePath: item,
+						cloudPath: new Date().getTime() + '.jpg'
+					})
+					list[index] = fileID
+				}
+			}))
+			resolve(data instanceof Array ? list : list[0])
+		}catch (err) {
+			uni.showToast({
+				title: err.message,
+				icon: 'none'
+			})
+			reject()
+		}
+	})
+}
+
 Vue.prototype.$store = store
 
 App.mpType = 'app'

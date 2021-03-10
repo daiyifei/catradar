@@ -26,6 +26,7 @@
 		},
 		"female": {
 			"bsonType": "bool",
+			"defaultValue": false,
 			"description": "性别 公:false 母:true"
 		},
 		"color": {
@@ -46,6 +47,7 @@
 		},
 		"neuter": {
 			"bsonType": "bool",
+			"defaultValue": false,
 			"description": "绝育 未绝育:false 已绝育:true"
 		},
 		"neuterDate": {

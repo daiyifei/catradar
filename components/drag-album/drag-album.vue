@@ -2,24 +2,22 @@
 	<view class="container">
 		<drag-sort v-model="list" :showDelete="false">
 			<template v-slot="{ item,index }">
-				<view class="grid" @tap="preview(item)">
-					<slot :item="item" :index="index">
-						<image :src="item" mode="aspectFill" />
-					</slot>
-					<view class="close" @tap="delItem(index)">
+				<view class="grid" @tap="preview">
+					<image :src="item" mode="aspectFill" />
+					<view class="close" @tap.prevent.stop="delItem(index)">
 						<text class='cuIcon-close'></text>
 					</view>
 				</view>
 			</template>
-			<view slot="append" class="grid solid" @tap="addItem">
-				<text class="cuIcon-add icon"></text>
+			<view slot="append" class="grid solids" @tap="addItem">
+				<text class="cuIcon-add"></text>
 			</view>
 		</drag-sort>
 	</view>
 </template>
 
 <script>
-	import dragSort from './dragSort.vue'
+	import dragSort from '../dragSort.vue'
 	export default {
 		behaviors: ['uni://form-field'],
 		components: {
@@ -38,10 +36,16 @@
 		},
 		data() {
 			return {
-				list: this.value
+				list: []
 			}
 		},
+		created() {
+			this.list = this.value
+		},
 		watch: {
+			value(val) {
+				this.list = this.value
+			},
 			list(val) {
 				this.$emit('change', this.list)
 			}
@@ -125,10 +129,6 @@
 	 display: block;
 	 width: 100%;
 	 height: 100%;
- }
- 
- .grid.solid {
-	 border: 1px solid #eee;
  }
  
  .grid .close {

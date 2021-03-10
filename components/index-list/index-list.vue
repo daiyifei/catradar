@@ -1,10 +1,8 @@
 <template>
 	<view>
-		<view class="cu-load loading text-gray" v-if="loading"></view>
-		<view class="cu-load text-gray" v-else-if="!list.length">暂无结果</view>
-		<u-index-list :scrollTop="scrollTop" :indexList="indexList" v-else>
+		<u-index-list :scrollTop="scrollTop" :indexList="indexList">
 			<!-- 置顶项目 -->
-			<slot name="top"></slot>
+			<slot></slot>
 			
 			<!-- 常规项目 -->
 			<view v-for="(group, index) in indexData" :key="index">
@@ -26,7 +24,7 @@
 				</view>
 			</view>
 			<!-- 计数 -->
-			<view class="cu-load text-gray">共{{list.length}}只</view>
+			<view class="cu-load text-gray" v-if="list.length">共{{list.length}}只</view>
 		</u-index-list>
 		
 		<!-- 操作菜单 -->
@@ -45,8 +43,8 @@
 			scrollTop: Number,
 			list: {
 				type: Array,
-				default: () => {}
-			}
+				default: () => []
+			},
 		},
 		data() {
 			return {

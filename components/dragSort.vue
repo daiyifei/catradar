@@ -1,6 +1,6 @@
 <template>
 	<view id="sort-box">
-		<view :style="[areaStyle]" class="sort-wrap" @touchend.stop.prevent="onEnd">
+		<view :style="[areaStyle]" class="sort-wrap" @touchend="onEnd">
 			<template v-for="item in sortList" >
 				<view 
 					@touchmove.stop.prevent="onMove($event, item)"
