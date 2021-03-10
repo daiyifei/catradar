@@ -3,13 +3,13 @@
 		<view class="cu-load loading text-gray" v-if="loading"></view>
 		<form @submit="onSubmit" v-else>
 			<view class="cu-form-group">
-				<remote-input placeholder="照片中的是谁？" ref="remote" v-model="form.cat_id" style="width: 100%;"/>
+				<remote-input placeholder="照片中的是谁？" ref="remote" v-model="form.cat_id" class="response" />
 			</view>
 			<view class="cu-form-group">
 				<textarea name="text" placeholder="写点什么吧..." maxlength="140" v-model="form.text"></textarea>
 			</view>
 			<view class="cu-form-group"> 
-				<drag-album name="album" ref="album" v-model="form.album" style="width: 100%;"></drag-album>
+				<drag-album name="album" ref="album" v-model="form.album" class="response" />
 			</view>
 			<button form-type="submit" class="cu-btn block bg-blue margin lg" :loading="saving" :disabled="!form.cat_id||!form.text||!form.album.length">{{id?'保存':'发布'}}</button>
 		</form>
@@ -23,6 +23,7 @@
 			return {
 				id: '',
 				form: {},
+				album: [],
 				data: {},
 				loading: false,
 				saving: false
@@ -41,13 +42,11 @@
 				this.loading = true
 				const { result: { data }} = await db.collection('timeline').doc(options.id).get()
 				this.form = data[0]
+				this.form.album = data[0].album
 				this.loading = false
 			}
 		},
 		methods: {
-			test(e) {
-				console.log(e)
-			},
 			async onSubmit() {
 				this.saving = true
 				try{

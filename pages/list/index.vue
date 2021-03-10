@@ -6,39 +6,39 @@
 				<text class="cuIcon-search"></text>
 				<input type="text" placeholder="搜索" confirm-type="search" @input="onSearch"></input>
 			</view>
-			<list-filter class="margin-right" v-model="condition" />
+			<list-filter class="margin-right" v-model="condition" @change="onFilterChange" />
 			<statistics class="margin-right" />
 		</view>
 		
 		<!-- 列表 -->
 		<index-list :scrollTop="scrollTop" :list="list">
-			<view slot="top">
-				<view class="cu-list menu">
-					<navigator class="cu-item" url="subpage?state=1">
-						<view class="content">
-							<text class="cuIcon-presentfill text-green"></text>
-							<text class="text-grey">待领养</text>
-						</view>
-					</navigator>
-					<navigator class="cu-item" url="subpage?state=2">
-						<view class="content">
-							<text class="cuIcon-crownfill text-orange"></text>
-							<text class="text-grey">已领养</text>
-						</view>
-					</navigator>
-					<navigator class="cu-item" url="subpage?state=3">
-						<view class="content">
-							<text class="cuIcon-explorefill text-blue"></text>
-							<text class="text-grey">失踪中</text>
-						</view>
-					</navigator>
-					<navigator class="cu-item" url="subpage?state=4">
-						<view class="content">
-							<text class="cuIcon-discoverfill text-grey"></text>
-							<text class="text-grey">回喵星</text>
-						</view>
-					</navigator>
-				</view>
+			<view class="cu-list menu">
+				<navigator class="cu-item" url="subpage?state=1">
+					<view class="content">
+						<text class="cuIcon-presentfill text-green"></text>
+						<text class="text-grey">待领养</text>
+					</view>
+				</navigator>
+				<navigator class="cu-item" url="subpage?state=2">
+					<view class="content">
+						<text class="cuIcon-crownfill text-orange"></text>
+						<text class="text-grey">已领养</text>
+					</view>
+				</navigator>
+				<navigator class="cu-item" url="subpage?state=3">
+					<view class="content">
+						<text class="cuIcon-explorefill text-blue"></text>
+						<text class="text-grey">失踪中</text>
+					</view>
+				</navigator>
+				<navigator class="cu-item" url="subpage?state=4">
+					<view class="content">
+						<text class="cuIcon-discoverfill text-grey"></text>
+						<text class="text-grey">回喵星</text>
+					</view>
+				</navigator>
+				<view class="cu-load loading text-gray" v-if="loading"></view>
+				<view class="cu-load text-gray" v-else-if="!list.length">暂无结果</view>
 			</view>
 		</index-list>
 		
@@ -60,6 +60,7 @@
 		data() {
 			return {
 				list: [],
+				loading: false,
 				condition: {},
 				scrollTop: 0
 			}
@@ -87,8 +88,10 @@
 		},
 		methods: {
 			async fetchData() {
-				const {result:{ data }} = await db.collection('list').where(this.condition).orderBy('py desc').get()
+				this.loading = true
+				const {result:{ data }} = await db.collection('list').where(this.condition).orderBy('py','asc').get()
 				this.list = data
+				this.loading = false
 			},
 			onSearch(e) {
 				this.condition = db.command.or({
@@ -96,7 +99,10 @@
 				},{
 					py: new RegExp('.*' + e.detail.value,'i')
 				})
-			}
+			},
+			onFilterChange(e) {
+				this.condition = e
+			},
 		}
 	}
 </script>

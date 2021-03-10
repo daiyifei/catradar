@@ -4,14 +4,14 @@
 			<form @submit="loginByPwd" class="cu-list menu card-menu margin-top-xl margin-bottom-xl shadow-lg radius">
 				<view class="cu-form-group">
 					<view class="title">用户名</view>
-					<input placeholder="请输入用户名" name="username"></input>
+					<input placeholder="请输入用户名" name="username" v-model="form.username"></input>
 				</view>
 				<view class="cu-form-group">
 					<view class="title">密码</view>
-					<input placeholder="请输入密码" name="password" type="password"></input>
+					<input placeholder="请输入密码" name="password" type="password" v-model="form.password"></input>
 				</view>
 				<view class="cu-form-group">
-					<button form-type="submit" class="cu-btn block bg-blue" style="width: 100%;">登录</button>
+					<button form-type="submit" class="cu-btn block bg-blue" style="width: 100%;" :disabled="!form.username||!form.password">登录</button>
 				</view>
 			</form>
 			
@@ -33,8 +33,11 @@
 		name: 'login',
 		data() {
 			return {
-				loading: false,
-				hasWeixinAuth: false
+				hasWeixinAuth: false,
+				form: {
+					username: '',
+					password: ''
+				}
 			}
 		},
 		computed: mapState(['hasLogin', 'userInfo']),
@@ -55,23 +58,9 @@
 			register(e) {
 				this.$request('user-center','register',e.detail.value)
 			},
-			loginByPwd(e) {
-				if(!e.detail.value.username) {
-					uni.showToast({
-						title: '请输入用户名',
-						icon: 'none'
-					})
-					return
-				}
-				if(!e.detail.value.username) {
-					uni.showToast({
-						title: '请输入密码',
-						icon: 'none'
-					})
-					return
-				}
+			loginByPwd() {
 				uni.showLoading()
-				this.$request('user-center','login',e.detail.value)
+				this.$request('user-center','login', this.form)
 					.then(res => {
 						uni.setStorageSync('uni_id_token', res.token)
 						uni.setStorageSync('uni_id_token_expired', res.tokenExpired)

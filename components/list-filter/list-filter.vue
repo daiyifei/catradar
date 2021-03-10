@@ -1,6 +1,6 @@
 <template>
 	<view>
-		<view @tap="showDrawer" :class="Object.keys(condition).length ? 'text-orange' : ''">
+		<view @tap="showDrawer" :class="JSON.stringify(condition) === '{}' ? '' : 'text-orange'">
 			<text class="cuIcon-filter"></text>
 			<text>筛选</text>
 		</view>
@@ -53,7 +53,7 @@
 				}, {
 					key: 'color',
 					name: '花色',
-					value: Array.from(Array(6), (v, k) => k),
+					value: Array.from(Array(7), (v, k) => k),
 				}, {
 					key: 'location',
 					name: '位置',
@@ -63,7 +63,7 @@
 		},
 		methods: {
 			showDrawer() {
-				this.condition = JSON.parse(JSON.stringify(this.value))
+				this.condition = this.$u.deepClone(this.value)
 				this.show = true
 			},
 			hideDrawer() {

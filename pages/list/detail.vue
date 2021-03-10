@@ -154,7 +154,7 @@
 				})
 				db.collection('timeline').where({
 					cat_id: this.id
-				}).get().then(res => {
+				}).orderBy('create_date','desc').get().then(res => {
 					this.timeline = res.result.data
 				})
 			},

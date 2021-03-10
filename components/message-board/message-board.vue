@@ -67,7 +67,9 @@
 				likeId: '',
 				showInput: false,
 				reply_nickname: '',
-				form: {},
+				form: {
+					
+				},
 				sending: false
 			}
 		},
