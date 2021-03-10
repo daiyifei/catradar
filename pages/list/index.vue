@@ -1,14 +1,16 @@
 <template>
 	<view>
-		<!-- 搜索栏 -->
-		<view class="cu-bar bg-white search">
-			<view class="search-form round">
-				<text class="cuIcon-search"></text>
-				<input type="text" placeholder="搜索" confirm-type="search" @input="onSearch"></input>
+		<u-navbar :is-back="false">
+			<!-- 搜索栏 -->
+			<view class="cu-bar search response">
+				<view class="search-form round">
+					<text class="cuIcon-search"></text>
+					<input placeholder="搜索" confirm-type="search" @input="onSearch"></input>
+				</view>
+				<list-filter class="margin-right" v-model="condition" @change="onFilterChange" />
+				<statistics class="margin-right" />
 			</view>
-			<list-filter class="margin-right" v-model="condition" @change="onFilterChange" />
-			<statistics class="margin-right" />
-		</view>
+		</u-navbar>
 		
 		<!-- 列表 -->
 		<index-list :scrollTop="scrollTop" :list="list">

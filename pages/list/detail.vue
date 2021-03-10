@@ -1,8 +1,6 @@
 <template>
 	<view>
-		<!-- #ifdef MP-WEIXIN -->
 		<u-navbar :background="background" :title="title" back-icon-color="#fff" :title-color="titleColor"></u-navbar>
-		<!-- #endif -->
 		<view class="container">
 			<!-- 封面 -->
 			<swiper class="swiper screen-swiper square-dot" :indicator-dots="true" :circular="true" @change="imgChange">
@@ -141,7 +139,8 @@
 			this.title = this.form.name
 			this.titleColor = `rgba(255,255,255,${opacity})`
 			this.background.background = this.form.female ? 
-				`rgba(224,57,151,${opacity})` : `rgba(0,129,255,${opacity})`
+				`linear-gradient(45deg, rgba(236,0,140,${opacity}), rgba(103,57,182,${opacity}))` :
+				`linear-gradient(45deg, rgba(0,129,255,${opacity}), rgba(28,187,180,${opacity}))`
 		},
 		methods: {
 			fetchData() {

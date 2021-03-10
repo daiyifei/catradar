@@ -7,12 +7,7 @@
 		<view class="cu-modal drawer-modal justify-end" :class="show ? 'show' : ''" @tap.stop="hideDrawer" @touchmove.stop.prevent>
 			<view class="cu-dialog bg-white basis-lg" @tap.stop="">
 				<scroll-view scroll-y @touchmove.stop.prevent style="height: 100vh;">
-					<view class="cu-bar bg-white solid-bottom">
-						<view class="action">
-							<text class="cuIcon-title text-blue"></text>统计
-						</view>
-					</view>
-					<view class="solid-bottom" v-for="(item,index) in keys" :key="index">
+					<view class="solid-bottom" v-for="(item,index) in keys" :key="index" v-show="show">
 						<view class="padding text-left padding-bottom-sm text-sm">{{item.label}}</view>
 						<pie-chart :width="450" :series="charts[item.key]"/>
 					</view>
@@ -73,4 +68,7 @@
 </script>
 
 <style>
+	.cu-dialog {
+		padding-top: var(--status-bar-height);
+	}
 </style>

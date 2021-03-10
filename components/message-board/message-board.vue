@@ -35,7 +35,12 @@
 		<view class="cu-modal bottom-modal" :class="showInput ? 'show' : ''" @tap.stop="hideInput">
 			<view class="cu-dialog" @tap.stop.prevent>
 				<view class="cu-bar input">
-					<input :placeholder="reply_nickname?'回复'+reply_nickname:'评论'" v-model="content" cursor-spacing="10" class="bg-gray round text-left padding-lr" />
+					<input 
+					:placeholder="reply_nickname?'回复'+reply_nickname:'评论'" 
+					v-model="content" 
+					cursor-spacing="10" 
+					class="bg-white round text-left padding-lr" 
+					:focus="showInput"/>
 					<!-- <view class="action">
 						<text class="cuIcon-emojifill text-grey"></text>
 					</view> -->
@@ -160,6 +165,7 @@
 				this.form.timeline_id = this.timelineId
 				this.form.comment_type = 1
 				this.showInput = true
+				this.$emit('input')
 			},
 			hideInput() {
 				this.form = {}
@@ -204,4 +210,10 @@
 </script>
 
 <style>
+	.cu-modal {
+		background-color: transparent;
+	}
+	.cu-bar.input {
+		background-color: #f0f0f0;
+	}
 </style>

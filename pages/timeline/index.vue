@@ -7,42 +7,53 @@
 		</view>
 		
 		<view v-else>
-			<!--列表主体-->
-			<view class="cu-list menu-avatar comment solids-top">
-				<view class="cu-item" v-for="(item, index) in list" :key="index">
-					<!-- 操作按钮 -->
-					<view 
-						class="btn-more padding cuIcon-moreandroid text-gray"
-						v-if="userInfo.scope==9||userInfo._id==item.user[0]._id"
-						@tap="showMenu(item._id)">
-					</view>
-					<!-- 头像 -->
-					<navigator :url="'/pages/list/detail?id='+item.cat[0]._id" class="cu-avatar">
-						<image :src="item.cat[0].avatar" mode="aspectFill" class="cu-avatar radius"></image>
-					</navigator>
-					<view class="content">
-						<view class="text-grey">{{item.cat[0].name}}</view>
-						<!-- 内容区域 -->
-						<view class="text-content">{{item.text}}</view>
-						<view class="grid grid-square col-3 margin-top-sm">
-							<view class="bg-img" v-for="(pic,idx) in item.album" :key="idx">
-								<image :src="pic" mode="aspectFill" @tap.stop="preview(item.album, idx)"></image>
-							</view>
-						</view>
-						<!-- 发布信息区域 -->
-						<view class="margin-top-sm flex justify-between">
-							<view class="text-gray">
-								<image :src="item.user[0].avatar" mode="aspectFill" class="cu-avatar sm round margin-right-xs"></image>
-								<text>{{item.user[0].nickname}} 发布于{{item.create_date|timeFrom}}</text>
-							</view>
-						</view>
-						<!-- 留言区域 -->
-						<message-board :timeline-id="item._id" :list="item.comments"></message-board>
+			<u-navbar :background="background" title="情报" back-icon-color="#fff" title-color="#fff"></u-navbar>
+			<view class="container">
+				<view class="header-bg">
+					<image src="https://vkceyugu.cdn.bspapp.com/VKCEYUGU-6ee74e1a-9337-4754-92e2-f7b377cdd878/39d05c55-569f-4916-8ee3-59a12eeb5e3b.gif" mode="scaleToFill" class="gif-wave"></image>
+					<view class="user-info margin">
+						<text>{{userInfo.nickname}}</text>
+						<image class="cu-avatar radius lg margin-left-sm" :src="userInfo.avatar"></image>
 					</view>
 				</view>
+				
+				<!--列表主体-->
+				<view class="cu-list menu-avatar comment solids-top">
+					<view class="cu-item" v-for="(item, index) in list" :key="index">
+						<!-- 操作按钮 -->
+						<view 
+							class="btn-more padding cuIcon-moreandroid text-gray"
+							v-if="userInfo.scope==9||userInfo._id==item.user[0]._id"
+							@tap="showMenu(item._id)">
+						</view>
+						<!-- 头像 -->
+						<navigator :url="'/pages/list/detail?id='+item.cat[0]._id" class="cu-avatar">
+							<image :src="item.cat[0].avatar" mode="aspectFill" class="cu-avatar radius"></image>
+						</navigator>
+						<view class="content">
+							<view class="text-grey">{{item.cat[0].name}}</view>
+							<!-- 内容区域 -->
+							<view class="text-content">{{item.text}}</view>
+							<view class="grid grid-square col-3 margin-top-sm">
+								<view class="bg-img" v-for="(pic,idx) in item.album" :key="idx">
+									<image :src="pic" mode="aspectFill" @tap.stop="preview(item.album, idx)"></image>
+								</view>
+							</view>
+							<!-- 发布信息区域 -->
+							<view class="margin-top-sm flex justify-between">
+								<view class="text-gray">
+									<image :src="item.user[0].avatar" mode="aspectFill" class="cu-avatar sm round margin-right-xs"></image>
+									<text>{{item.user[0].nickname}} 发布于{{item.create_date|timeFrom}}</text>
+								</view>
+							</view>
+							<!-- 留言区域 -->
+							<message-board :timeline-id="item._id" :list="item.comments" @input="onInput"></message-board>
+						</view>
+					</view>
+				</view>
+				<view class="cu-load loading text-gray" v-if="loading"></view>
+				<view class="cu-load text-gray text-sm" v-if="!hasMore">没有更多了</view>
 			</view>
-			<view class="cu-load loading text-gray" v-if="loading"></view>
-			<view class="cu-load text-gray text-sm" v-if="!hasMore">没有更多了</view>
 			
 			<!--新建按钮-->
 			<view class="cu-avatar round lg bg-gradual-blue cuIcon-camera btn-new margin" @tap="add"></view>
@@ -75,7 +86,10 @@
 					color: 'red'
 				}],
 				show: false,
-				id: ''
+				id: '',
+				background: {
+					background: ''
+				}
 			}
 		},
 		computed: mapState(['hasLogin', 'userInfo']),
@@ -83,6 +97,10 @@
 			this.fetchData()
 		},
 		onShow() {
+			if(!this.list.length) {
+				this.fetchData()
+			}
+			
 			uni.$on('refresh', data => {
 				if(data) {
 					const index = this.list.findIndex(item => {
@@ -99,11 +117,17 @@
 			await this.fetchData()
 			uni.stopPullDownRefresh()
 		},
+		onPageScroll(e) {
+			const opacity = e.scrollTop/100
+			this.background.background = `linear-gradient(45deg, rgba(57,181,74,${opacity}), rgba(141,198,63,${opacity}))`
+		},
 		onReachBottom() {
 			this.loadMore()
 		},
 		methods: {
 			async fetchData() {
+				if(!this.hasLogin)
+					return
 				this.list = []
 				this.page = 1
 				this.total = 0
@@ -133,6 +157,11 @@
 			showMenu(id) {
 				this.id = id
 				this.show = true
+			},
+			onInput() {
+				uni.pageScrollTo({
+					scrollTop:0
+				})
 			},
 			add() {
 				uni.chooseImage({
@@ -176,7 +205,57 @@
 .fullscreen {
 	height: 100vh;
 }
-	
+
+.container {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+}
+
+.header-bg {
+	position: relative;
+	background-image: url(https://image.weilanwl.com/color2.0/index.jpg);
+	background-size: cover;
+	height: 400rpx;
+	display: flex;
+	justify-content: center;
+	padding-top: 40rpx;
+	flex-direction: column;
+	align-items: center;
+	color: #fff;
+	font-weight: 300;
+	text-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
+	z-index: 1;
+}
+
+.header-bg .gif-wave {
+	position: absolute;
+	width: 100%;
+	bottom: 0;
+	left: 0;
+	mix-blend-mode: screen;  
+	height: 100rpx;  
+}
+
+.header-bg .user-info {
+	position: absolute;
+	right: 0;
+	bottom: -50rpx;
+	font-size: 40rpx;
+}
+
+.header-bg .cu-avatar {
+	width: 150rpx;
+	height: 150rpx;
+}
+
+.cu-list {
+	margin-top: -10rpx;
+	padding-top: 200rpx;
+	background-color: #fff;
+}
+
 .btn-more {
 	position: absolute;
 	top: 0;

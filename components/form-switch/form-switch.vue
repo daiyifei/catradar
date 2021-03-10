@@ -36,22 +36,22 @@
 	}
 </script>
 
-<style>
-	.switch-sex>>>.uni-switch-input,
-	.switch-sex>>>wx-switch-input {
+<style scoped>
+	.gender>>>.uni-switch-input,
+	.gender>>>wx-switch-input {
 		background: #0081FF !important;
 	}
 	
-	.switch-sex.checked>>>.uni-switch-input,
-	.switch-sex.checked>>>wx-switch-input {
+	.gender.checked>>>.uni-switch-input,
+	.gender.checked>>>wx-switch-input {
 		background: #e54d42 !important;
 	}
-
-	.switch-sex::after {
+	
+	.gender::after {
 		content: "\e71a";
 	}
 
-	.switch-sex::before {
+	.gender::before {
 		content: "\e71c";
 	}
 </style>
