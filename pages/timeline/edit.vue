@@ -3,13 +3,13 @@
 		<view class="cu-load loading text-gray" v-if="loading"></view>
 		<form @submit="onSubmit" v-else>
 			<view class="cu-form-group">
-				<remote-input placeholder="照片中的是谁？" ref="remote" v-model="form.cat_id" class="response" />
+				<remote-input placeholder="照片中的是谁？" ref="remote" v-model="form.cat_id" class="response" @change="onChange('cat_id', $event)" />
 			</view>
 			<view class="cu-form-group">
 				<textarea name="text" placeholder="写点什么吧..." maxlength="140" v-model="form.text"></textarea>
 			</view>
 			<view class="cu-form-group"> 
-				<drag-album name="album" ref="album" v-model="form.album" class="response" />
+				<drag-album name="album" ref="album" v-model="form.album" class="response" @change="onChange('album', $event)" />
 			</view>
 			<button form-type="submit" class="cu-btn block bg-blue margin lg" :loading="saving" :disabled="!form.cat_id||!form.text||!form.album.length">{{id?'保存':'发布'}}</button>
 		</form>
@@ -22,8 +22,11 @@
 		data() {
 			return {
 				id: '',
-				form: {},
-				album: [],
+				form: {
+					cat_id: '',
+					text: '',
+					album: []
+				},
 				data: {},
 				loading: false,
 				saving: false
@@ -42,11 +45,13 @@
 				this.loading = true
 				const { result: { data }} = await db.collection('timeline').doc(options.id).get()
 				this.form = data[0]
-				this.form.album = data[0].album
 				this.loading = false
 			}
 		},
 		methods: {
+			onChange(key, value) {
+				this.$set(this.form, key, value)
+			},
 			async onSubmit() {
 				this.saving = true
 				try{
@@ -54,7 +59,6 @@
 					if(this.id) {
 						// 编辑
 						delete this.form._id
-						console.log(this.form.cat_id)
 						await db.collection('timeline').doc(this.id).update(this.form)
 						uni.showToast({
 							title: '保存成功'
@@ -68,7 +72,6 @@
 						uni.showToast({
 							title: '发布成功'
 						})
-						uni.$emit('refresh')
 					}
 					this.saving = false
 					setTimeout(() => {

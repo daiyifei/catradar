@@ -1,9 +1,11 @@
 <template>
 	<view>
+		<u-skeleton :loading="loading" animation bgColor="#FFF" style="position: fixed;"></u-skeleton>
+		
 		<u-navbar :background="background" :title="title" back-icon-color="#fff" :title-color="titleColor"></u-navbar>
-		<view class="container">
+		<view class="container u-skeleton">
 			<!-- 封面 -->
-			<swiper class="swiper screen-swiper square-dot" :indicator-dots="true" :circular="true" @change="imgChange">
+			<swiper class="swiper screen-swiper square-dot u-skeleton-rect" :indicator-dots="true" :circular="true" @change="imgChange">
 				<swiper-item v-for="(item,index) in form.album" :key="index">
 					<view class="swiper-item" @tap="preview(form.album, index)">
 						<video :src="item" autoplay loop :show-play-btn="false" :controls="false" objectFit="cover" v-if="item.split('.')[form.album.length]=='mp4'" />
@@ -14,10 +16,9 @@
 			
 			<!-- 头像 -->
 			<view class="padding flex align-center bg-white margin-sm radius">
-				<image :src="form.avatar" class="cu-avatar xl round margin-right-sm" v-if="form.avatar"></image>
-				<view class="cu-avatar xl round margin-right-sm" v-else>{{form.name}}</view>
-				<view>
-					<text class="text-xxl">{{form.name}}</text>
+				<image :src="form.avatar" class="cu-avatar xl round margin-right-sm u-skeleton-circle"></image>
+				<view class="u-skeleton-rect">
+					<text class="text-xxl u-skeleton-circle">{{form.name}}</text>
 					<view>
 						<text class="gender margin-right-xs" :class="form.female ? 'cuIcon-female female' : 'cuIcon-male'"></text>
 						<text class="text-grey text-lg">{{form.birthday|age}}</text>
@@ -26,7 +27,7 @@
 			</view>
 			
 			<!-- 信息 -->
-			<view class="margin-sm bg-white radius">
+			<view class="margin-sm bg-white radius u-skeleton-rect">
 				<view class="cu-bar">
 					<view class="action sub-title">
 						<text class="text-xl text-bold text-green">信息</text>

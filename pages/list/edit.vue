@@ -10,7 +10,7 @@
 				<view class="title">名字</view>
 				<input placeholder="请输入猫咪名字" v-model="form.name"></input>
 			</view>
-			<view class="cu-form-group required">
+			<view class="cu-form-group">
 				<view class="title">性别</view>
 				<form-switch type="gender" v-model="form.female" @change="onChange('female', $event)"/>
 			</view>
@@ -95,8 +95,8 @@
 					}
 				})
 			},
-			onChange(name, value) {
-				this.form[name] = value
+			onChange(key, value) {
+				this.$set(this.form, key, value)
 			},
 			async onSubmit(e) {
 				this.saving = true

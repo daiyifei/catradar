@@ -120,6 +120,7 @@
 				this.$set(this.selected, 'name', item.name)
 				this.$set(this.selected, 'avatar', item.avatar)
 				this.$emit('change', item._id)
+				this.showCandidates = false
 			}
 		}
 	}
