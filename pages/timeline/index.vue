@@ -87,6 +87,7 @@
 				}],
 				show: false,
 				id: '',
+				replyUser: {},
 				background: {
 					background: ''
 				}
@@ -95,12 +96,6 @@
 		computed: mapState(['hasLogin', 'userInfo']),
 		onLoad() {
 			this.fetchData()
-		},
-		onShow() {
-			if(!this.list.length) {
-				this.fetchData()
-			}
-			
 			uni.$on('refresh', data => {
 				if(data) {
 					const index = this.list.findIndex(item => {
@@ -112,6 +107,11 @@
 					this.fetchData()
 				}
 			})
+		},
+		onShow() {
+			if(!this.list.length) {
+				this.fetchData()
+			}
 		},
 		async onPullDownRefresh() {
 			await this.fetchData()
@@ -126,8 +126,6 @@
 		},
 		methods: {
 			async fetchData() {
-				if(!this.hasLogin)
-					return
 				this.list = []
 				this.page = 1
 				this.total = 0
@@ -158,10 +156,9 @@
 				this.id = id
 				this.show = true
 			},
-			onInput() {
-				uni.pageScrollTo({
-					scrollTop:0
-				})
+			onInput(id, replyUser) {
+				this.id = id
+				this.replyUser = replyUser
 			},
 			add() {
 				uni.chooseImage({
@@ -241,18 +238,12 @@
 .header-bg .user-info {
 	position: absolute;
 	right: 0;
-	bottom: -50rpx;
-	font-size: 40rpx;
-}
-
-.header-bg .cu-avatar {
-	width: 150rpx;
-	height: 150rpx;
+	bottom: -30rpx;
 }
 
 .cu-list {
 	margin-top: -10rpx;
-	padding-top: 200rpx;
+	padding-top: 100rpx;
 	background-color: #fff;
 }
 

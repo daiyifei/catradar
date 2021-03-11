@@ -100,51 +100,10 @@
 		},
 		methods: {
 			async refresh() {
-				const $ = db.command.aggregate
-				const _ = db.command
-				const res = await db.collection('comments').aggregate()
-					.match({
-						timeline_id: this.timelineId
-					})
-					.lookup({
-						from: 'uni-id-users',
-						let: {
-							id: '$user_id'
-						},
-						pipeline: $.pipeline()
-							.match(_.expr(
-								$.eq(['$_id', '$$id'])
-							))
-							.project({
-								_id: 1,
-								nickname: 1,
-								avatar: 1
-							})
-							.done(),
-						as: 'user',
-					})
-					.lookup({
-						from: 'uni-id-users',
-						let: {
-							id: '$reply_user_id'
-						},
-						pipeline: $.pipeline()
-							.match(_.expr(
-								$.eq(['$_id', '$$id'])
-							))
-							.project({
-								_id: 1,
-								nickname: 1,
-								avatar: 1
-							})
-							.done(),
-						as: 'reply_user',
-					})
-					.sort({
-						create_date: -1
-					})
-					.end()
-				this.data = res.result.data
+				const { data } = await this.$request('timeline', 'getCommentList', {
+					timelineId: this.timelineId
+				})
+				this.data = data
 			},
 			async like() {
 				uni.showLoading()
@@ -201,18 +160,12 @@
 					this.form.comment_type = 1
 					this.showInput = true
 				}
-			},
-			remove(id) {
-				
 			}
 		}
 	}
 </script>
 
 <style>
-	.cu-modal {
-		background-color: transparent;
-	}
 	.cu-bar.input {
 		background-color: #f0f0f0;
 	}

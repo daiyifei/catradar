@@ -30,6 +30,9 @@ exports.main = async (event, context) => {
 		case 'getList':
 			return getList(params)
 			break
+		case 'getCommentList':
+			return getCommentList(params)
+			break
 		default:
 			return {
 				code: 403,
@@ -39,11 +42,12 @@ exports.main = async (event, context) => {
 	}
 }
 
-
 async function getList(params) {
-	const { limit = 20, page = 1 } = params
-	const { total } = await db.collection('timeline').count()
+	const { limit = 20, page = 1, id = '' } = params
 	const { data } = await db.collection('timeline').aggregate()
+		.match({
+			_id: id ? id : _.exists(true)
+		})
 		.lookup({
 			from: 'list',
 			let: {
@@ -133,12 +137,71 @@ async function getList(params) {
 			create_date: -1
 		})
 		.end()
+		
+	if(id) {
+		return {
+			code: 0,
+			data: data[0]
+		}
+	}
+	
+	const { total } = await db.collection('timeline').count()
 	
 	return {
 		code: 0,
 		page,
 		limit,
 		total,
+		data
+	}	
+}
+
+async function getCommentList(params) {
+	const { data } = await db.collection('comments').aggregate()
+		.match({
+			timeline_id: params.timelineId
+		})
+		.lookup({
+			from: 'uni-id-users',
+			let: {
+				id: '$user_id'
+			},
+			pipeline: $.pipeline()
+				.match(_.expr(
+					$.eq(['$_id', '$$id'])
+				))
+				.project({
+					_id: 1,
+					nickname: 1,
+					avatar: 1
+				})
+				.done(),
+			as: 'user',
+		})
+		.lookup({
+			from: 'uni-id-users',
+			let: {
+				id: '$reply_user_id'
+			},
+			pipeline: $.pipeline()
+				.match(_.expr(
+					$.eq(['$_id', '$$id'])
+				))
+				.project({
+					_id: 1,
+					nickname: 1,
+					avatar: 1
+				})
+				.done(),
+			as: 'reply_user',
+		})
+		.sort({
+			create_date: -1
+		})
+		.end()
+		
+	return {
+		code: 0,
 		data
 	}	
 }
