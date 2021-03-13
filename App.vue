@@ -6,7 +6,7 @@
 			...mapMutations(['login'])
 		},
 		onLaunch: function() {
-			// auto login
+			// 自动登录
 			if(!uni.getStorageSync('uni_id_token'))
 				return
 			
@@ -30,7 +30,7 @@
 					uni.clearStorageSync('uni_id_token_expired')
 				})
 			
-			// check update
+			// 检查更新
 			// #ifdef APP-PLUS
 			plus.runtime.getProperty(plus.runtime.appid, ({
 				version
@@ -92,6 +92,13 @@
 
 	.cu-form-group .title {
 		min-width: calc(4em + 15px);
+	}
+	.gender {
+		color: #87CEEB;
+	}
+	
+	.gender.female {
+		color: #FFC0CB;
 	}
 	/* #endif */
 </style>

@@ -1,6 +1,6 @@
 <template>
 	<view>
-		<u-navbar :is-back="false">
+		<u-navbar :is-back="false" ref="navbar">
 			<!-- 搜索栏 -->
 			<view class="cu-bar search response">
 				<view class="search-form round">
@@ -13,7 +13,7 @@
 		</u-navbar>
 		
 		<!-- 列表 -->
-		<index-list :scrollTop="scrollTop" :list="list">
+		<index-list :scrollTop="scrollTop" :offsetTop="offsetTop" :list="list" ref="indexList">
 			<view class="cu-list menu">
 				<navigator class="cu-item" url="subpage?state=1">
 					<view class="content">
@@ -63,8 +63,11 @@
 			return {
 				list: [],
 				loading: false,
-				condition: {},
-				scrollTop: 0
+				condition: {
+					state: 0
+				},
+				scrollTop: 0,
+				offsetTop: 0
 			}
 		},
 		computed: mapState(['hasLogin', 'userInfo']),
@@ -83,6 +86,7 @@
 		},
 		onPageScroll(e) {
 			this.scrollTop = e.scrollTop
+			this.$refs.indexList.stickyOffsetTop = this.$refs.navbar.navbarHeight
 		},
 		async onPullDownRefresh() {
 			await this.fetchData()
@@ -96,11 +100,14 @@
 				this.loading = false
 			},
 			onSearch(e) {
-				this.condition = db.command.or({
-					name: new RegExp('.*' + e.detail.value,'i')
+				const { value } = e.detail
+				this.condition = value ? db.command.or({
+					name: new RegExp('.*' + value,'i')
 				},{
-					py: new RegExp('.*' + e.detail.value,'i')
-				})
+					py: new RegExp('.*' + value,'i')
+				}) : {
+					state: 0
+				}
 			},
 			onFilterChange(e) {
 				this.condition = e

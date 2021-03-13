@@ -36,11 +36,13 @@
 			<view class="cu-dialog" @tap.stop.prevent>
 				<view class="cu-bar input">
 					<input 
+					<!-- #ifdef MP-WEIXIN -->
+					:focus="showInput"
+					<!-- #endif -->
 					:placeholder="reply_nickname?'回复'+reply_nickname:'评论'" 
 					v-model="content" 
 					cursor-spacing="10" 
-					class="bg-white round text-left padding-lr" 
-					:focus="showInput"/>
+					class="bg-white round text-left padding-lr" />
 					<!-- <view class="action">
 						<text class="cuIcon-emojifill text-grey"></text>
 					</view> -->

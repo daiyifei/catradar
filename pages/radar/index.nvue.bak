@@ -1,0 +1,164 @@
+<template>
+	<view class="container">
+		<map id="map" ref="map" class="map" :latitude="latitude" :longitude="longitude" :markers="markers" :controls="controls"
+		 :scale="scale" @markertap="showList" @controltap="reset" show-location></map>
+		<view class="modal" @tap="reset" v-if="showModal">
+			<view class="list">
+				<view class="list-item" v-for="(item,index) in list" :key="index" @tap="toDetail" :data-id="item._id">
+					<image :src="item.avatar" class="avatar"></image>
+					<text class="name">{{item.name}}</text>
+				</view>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script>
+	import locations from '@/static/locations.json'
+	export default {
+		data() {
+			return {
+				origin: {
+					latitude: 32.096591,
+					longitude: 118.916949,
+				},
+				latitude: 32.096591,
+				longitude: 118.916949,
+				scale: 17,
+				markers: [],
+				controls: [{
+					iconPath: '/static/reset.png',
+					position: {
+						left: 9999,
+						top: 9999,
+						width: 35,
+						height: 35
+					},
+					clickable: true
+				}],
+				list: [],
+				show: false
+			}
+		},
+		onLoad() {
+			this.fetchData()
+			const {
+				windowHeight,
+				windowWidth
+			} = uni.getSystemInfoSync()
+			this.controls[0].position.top = windowHeight - 50
+			this.controls[0].position.left = windowWidth - 50
+		},
+		methods: {
+			fetchData() {
+				plus.nativeUI.showWaiting()
+				uniCloud.callFunction({
+					name: 'list',
+					data: {
+						action: 'getStat',
+						params: {
+							key: 'location'
+						}
+					}
+				}).then(res => {
+					plus.nativeUI.closeWaiting()
+					const markers = []
+					res.result.data.forEach(item => {
+						if (item._id !== undefined) {
+							markers.push({
+								id: item._id,
+								iconPath: '/static/location.png',
+								width: 40,
+								height: 40,
+								latitude: locations[item._id].latitude,
+								longitude: locations[item._id].longitude
+							})
+						}
+					})
+					this.markers = markers
+					plus.navigator.closeSplashscreen() 
+				})
+			},
+			showList(e) {
+				const location = e.detail.markerId
+				plus.nativeUI.showWaiting()
+				this.scale = 19
+				this.latitude = locations[location].latitude
+				this.longitude = locations[location].longitude
+				db.collection('list').where({
+					state: 0,
+					location: parseInt(location)
+				}).get().then(res => {
+					uni.hideLoading()
+					this.showModal = true
+					this.list = res.result.data
+				})
+				e.stopPropagation()
+			},
+			reset(e) {
+				this.$refs.map.moveToLocation(this.origin)
+				this.list = []
+				this.showModal = false
+				this.scale = 17
+			},
+			toDetail(e) {
+				e.stopPropagation()
+				uni.navigateTo({
+					url: '/pages/list/detail?id=' + e.currentTarget.dataset.id
+				})
+			}
+		}
+	}
+</script>
+
+<style>
+	.container {
+		flex: 1;
+	}
+
+	.map {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: -30px;
+		flex: 1;
+	}
+
+	.modal {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		justify-content: center;
+		align-items: center;
+		transition-property: background-color;  
+		transition-duration: 3000; 
+		background-color: rgba(0, 0, 0, .6);
+	}
+	
+	.list {
+		flex-direction: row;
+		flex-wrap: wrap;
+		margin-left: 50px;
+		margin-right: 50px;
+	}
+
+	.list-item {
+		align-items: center;
+		margin: 10px;
+	}
+
+	.avatar {
+		width: 50px;
+		height: 50px;
+		border-radius: 50%;
+	}
+
+	.name {
+		margin-top: 8px;
+		font-size: 14px;
+		color: #fff;
+	}
+</style>

@@ -1,6 +1,6 @@
 <template>
 	<view>
-		<u-index-list :scrollTop="scrollTop" :indexList="indexList">
+		<u-index-list :scrollTop="scrollTop" :indexList="indexList" :offset-top="offsetTop">
 			<!-- 置顶项目 -->
 			<slot></slot>
 			
@@ -40,7 +40,14 @@
 	} from 'vuex'
 	export default {
 		props: {
-			scrollTop: Number,
+			scrollTop: {
+				type: Number,
+				default: 0
+			},
+			offsetTop: {
+				type: Number,
+				default: 0
+			},
 			list: {
 				type: Array,
 				default: () => []
@@ -62,12 +69,9 @@
 			...mapState(['hasLogin', 'userInfo']),
 			loading() {
 				return !this.list.length
-			}
+			},
 		},
 		watch: {
-			scrollTop(val) {
-				this.scrollTop = val
-			},
 			list(val) {
 				let letters = 'abcdefghijklmnopqrstuvwxyz'.split('')
 				this.indexList = []
@@ -106,11 +110,4 @@
 </script>
 
 <style>
-	.gender {
-		color: #87CEEB;
-	}
-	
-	.gender.female {
-		color: #FFC0CB;
-	}
 </style>

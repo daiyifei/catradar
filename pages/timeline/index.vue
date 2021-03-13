@@ -1,22 +1,21 @@
 <template>
-	<view>
-		<view class="fullscreen" v-if="!hasLogin">
-			<u-empty text="请登录后关注动态" mode="data" >
-				<navigator url="/pages/mine/index" class="cu-btn bg-blue margin radius" slot="bottom" open-type="switchTab">去登录</navigator>
-			</u-empty>
-		</view>
-		
-		<view v-else>
-			<u-navbar :background="background" title="情报" back-icon-color="#fff" title-color="#fff"></u-navbar>
-			<view class="container">
-				<view class="header-bg">
-					<image src="https://vkceyugu.cdn.bspapp.com/VKCEYUGU-6ee74e1a-9337-4754-92e2-f7b377cdd878/39d05c55-569f-4916-8ee3-59a12eeb5e3b.gif" mode="scaleToFill" class="gif-wave"></image>
-					<view class="user-info margin">
-						<text>{{userInfo.nickname}}</text>
-						<image class="cu-avatar radius lg margin-left-sm" :src="userInfo.avatar"></image>
-					</view>
+	<view >
+		<u-navbar :is-back="false" :background="background" title="情报" back-icon-color="#fff" title-color="#fff"></u-navbar>
+		<view class="container">
+			<view class="header-bg">
+				<image src="https://vkceyugu.cdn.bspapp.com/VKCEYUGU-6ee74e1a-9337-4754-92e2-f7b377cdd878/39d05c55-569f-4916-8ee3-59a12eeb5e3b.gif" mode="scaleToFill" class="gif-wave"></image>
+				<view class="user-info margin" v-if="hasLogin">
+					<text>{{userInfo.nickname}}</text>
+					<image class="cu-avatar radius lg margin-left-sm" :src="userInfo.avatar"></image>
 				</view>
-				
+			</view>
+			
+			<view class="need-auth" v-if="!hasLogin">
+				<u-empty text="请先登录" mode="data">
+					<navigator url="/pages/mine/index" class="cu-btn bg-blue margin radius" slot="bottom" open-type="switchTab">去登录</navigator>
+				</u-empty>
+			</view>
+			<view v-else>
 				<!--列表主体-->
 				<view class="cu-list menu-avatar comment solids-top">
 					<view class="cu-item" v-for="(item, index) in list" :key="index">
@@ -47,19 +46,19 @@
 								</view>
 							</view>
 							<!-- 留言区域 -->
-							<message-board :timeline-id="item._id" :list="item.comments" @input="onInput"></message-board>
+							<message-board :timeline-id="item._id" :list="item.comments"></message-board>
 						</view>
 					</view>
 				</view>
 				<view class="cu-load loading text-gray" v-if="loading"></view>
 				<view class="cu-load text-gray text-sm" v-if="!hasMore">没有更多了</view>
+				
+				<!--新建按钮-->
+				<view class="cu-avatar round lg bg-gradual-blue cuIcon-camera btn-new margin" @tap="add"></view>
+				
+				<!--操作菜单-->
+				<u-action-sheet :list="actions" @click="click" v-model="show"></u-action-sheet>
 			</view>
-			
-			<!--新建按钮-->
-			<view class="cu-avatar round lg bg-gradual-blue cuIcon-camera btn-new margin" @tap="add"></view>
-			
-			<!--操作菜单-->
-			<u-action-sheet :list="actions" @click="click" v-model="show"></u-action-sheet>
 		</view>
 	</view>
 </template>
@@ -156,10 +155,6 @@
 				this.id = id
 				this.show = true
 			},
-			onInput(id, replyUser) {
-				this.id = id
-				this.replyUser = replyUser
-			},
 			add() {
 				uni.chooseImage({
 					success: res => {
@@ -199,15 +194,15 @@
 </script>
 
 <style>
-.fullscreen {
-	height: 100vh;
-}
-
 .container {
 	position: absolute;
 	top: 0;
 	left: 0;
 	right: 0;
+}
+
+.need-auth {
+	height: calc(100vh - 400rpx);
 }
 
 .header-bg {

@@ -38,7 +38,7 @@
 			async fetchData() {
 				this.loading = true
 				uni.setNavigationBarTitle({
-					title: ['流浪中','待领养','已领养','失踪中','回喵星'][this.state]
+					title: this.$root.$options.filters.state(this.state)
 				})
 				const { result: { data } } = await db.collection('list').where({
 					state: this.state

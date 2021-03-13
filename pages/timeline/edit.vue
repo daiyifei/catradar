@@ -6,7 +6,7 @@
 				<remote-input placeholder="照片中的是谁？" ref="remote" v-model="form.cat_id" class="response" @change="onChange('cat_id', $event)" />
 			</view>
 			<view class="cu-form-group">
-				<textarea name="text" placeholder="写点什么吧..." maxlength="140" v-model="form.text"></textarea>
+				<textarea name="text" placeholder="写点什么吧..." maxlength="140" v-model="form.text" @change="onChange('text', $event)"></textarea>
 			</view>
 			<view class="cu-form-group"> 
 				<drag-album name="album" ref="album" v-model="form.album" class="response" @change="onChange('album', $event)" />
