@@ -146,7 +146,8 @@
 				})
 			},
 			updateUser() {
-				// #ifdef APP-PLUS
+				// #ifdef APP-PLUS || MP-WEIXIN
+				uni.showLoading()
 				uni.login({
 				  provider: 'weixin',
 				  success: (loginRes) => {

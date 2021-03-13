@@ -1,0 +1,58 @@
+{
+  "bsonType": "object",
+  "required": [
+    "name",
+    "latitude",
+    "longitude"
+  ],
+  "permission": {
+    "read": true,
+    "create": true,
+    "update": "doc.uid == auth.uid",
+    "delete": "doc.uid == auth.uid"
+  },
+  "properties": {
+    "_id": {
+      "description": "存储文档 ID（文章 ID），系统自动生成"
+    },
+    "name": {
+      "bsonType": "string",
+      "description": "基地名称",
+      "trim": "both"
+    },
+    "latitude": {
+      "bsonType": "number",
+      "description": "纬度"
+    },
+    "longitude": {
+      "bsonType": "number",
+      "description": "经度"
+    },
+    "description": {
+      "bsonType": "string",
+      "description": "基地描述",
+      "trim": "both"
+    },
+    "avatar": {
+      "bsonType": "string",
+      "description": "图标地址",
+      "pattern": "^(http://|https://|/|./|@/)\\S",
+      "trim": "both"
+    },
+    "locations": {
+      "bsonType": "array",
+      "description": "位置列表"
+    },
+    "count": {
+      "bsonType": "int",
+      "description": "该社区猫咪总数"
+    },
+    "created_date": {
+      "bsonType": "timestamp",
+      "description": "创建时间",
+      "forceDefaultValue": {
+        "$env": "now"
+      }
+    }
+  }
+}

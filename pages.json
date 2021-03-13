@@ -2,6 +2,22 @@
 	"pages": [
 		//pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
 		{
+			"path": "pages/radar/index",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTextStyle": "black",
+				"titleNView": false,
+				"app-plus": {
+					"subNVues": [{
+						"id": "modal",
+						"path": "pages/radar/subnvue/modal",
+						"style": {
+							"background": "transparent"
+						}
+					}]
+				}
+			}
+		}, {
 			"path": "pages/list/index",
 			"style": {
 				"enablePullDownRefresh": true,
@@ -47,14 +63,42 @@
 			"style": {
 				"enablePullDownRefresh": true
 			}
+		}, {
+			"path": "pages/mine/favs",
+			"style": {
+				"navigationBarTitleText": "收藏",
+				"enablePullDownRefresh": false
+			}
+
+		}, {
+			"path": "pages/mine/comments",
+			"style": {
+				"navigationBarTitleText": "评论",
+				"enablePullDownRefresh": false
+			}
+
 		}
-	],
+	    ,{
+            "path" : "pages/timeline/detail",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+    ],
 	"tabBar": {
 		"color": "#cccccc",
 		"selectedColor": "#1296db",
 		"borderStyle": "white",
 		"backgroundColor": "#ffffff",
 		"list": [{
+			"pagePath": "pages/radar/index",
+			"iconPath": "static/tabbar/icon_radar.png",
+			"selectedIconPath": "static/tabbar/icon_radar_hl.png",
+			"text": "雷达"
+		}, {
 			"pagePath": "pages/list/index",
 			"iconPath": "static/tabbar/icon_cats.png",
 			"selectedIconPath": "static/tabbar/icon_cats_hl.png",

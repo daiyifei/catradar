@@ -1,6 +1,6 @@
 <template>
 	<view>
-		<view @tap="showDrawer" :class="JSON.stringify(condition) === '{}' ? '' : 'text-orange'">
+		<view @tap="showDrawer" :class="filterOn ? 'text-orange' : ''">
 			<text class="cuIcon-filter"></text>
 			<text>筛选</text>
 		</view>
@@ -56,6 +56,13 @@
 				}]
 			}
 		},
+		computed: {
+			filterOn() {
+				return ~this.filters.findIndex(item => {
+					return ~Object.keys(this.condition).indexOf(item.key)
+				})
+			}
+		},
 		methods: {
 			showDrawer() {
 				this.condition = this.$u.deepClone(this.value)
@@ -72,7 +79,9 @@
 				}
 			},
 			clearFilter() {
-				this.condition = {}
+				this.filters.forEach(item => {
+					this.$delete(this.condition, item.key)
+				})
 			},
 			applyFilter() {
 				this.$emit('change', this.condition)

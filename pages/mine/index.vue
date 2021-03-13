@@ -1,7 +1,8 @@
 <template>
 	<view>		
 		<!-- 头部 -->
-		<view class="UCenter-bg" @tap="updateUser">
+		<view class="UCenter-bg">
+			<button class="btn-transparent" open-type="getUserInfo" @tap="updateUser"></button>
 			<image v-if="userInfo.avatar" :src="userInfo.avatar" class="avatar"/>
 			<view class="avatar cuIcon-my text-white" v-else></view>
 			<view class="text-xl">{{hasLogin?userInfo.nickname:'请登录'}}</view>
@@ -11,27 +12,27 @@
 			<image src="https://vkceyugu.cdn.bspapp.com/VKCEYUGU-6ee74e1a-9337-4754-92e2-f7b377cdd878/39d05c55-569f-4916-8ee3-59a12eeb5e3b.gif" mode="scaleToFill" class="gif-wave"></image>
 		  </view>
 		  <view class="padding flex text-center text-grey bg-white shadow-warp">
-		    <view class="flex flex-sub flex-direction solid-right">
-		      <view class="text-xxl text-orange">{{visitTotal}}</view>
+		    <view class="flex flex-sub flex-direction solid-right" @tap="toDetail('comments?type=0')">
+		      <view class="text-xxl text-orange">{{appreciateTotal}}</view>
 		      <view class="margin-top-sm">
-		        <text class="cuIcon-attentionfill"></text>
-						<text class="margin-left-xs">浏览</text>
+		        <text class="cuIcon-appreciatefill"></text>
+						<text class="margin-left-xs">赞</text>
 					</view>
 		    </view>
-		    <view class="flex flex-sub flex-direction solid-right">
-		      <view class="text-xxl text-blue">{{starCount}}</view>
+		    <view class="flex flex-sub flex-direction solid-right" @tap="toDetail('comments?type=1')">
+		      <view class="text-xxl text-green">{{commentTotal}}</view>
 		      <view class="margin-top-sm">
-		        <text class="cuIcon-favorfill"></text>
+		        <text class="cuIcon-commentfill"></text>
+						<text class="margin-left-xs">评论</text>
+					</view>
+		    </view>
+				<view class="flex flex-sub flex-direction" @tap="toDetail('favs')">
+				  <view class="text-xxl text-blue">{{favTotal}}</view>
+				  <view class="margin-top-sm">
+				    <text class="cuIcon-favorfill"></text>
 						<text class="margin-left-xs">收藏</text>
 					</view>
-		    </view>
-		    <view class="flex flex-sub flex-direction">
-		      <view class="text-xxl text-green">{{forksCount}}</view>
-		      <view class="margin-top-sm">
-		        <text class="cuIcon-fork"></text>
-						<text class="margin-left-xs">发布</text>
-					</view>
-		    </view>
+				</view>
 		  </view>
 			
 			<!-- 菜单 -->
@@ -50,6 +51,22 @@
 					</button>
 				</view>
 				<!-- #endif -->
+				<!-- #ifdef MP-WEIXIN -->
+				<view class="cu-item">
+					<button class="cu-btn content" open-type="contact">
+						<text class="cuIcon-service text-grey"></text>
+						<text class="text-grey">联系客服</text>
+					</button>
+				</view>
+				<!-- #endif -->
+				<!-- #ifndef H5 -->
+				<view class="cu-item">
+					<button class="cu-btn content" open-type="feedback">
+						<text class="cuIcon-comment text-grey"></text>
+						<text class="text-grey">意见反馈</text>
+					</button>
+				</view>
+				<!-- #endif -->
 				<view class="cu-item">
 					<button class="cu-btn content" @tap="logout">
 						<text class="cuIcon-exit text-red"></text>
@@ -63,7 +80,7 @@
 </template>
 
 <script>
-	let weixinAuthService
+	const db = uniCloud.database()
 	import {
 		mapState,
 		mapMutations
@@ -72,15 +89,56 @@
 		data() {
 			return {
 				uCenter: {},
-				starCount: 0,
-				forksCount: 0,
-				visitTotal: 0, 
+				appreciateTotal: 0,
+				commentTotal: 0,
+				favTotal: 0
 			}
 		},
 		computed: mapState(['hasLogin', 'userInfo']),
+		watch: {
+			hasLogin(val) {
+				if(val) {
+					this.fetchData()
+				}
+			}
+		},
+		onShow() {
+			if(this.hasLogin) {
+				this.fetchData()
+			}
+		},
 		methods: {
 			logout() {
 				this.$refs.login.doLogout()
+			},
+			async fetchData() {
+				const that = this
+				const { result: { total: appreciateTotal } } = await db.collection('comments').where({
+					user_id: this.userInfo._id,
+					comment_type: 0
+				}).count()
+				const { result: { total: commentTotal } } = await db.collection('comments').where({
+					user_id: this.userInfo._id,
+					comment_type: 1
+				}).count()
+				
+				let i = 0
+				numAni()
+				function numAni() {
+					if (i < 20) {
+						setTimeout(function () {
+							that.appreciateTotal = i
+							that.commentTotal = i
+							that.favTotal = i
+							i++
+							numAni()
+						}, 20)
+					} else {
+						that.appreciateTotal = appreciateTotal
+						that.commentTotal = commentTotal
+						that.favTotal = that.userInfo.fav.length
+					}
+				}
 			},
 			bindWeixin() {
 				this.$refs.login.bindWeixin()
@@ -90,6 +148,15 @@
 			},
 			updateUser() {
 				this.$refs.login.updateUser()
+			},
+			toDetail(url) {
+				if(!this.hasLogin) {
+					this.$u.toast('请先登录')
+					return
+				}
+				uni.navigateTo({
+					url
+				})
 			}
 		}
 	}
@@ -97,6 +164,7 @@
 
 <style>
 .UCenter-bg {
+	position: relative;
   background-image: url(https://image.weilanwl.com/color2.0/index.jpg);
   background-size: cover;
   height: 550rpx;
@@ -104,12 +172,21 @@
   justify-content: center;
   padding-top: 40rpx;
   overflow: hidden;
-  position: relative;
   flex-direction: column;
   align-items: center;
   color: #fff;
   font-weight: 300;
   text-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
+}
+
+.btn-transparent {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 9;
+	background: transparent;
 }
 
 .UCenter-bg text {

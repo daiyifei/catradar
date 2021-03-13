@@ -1,0 +1,70 @@
+<template>
+	<view class="modal" v-if="list.length" @tap.stop.prevent="onHide">
+		<view class="list">
+			<navigator class="list-item" :url="`/pages/list/detail?id=${item._id}`"
+				v-for="(item,index) in list" :key="index" @tap.stop="toDetail(item._id)">
+				<image :src="item.avatar" class="avatar" />
+				<text class="name">{{item.name}}</text>
+			</navigator>
+		</view>
+	</view>
+</template>
+
+<script>
+	export default {
+		data() {
+			return {
+				list: []
+			}
+		},
+		created() {
+			uni.$on('modal-popup', list => {
+				this.list = list
+			})
+		},
+		methods: {
+			onHide() {
+				uni.$emit('modal-hide')
+			}
+		}
+	}
+</script>
+
+<style>
+	.modal {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		justify-content: center;
+		align-items: center;
+		transition-property: background-color;  
+		transition-duration: 3000; 
+		background-color: rgba(0, 0, 0, .6);
+	}
+	
+	.list {
+		flex-direction: row;
+		flex-wrap: wrap;
+		margin-left: 50px;
+		margin-right: 50px;
+	}
+
+	.list-item {
+		align-items: center;
+		margin: 10px;
+	}
+
+	.avatar {
+		width: 50px;
+		height: 50px;
+		border-radius: 50%;
+	}
+
+	.name {
+		margin-top: 8px;
+		font-size: 14px;
+		color: #fff;
+	}
+</style>

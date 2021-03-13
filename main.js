@@ -18,6 +18,11 @@ Vue.component('mine', mine)
 
 Vue.config.productionTip = false
 
+Vue.filter('state', function (value) {
+	if (value === undefined) return '未知'
+	return ['流浪中','待领养','已领养','失踪中','回喵星'][value]
+})
+
 Vue.filter('age', function (value) {
   if (!value) return '年龄不详'
 	const year = parseInt(moment().diff(value, 'year',true))

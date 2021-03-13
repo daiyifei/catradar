@@ -1,8 +1,14 @@
 <template>
 	<view>
-		<u-skeleton :loading="loading" animation bgColor="#FFF" style="position: fixed;"></u-skeleton>
-		
-		<u-navbar :background="background" :title="title" back-icon-color="#fff" :title-color="titleColor"></u-navbar>
+		<u-skeleton :loading="loading" animation bgColor="#FFF"></u-skeleton>
+		<u-navbar 
+			:back-icon-name="isSingle?'home':'nav-back'" 
+			:custom-back="customBack"
+			:background="background" 
+			:title="title" 
+			back-icon-color="#fff" 
+			:title-color="titleColor">
+		</u-navbar>
 		<view class="container u-skeleton">
 			<!-- 封面 -->
 			<swiper class="swiper screen-swiper square-dot u-skeleton-rect" :indicator-dots="true" :circular="true" @change="imgChange">
@@ -14,108 +20,131 @@
 				</swiper-item>
 			</swiper>
 			
-			<!-- 头像 -->
-			<view class="padding flex align-center bg-white margin-sm radius">
-				<image :src="form.avatar" class="cu-avatar xl round margin-right-sm u-skeleton-circle"></image>
-				<view class="u-skeleton-rect">
-					<text class="text-xxl u-skeleton-circle">{{form.name}}</text>
-					<view>
-						<text class="gender margin-right-xs" :class="form.female ? 'cuIcon-female female' : 'cuIcon-male'"></text>
-						<text class="text-grey text-lg">{{form.birthday|age}}</text>
+			<template v-if="hasLogin">
+				<!-- 头部 -->
+				<view class="header padding flex align-center bg-white margin-sm radius shadow shadow-blur" @tap="fav">
+					<image :src="form.avatar" class="cu-avatar xl round margin-right-sm u-skeleton-circle"></image>
+					<view class="u-skeleton-rect">
+						<view class="text-xxl u-skeleton-circle">{{form.name}}</view>
+						<view class="u-skeleton-rect">
+							<text class="gender margin-right-xs" :class="form.female ? 'cuIcon-female female' : 'cuIcon-male'"></text>
+							<text class="text-grey text-lg">{{form.birthday | age}}</text>
+						</view>
+					</view>
+					<view class="action padding flex flex-direction justify-between align-end">
+						<view class="cu-tag round u-skeleton-rect" :class="'bg-'+['gray','green','orange','blue','grey'][form.state]">
+							{{form.state | state}}
+						</view>
+						<view class="fav u-skeleton-rect">
+							<text :class="isFav?'cuIcon-favorfill text-orange':'cuIcon-favor'"></text>
+						</view>
 					</view>
 				</view>
-			</view>
-			
-			<!-- 信息 -->
-			<view class="margin-sm bg-white radius u-skeleton-rect">
-				<view class="cu-bar">
-					<view class="action sub-title">
-						<text class="text-xl text-bold text-green">信息</text>
-						<text class="text-ABC text-green">information</text>
+				
+				<!-- 信息 -->
+				<view class="margin-sm bg-white radius u-skeleton-rect shadow shadow-blur">
+					<view class="cu-bar">
+						<view class="action sub-title">
+							<text class="text-xl text-bold text-green">信息</text>
+							<text class="text-ABC text-green">information</text>
+						</view>
+					</view>
+					<view class="cu-list menu">
+						<view class="cu-item">
+							<view class="content text-grey">性别</view>
+							<view class="action">{{form.female|female}}</view>
+						</view>
+						<view class="cu-item">
+							<view class="content text-grey">花色</view>
+							<view class="action">{{form.color|color}}</view>
+						</view>
+						<view class="cu-item">
+							<view class="content text-grey">生日</view>
+							<view class="action">{{form.birthday?form.birthday:'未知'}}</view>
+						</view>
+						<view class="cu-item">
+							<view class="content text-grey">绝育</view>
+							<view class="action">{{form.neuter|neuter}}</view>
+						</view>
+						<view class="cu-item" v-if="form.neuterDate">
+							<view class="content text-grey">绝育时间</view>
+							<view class="action">{{form.neuterDate}}</view>
+						</view>
+						<view class="cu-item" v-if="form.location">
+							<view class="content text-grey">位置</view>
+							<view class="action">{{form.location|location}}</view>
+						</view>
+						<view class="cu-item" v-if="form.intro">
+							<view class="content text-grey">简介</view>
+							<view class="action">{{form.intro}}</view>
+						</view>
 					</view>
 				</view>
-				<view class="cu-list menu">
-					<view class="cu-item">
-						<view class="content text-grey">性别</view>
-						<view class="action">{{form.female|female}}</view>
+				
+				<!-- 关系 -->
+				<view class="margin-sm bg-white radius shadow shadow-blur" v-if="form.relation">
+					<view class="cu-bar">
+						<view class="action sub-title">
+							<text class="text-xl text-bold text-blue">关系</text>
+							<text class="text-ABC text-blue">relationship</text>
+						</view>
 					</view>
-					<view class="cu-item">
-						<view class="content text-grey">花色</view>
-						<view class="action">{{form.color|color}}</view>
-					</view>
-					<view class="cu-item">
-						<view class="content text-grey">生日</view>
-						<view class="action">{{form.birthday?form.birthday:'未知'}}</view>
-					</view>
-					<view class="cu-item">
-						<view class="content text-grey">绝育</view>
-						<view class="action">{{form.neuter|neuter}}</view>
-					</view>
-					<view class="cu-item" v-if="form.neuterDate">
-						<view class="content text-grey">绝育时间</view>
-						<view class="action">{{form.neuterDate}}</view>
-					</view>
-					<view class="cu-item" v-if="form.location">
-						<view class="content text-grey">位置</view>
-						<view class="action">{{form.location|location}}</view>
-					</view>
-					<view class="cu-item" v-if="form.intro">
-						<view class="content text-grey">简介</view>
-						<view class="action">{{form.intro}}</view>
+					<view class="cu-list grid col-4 no-border">
+						<view class="cu-item" v-for="(item, index) in form.relation" :key="index">
+							<navigator :url="'detail?id='+item.detail._id" class="flex flex-direction align-center">
+								<image :src="item.detail.avatar" mode="aspectFill" class="cu-avatar xl round margin-bottom-xs" v-if="item.detail.avatar"></image>
+								<view class="cu-avatar xl round margin-bottom-xs" v-else>{{item.detail.name}}</view>
+								<view class="flex">
+									<view class="margin-right-xs">{{item.tag}}</view>
+									<view class="text-blue">{{item.detail.name}}</view>
+								</view>
+							</navigator>
+						</view>
 					</view>
 				</view>
-			</view>
-			
-			<!-- 关系 -->
-			<view class="margin-sm bg-white radius radius" v-if="form.relation">
-				<view class="cu-bar">
-					<view class="action sub-title">
-						<text class="text-xl text-bold text-blue">关系</text>
-						<text class="text-ABC text-blue">relationship</text>
+				
+				<!-- 动态 -->
+				<view class="margin-sm bg-white radius shadow shadow-blur">
+					<view class="cu-bar">
+						<view class="action sub-title">
+							<text class="text-xl text-bold text-orange">动态</text>
+							<text class="text-ABC text-orange">timeline</text>
+						</view>
 					</view>
-				</view>
-				<view class="cu-list grid col-4 no-border">
-					<view class="cu-item" v-for="(item, index) in form.relation" :key="index">
-						<navigator :url="'detail?id='+item.detail._id" class="flex flex-direction align-center">
-							<image :src="item.detail.avatar" mode="aspectFill" class="cu-avatar xl round margin-bottom-xs" v-if="item.detail.avatar"></image>
-							<view class="cu-avatar xl round margin-bottom-xs" v-else>{{item.detail.name}}</view>
-							<view class="flex">
-								<view class="margin-right-xs">{{item.tag}}</view>
-								<view class="text-blue">{{item.detail.name}}</view>
-							</view>
-						</navigator>
-					</view>
-				</view>
-			</view>
-			
-			<!-- 动态 -->
-			<view class="margin-sm bg-white radius radius">
-				<view class="cu-bar">
-					<view class="action sub-title">
-						<text class="text-xl text-bold text-orange">动态</text>
-						<text class="text-ABC text-orange">timeline</text>
-					</view>
-				</view>
-				<view v-for="(item,index) in timeline" :key="index" class="cu-timeline">
-					<view class="cu-time margin-left">{{item.create_date|timeFrom('yy/mm/dd')}}</view>
-					<view class="cu-item" :class="index?'':'text-blue'">
-						<view class="content">
-							<view class="text-content">{{item.text}}</view>
-							<view class="grid grid-square col-3 margin-top-sm">
-								<view class="bg-img" v-for="(pic,idx) in item.album" :key="idx">
-									<image :src="pic" mode="aspectFill" @tap.stop="preview(item.album, idx)"></image>
+					<view v-for="(item,index) in timeline" :key="index" class="cu-timeline">
+						<view class="cu-time margin-left">{{item.create_date|timeFrom('yy/mm/dd')}}</view>
+						<view class="cu-item" :class="index?'':'text-blue'">
+							<view class="content">
+								<view class="text-content">{{item.text}}</view>
+								<view class="grid grid-square col-3 margin-top-sm">
+									<view class="bg-img" v-for="(pic,idx) in item.album" :key="idx">
+										<image :src="pic" mode="aspectFill" @tap.stop="preview(item.album, idx)"></image>
+									</view>
 								</view>
 							</view>
 						</view>
 					</view>
+					<view class="text-sm text-gray text-center padding-bottom">暂无更多</view>
 				</view>
-				<view class="text-sm text-gray text-center padding-bottom">暂无更多</view>
+			</template>
+			
+			
+			<!-- 未登录 -->
+			<view class="need-auth" v-else>
+				<u-empty text="请先登录" mode="data">
+					<navigator url="/pages/mine/index" class="cu-btn bg-blue margin radius" slot="bottom" open-type="switchTab">去登录</navigator>
+				</u-empty>
 			</view>
 		</view>
 	</view>
 </template>
 
 <script>
+  const db = uniCloud.database()
+	import {
+		mapState,
+		mapMutations
+	} from 'vuex'
 	export default {
 		data() {
 			return {
@@ -129,6 +158,20 @@
 				},
 				title: '',
 				titleColor: ''
+			}
+		},
+		computed: {
+			...mapState(['hasLogin', 'userInfo']),
+			isSingle() {
+				const pages = getCurrentPages()
+				return pages.length === 1
+			},
+			isFav() {
+				if(this.hasLogin && ~this.userInfo.fav.indexOf(this.form._id)) {
+					return true
+				}else {
+					return false
+				}
 			}
 		},
 		onLoad(option) {
@@ -170,6 +213,27 @@
 				  current
 				})
 			},
+			customBack() {
+				if(this.isSingle) {
+					uni.reLaunch({
+						url: '/pages/radar/index'
+					})
+				}else {
+					uni.navigateBack()
+				}
+			},
+			fav() {
+				const { _id, fav = [] } = this.userInfo
+				if(this.isFav) {
+					fav.splice(fav.indexOf(this.form._id),1)
+				}else {
+					fav.push(this.form._id)
+				}
+				db.collection('uni-id-users').doc(_id).update({
+					fav
+				})
+				this.$u.toast(this.isFav?'已收藏':'已取消')
+			},
 			onNavigationBarButtonTap(e) {
 				switch(e.type) {
 					case 'share':
@@ -178,14 +242,21 @@
 							scene: "WXSceneSession",
 						  type: 2,
 						  imageUrl: this.form.album[this.current],
-						  fail(e) {
-								console.log(e)
+						  fail(err) {
+								this.$u.toast(err.message)
 						  }
 						})
 						break
 					default:
 						break
 				}
+			}
+		},
+		onShareAppMessage() {
+			return {
+				title: this.form.name,
+				path: '/pages/list/detail?id=' + this.form._id,
+				imageUrl: this.form.album[this.current]
 			}
 		}
 	}
@@ -204,14 +275,21 @@
 		height: 750rpx;
 	}
 	
-	/* gender */
-	.gender {
-		font-weight: bold;
-		color: #87CEEB;
+	.header {
+		position: relative;
+		overflow: hidden;
 	}
-
-	.female {
-		color: #FFC0CB;
+	
+	.header .action {
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+	}
+	
+	.header .fav {
+		margin-right: 10rpx;
+		font-size: 40rpx;
 	}
 	
 	.cu-list .action {
@@ -220,5 +298,9 @@
 		text-align: left;
 		line-height: 1.75em;
 		width: 480rpx;
+	}
+	
+	.need-auth {
+		height: calc(100vh - 750rpx);
 	}
 </style>
