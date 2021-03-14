@@ -1,0 +1,46 @@
+diff --git a/node_modules/uview-ui/components/u-index-list/u-index-list.vue b/node_modules/uview-ui/components/u-index-list/u-index-list.vue
+index 9084be5..21e9939 100644
+--- a/node_modules/uview-ui/components/u-index-list/u-index-list.vue
++++ b/node_modules/uview-ui/components/u-index-list/u-index-list.vue
+@@ -74,10 +74,10 @@
+ 		},
+ 		created() {
+ 			// #ifdef H5
+-			this.stickyOffsetTop = this.offsetTop ? uni.upx2px(this.offsetTop) : 44;
++			this.stickyOffsetTop = this.offsetTop ? this.offsetTop : 44;
+ 			// #endif
+ 			// #ifndef H5
+-			this.stickyOffsetTop = this.offsetTop ? uni.upx2px(this.offsetTop) : 0;
++			this.stickyOffsetTop = this.offsetTop ? this.offsetTop : 0;
+ 			// #endif
+ 			// 只能在created生命周期定义children，如果在data定义，会因为循环引用而报错
+ 			this.children = [];
+@@ -133,7 +133,7 @@
+ 				return this.$uGetRect('.u-index-bar').then((rect) => {
+ 					Object.assign(this, {
+ 						height: rect.height,
+-						top: rect.top + this.scrollTop
++						top: rect.top + this.scrollTop - this.stickyOffsetTop
+ 					});
+ 				});
+ 			},
+@@ -155,7 +155,8 @@
+ 				for (let i = this.children.length - 1; i >= 0; i--) {
+ 					const preAnchorHeight = i > 0 ? children[i - 1].height : 0;
+ 					const reachTop = sticky ? preAnchorHeight : 0;
+-					if (reachTop >= children[i].top) {
++					//bug: if (reachTop >= children[i].top) 
++					if (reachTop + this.offsetTop >= children[i].top) {
+ 						return i;
+ 					}
+ 				}
+@@ -257,7 +258,8 @@
+ 					this.$emit('select', anchor.index);
+ 					uni.pageScrollTo({
+ 						duration: 0,
+-						scrollTop: anchor.top + this.scrollTop
++						// bug: scrollTop: anchor.top + this.scrollTop
++						scrollTop: anchor.top + this.scrollTop - this.offsetTop
+ 					});
+ 				}
+ 			}
