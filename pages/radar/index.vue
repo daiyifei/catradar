@@ -3,7 +3,7 @@
 		<u-navbar :is-back="false" ref="navbar" :background="{background:`linear-gradient(45deg, rgba(0,129,255,1), rgba(28,187,180,1))`}">
 			<view class="padding text-white" @tap="showBaseList">
 				<text class="cuIcon-locationfill margin-right-xs"></text>
-				<text>{{baseInfo?baseInfo.name:'选择基地'}}</text>
+				<text>{{hasBase?baseInfo.name:'选择基地'}}</text>
 				<text :class="baseList.length ? 'cuIcon-triangleupfill' : 'cuIcon-triangledownfill'"></text>
 			</view>
 		</u-navbar>
@@ -23,13 +23,29 @@
 			</cover-view>
 			<!-- 基地列表 -->
 			<view class="cu-modal bottom-modal" :class="baseList.length?'show':''" @tap="baseList=[]" v-if="baseList.length">
-				<view class="cu-dialog">
-					<view class="cu-list menu">
-						<view class="cu-item" v-for="(item,index) in baseList" :key="index" @tap.stop="selectBase(item)">
-							<text class="action text-grey">{{item.name}}</text>
-							<button class="action cu-btn round line-blue" @tap="subscribe(item._id)">
-								{{~userInfo.subscribe.indexOf(item._id)?'取关':'关注'}}
-							</button>
+				<view class="cu-dialog" @tap.stop.prevent>
+					<view class="cu-bar bg-white solid-bottom">
+						<view class="action">
+							<text class="cuIcon-title text-blue"></text> 基地列表
+						</view>
+						<view class="action" @tap="baseList=[]">
+							<text class="cuIcon-close text-red"></text>
+						</view>
+					</view>
+					<view class="cu-list menu-avatar">
+						<view class="cu-item" v-for="(item,index) in baseList" :key="index">
+							<image class="cu-avatar round lg" :src="item.avatar" v-if="item.avatar" />
+							<view class="cu-avatar round lg" v-else>{{item.name}}</view>
+							<view class="content">
+								<view class="text-grey">{{item.name}}</view>
+								<view class="text-gray text-sm flex">
+									<view class="text-cut">距离{{item.distance | distance}}</view>
+								</view>
+							</view>
+							<view class="action margin-sm" @tap.stop.prevent="subscribe(item)">
+								<view class="text-gray text-sm" v-if="~userInfo.subscribe.indexOf(item._id)">退出</view>
+								<view class="action cu-tag round light bg-blue" v-else>加入</view>
+							</view>
 						</view>
 					</view>
 				</view>
@@ -53,21 +69,20 @@
 				scale: 17,
 				markers: [],
 				baseList: [],
-				baseInfo: '',
 				catList: []
 			}
 		},
-		computed: mapState(['hasLogin', 'userInfo']),
+		computed: mapState(['hasLogin', 'userInfo', 'hasBase', 'baseInfo']),
 		watch: {
-			hasLogin(val) {
+			hasBase(val) {
 				this.showBase()
 			}
 		},
 		onLoad() {
 			this.getLocation()
-			this.showBase()
 		},
 		methods: {
+			...mapMutations(['enter', 'quit']),
 			getLocation() {
 				uni.getLocation({
 					type:'gcj02',
@@ -83,13 +98,7 @@
 				})
 			},
 			async showBase() {
-				if(!this.hasLogin || !this.userInfo.subscribe.length) {
-					this.baseInfo = ''
-					return
-				}
 				uni.showLoading()
-				const { result: { data } } = await db.collection('bases').doc(this.userInfo.subscribe[0]).get()
-				this.baseInfo = data[0]
 				
 				const map = uni.createMapContext('map')
 				map.moveToLocation(this.baseInfo)
@@ -99,7 +108,7 @@
 				})
 				const markers = []
 				list.forEach(item => {
-					if (item._id !== undefined) {
+					if (item._id !== undefined && item._id !== null) {
 						markers.push({
 							id: item._id,
 							iconPath: '/static/location.png',
@@ -113,33 +122,37 @@
 				this.markers = markers
 				uni.hideLoading()
 			},
-			showBaseList() {
+			async showBaseList() {
 				if(!this.hasLogin) {
 					this.$u.toast('请先登录')
 					return
 				}
 				uni.showLoading()
-				db.collection('bases').get().then(res => {
-					this.baseList = res.result.data
-					uni.hideLoading()
+				const { result : { data } } = await db.collection('bases').get()
+				data.map(item => {
+					item.distance = this.getDistance(this, item)
 				})
+				this.baseList = data
+				uni.hideLoading()
 			},
-			selectBase(item) {
-				this.baseInfo = item
-				this.latitude = item.latitude
-				this.longitude = item.longitude
-				this.showBase()
-				this.baseList = []
-			},
-			subscribe(id) {
+			subscribe(item) {
 				const { subscribe = [] } = this.userInfo
+				const { _id: id } = item
 				if(~subscribe.indexOf(id)) {
 					subscribe.splice(subscribe.indexOf(id),1)
+					this.baseInfo = ''
+					this.markers = []
+					this.quit()
+					this.getLocation()
 				}else {
 					subscribe.push(id)
+					this.enter(item)
+					this.showBase()
 				}
 				db.collection('uni-id-users').doc(this.userInfo._id).update({
 					subscribe 
+				}).then(() => {
+					this.$u.toast(~subscribe.indexOf(id) ? '已加入' : '已退出')
 				})
 			},
 			showCatList(e) {
@@ -175,6 +188,19 @@
 				uni.navigateTo({
 					url: '/pages/list/detail?id=' + id
 				})
+			},
+			getDistance(location1, location2){
+				const { latitude: lat1, longitude: lng1 } = location1,
+					{ latitude: lat2, longitude: lng2 } = location2
+				let radLat1 = lat1*Math.PI / 180.0;
+				let radLat2 = lat2*Math.PI / 180.0;
+				let a = radLat1 - radLat2;
+				let  b = lng1*Math.PI / 180.0 - lng2*Math.PI / 180.0;
+				let s = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin(a/2),2) +
+				Math.cos(radLat1)*Math.cos(radLat2)*Math.pow(Math.sin(b/2),2)));
+				s = s *6378.137 ;// EARTH_RADIUS;
+				s = Math.round(s * 10000) / 10000;
+				return s; //km
 			}
 		},
 		onShareAppMessage() {
@@ -201,7 +227,7 @@
 		height: 70rpx;
 	}
 	
-	.menu {
+	.bottom-modal {
 		padding-bottom: var(--window-bottom);
 	}
 

@@ -1,54 +1,61 @@
 <template>
 	<view>
-		<u-navbar :is-back="false" ref="navbar">
-			<!-- 搜索栏 -->
-			<view class="cu-bar search response">
-				<view class="search-form round">
-					<text class="cuIcon-search"></text>
-					<input placeholder="搜索" confirm-type="search" @input="onSearch"></input>
+		<view class="need-auth" v-if="!hasLogin">
+			<u-empty text="请先登录" mode="permission">
+				<navigator url="/pages/mine/index" class="cu-btn bg-blue margin radius" slot="bottom" open-type="switchTab">去登录</navigator>
+			</u-empty>
+		</view>
+		<view class="need-auth" v-else-if="!hasBase">
+			<u-empty text="未加入任何基地" mode="list">
+				<navigator url="/pages/radar/index" class="cu-btn bg-blue margin radius" slot="bottom" open-type="switchTab">去选择</navigator>
+			</u-empty>
+		</view>
+		
+		<view v-else>
+			<u-navbar :is-back="false" ref="navbar">
+				<!-- 搜索栏 -->
+				<view class="cu-bar search response">
+					<view class="search-form round">
+						<text class="cuIcon-search"></text>
+						<input placeholder="搜索" confirm-type="search" @input="onSearch"></input>
+					</view>
+					<list-filter class="margin-right" v-model="condition" @change="onFilterChange" />
+					<statistics class="margin-right" />
 				</view>
-				<list-filter class="margin-right" v-model="condition" @change="onFilterChange" />
-				<statistics class="margin-right" />
-			</view>
-		</u-navbar>
-		
-		<!-- 列表 -->
-		<index-list :scrollTop="scrollTop" :offsetTop="offsetTop" :list="list" ref="indexList">
-			<view class="cu-list menu">
-				<navigator class="cu-item" url="subpage?state=1">
-					<view class="content">
-						<text class="cuIcon-presentfill text-green"></text>
-						<text class="text-grey">待领养</text>
-					</view>
-				</navigator>
-				<navigator class="cu-item" url="subpage?state=2">
-					<view class="content">
-						<text class="cuIcon-crownfill text-orange"></text>
-						<text class="text-grey">已领养</text>
-					</view>
-				</navigator>
-				<navigator class="cu-item" url="subpage?state=3">
-					<view class="content">
-						<text class="cuIcon-explorefill text-blue"></text>
-						<text class="text-grey">失踪中</text>
-					</view>
-				</navigator>
-				<navigator class="cu-item" url="subpage?state=4">
-					<view class="content">
-						<text class="cuIcon-discoverfill text-grey"></text>
-						<text class="text-grey">回喵星</text>
-					</view>
-				</navigator>
-				<view class="cu-load loading text-gray" v-if="loading"></view>
-				<view class="cu-load text-gray" v-else-if="!list.length">暂无结果</view>
-			</view>
-		</index-list>
-		
-		<!--新建按钮-->
-		<navigator 
-			class="cu-avatar round lg bg-gradual-blue cuIcon-add btn-new margin"
-			url="edit"
-			v-if="hasLogin&&userInfo.scope===9"></navigator>
+			</u-navbar>
+			
+			<!-- 列表 -->
+			<index-list :scrollTop="scrollTop" :offset-top="offsetTop" :list="list" ref="indexList" v-if="offsetTop">
+				<view class="cu-list menu">
+					<navigator class="cu-item" url="subpage?state=1">
+						<view class="content">
+							<text class="cuIcon-explorefill text-blue"></text>
+							<text class="text-grey">失踪中</text>
+						</view>
+					</navigator>
+					<navigator class="cu-item" url="subpage?state=2">
+						<view class="content">
+							<text class="cuIcon-crownfill text-orange"></text>
+							<text class="text-grey">已领养</text>
+						</view>
+					</navigator>
+					<navigator class="cu-item" url="subpage?state=3">
+						<view class="content">
+							<text class="cuIcon-discoverfill text-grey"></text>
+							<text class="text-grey">回喵星</text>
+						</view>
+					</navigator>
+					<view class="cu-load loading text-gray" v-if="loading"></view>
+					<view class="cu-load text-gray" v-else-if="!list.length">暂无结果</view>
+				</view>
+			</index-list>
+			
+			<!--新建按钮-->
+			<navigator 
+				class="cu-avatar round lg bg-gradual-blue cuIcon-add btn-new margin"
+				url="edit"
+				v-if="hasLogin&&userInfo.scope===9"></navigator>
+		</view>
 	</view>
 </template>
 
@@ -70,23 +77,30 @@
 				offsetTop: 0
 			}
 		},
-		computed: mapState(['hasLogin', 'userInfo']),
+		computed: {
+			...mapState(['hasLogin', 'userInfo', 'hasBase'])
+		},
 		watch: {
 			condition(val) {
 				this.fetchData()
 			}
 		},
-		onLoad() {
-			this.fetchData()
+		mounted() {
+			if(this.$refs.navbar) {
+				const { navbarHeight, statusBarHeight } = this.$refs.navbar
+				this.offsetTop = navbarHeight + statusBarHeight
+			}
 		},
 		onShow() {
+			if(this.hasBase && !this.list.length) {
+				this.fetchData()
+			}
 			uni.$on('refresh',() => {
 				this.fetchData()
 			})
 		},
 		onPageScroll(e) {
 			this.scrollTop = e.scrollTop
-			this.$refs.indexList.stickyOffsetTop = this.$refs.navbar.navbarHeight
 		},
 		async onPullDownRefresh() {
 			await this.fetchData()
@@ -123,5 +137,9 @@
 		bottom: var(--window-bottom);
 		opacity: .9;
 		line-height: 80rpx;
+	}
+	
+	.need-auth {
+		height: calc(100vh - var(--window-bottom));
 	}
 </style>

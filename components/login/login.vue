@@ -17,7 +17,7 @@
 			
 			<!-- 微信登录 -->
 			<!-- #ifdef APP-PLUS || MP-WEIXIN -->
-			<view class="weixin cuIcon-weixin text-green" @tap="loginByWeixin"></view>
+			<button class="weixin cuIcon-weixin text-green" @getuserinfo="loginByWeixin" open-type="getUserInfo"></button>
 			<!-- #endif -->
 		</template>
 	</view>
@@ -27,7 +27,8 @@
 	let weixinAuthService
 	import {
 		mapState,
-		mapMutations
+		mapMutations,
+		mapActions
 	} from 'vuex'
 	export default {
 		name: 'login',
@@ -55,6 +56,7 @@
 		},
 		methods: {
 			...mapMutations(['login','logout']),
+			...mapActions(['getBaseInfo']),
 			register(e) {
 				this.$request('user-center','register',e.detail.value)
 			},
@@ -65,6 +67,7 @@
 						uni.setStorageSync('uni_id_token', res.token)
 						uni.setStorageSync('uni_id_token_expired', res.tokenExpired)
 						this.login(res.userInfo)
+						this.getBaseInfo()
 						uni.hideLoading()
 					})
 					.catch(msg => {
@@ -75,24 +78,36 @@
 						})
 					})
 			},
-			loginByWeixin() {
+			async loginByWeixin(e) {
 				uni.showLoading()
-				this.getWeixinCode().then((code) => {
-					this.$request('user-center','loginByWeixin', {code})
-						.then(res => {
-							uni.setStorageSync('uni_id_token', res.token)
-							uni.setStorageSync('uni_id_token_expired', res.tokenExpired)
-							this.login(res.userInfo)
-							uni.hideLoading()
-						})
-						.catch((e) => {
-							uni.hideLoading()
-							uni.showModal({
-								showCancel: false,
-								content: '微信登录失败，请稍后再试'
-							})
-						})
+				// #ifdef MP-WEIXIN
+				if(!e.detail.userInfo) {
+					uni.hideLoading()
+					return
+				}
+				// #endif
+				
+				try{
+					const code = await this.getWeixinCode()
+					const { userInfo, token, tokenExpired } = await this.$request('user-center','loginByWeixin', { code })
+					uni.setStorageSync('uni_id_token', token)
+					uni.setStorageSync('uni_id_token_expired', tokenExpired)
+					if(userInfo.nickname && userInfo.avatar) {
+						this.login(userInfo)
+						this.getBaseInfo()
+					}else {
+						await this.updateUser()
+					}
+					uni.hideLoading()
+				}catch(e) {
+					console.log(e)
+					this.logout()
+					uni.hideLoading()
+					uni.showModal({
+						showCancel: false,
+						content: '微信登录失败，请稍后再试'
 					})
+				}
 			},
 			getWeixinCode() {
 				return new Promise((resolve, reject) => {
@@ -139,38 +154,45 @@
 					this.refresh()
 				})
 			},
-			refresh() {
-				this.$request('user-center','getUserInfo').then(res => {
-					this.login(res.userInfo)
-					uni.hideLoading()
-				})
+			async refresh() {
+				const { userInfo } = await this.$request('user-center','getUserInfo')
+				this.login(userInfo)
+				uni.hideLoading()
 			},
-			updateUser() {
+			async updateUser() {
 				// #ifdef APP-PLUS || MP-WEIXIN
 				uni.showLoading()
-				uni.login({
-				  provider: 'weixin',
-				  success: (loginRes) => {
-				    // 获取用户信息
-				    uni.getUserInfo({
-				      provider: 'weixin',
-				      success: ({userInfo}) => {
-								const { nickName, avatarUrl, gender } = userInfo
-								this.$request('user-center','updateUser', {
-									nickname: nickName,
-									avatar: avatarUrl,
-									gender
-								}).then(res => {
-									uni.showToast({
-										title: '头像昵称已同步',
-										icon: 'none'
-									})
-									this.refresh()
-								})
-				      }
-				    })
-				  }
-				});
+				const userInfo = await new Promise((resolve,reject) => {
+					uni.login({
+					  provider: 'weixin',
+					  success: res => {
+							// 获取用户信息
+							uni.getUserInfo({
+							  provider: 'weixin',
+							  success: ({userInfo}) => {
+									resolve(userInfo)
+							  },
+								fail: err => {
+									reject(err)
+								}
+							})
+						},
+						fail: err => {
+							reject(err)
+						}
+					})
+				})
+				const { nickName, avatarUrl, gender } = userInfo
+				await	this.$request('user-center','updateUser', {
+					nickname: nickName,
+					avatar: avatarUrl,
+					gender
+				})
+				await this.refresh()
+				uni.showToast({
+					title: '用户信息已同步',
+					icon: 'none'
+				})
 				// #endif
 			},
 			doLogout() {
@@ -205,11 +227,17 @@
 		bottom: 50rpx;
 		width: 100rpx;
 		height: 100rpx;
-		line-height: 90rpx;
+		display: flex;
+		justify-content: center;
+		align-items: center;
 		text-align: center;
+		padding-bottom: 10rpx;
 		font-size: 50rpx;
 		background-color: #fff;
 		border-radius: 50%;
 		border: 1px solid #eee;
+	}
+	.weixin::after {
+		border: none;
 	}
 </style>

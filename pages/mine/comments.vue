@@ -2,9 +2,10 @@
 	<view>
 		<unicloud-db ref="udb" v-slot:default="{data, loading, error, options, hasMore}" 
 			collection="comments,uni-id-users,list,timeline"
-			field="_id,user_id{_id,nickname,avatar},timeline_id{_id,cat_id{_id,name,avatar}},content,create_date"
+			field="_id,user_id{_id,nickname,avatar},reply_user_id{_id,nickname,avatar},timeline_id{_id,cat_id{_id,name,avatar}},content,create_date"
 			orderby="create_date desc"
 			:where="condition"
+			manual
 			@load="loaded">
 			<view class="cu-load loading text-gray" v-if="loading"></view>
 			<view class="cu-list menu-avatar" v-else>
@@ -19,7 +20,12 @@
 						</view>
 						<view class="text-gray text-sm flex">
 							<view class="text-cut">
-								{{(type?'评论了':'赞了')+item.timeline_id[0].cat_id[0].name+(type?': '+item.content:'')}}
+								<text v-if="item.content">
+									<text v-if="item.reply_user_id.length">回复了{{item.reply_user_id[0].nickname}}</text>
+									<text v-else>评论了{{item.timeline_id[0].cat_id[0].name}}</text>
+									<text>: {{item.content}}</text>
+								</text>
+								<text v-else>赞了{{item.timeline_id[0].cat_id[0].name}}</text>
 							</view>
 						</view>
 					</view>
@@ -46,21 +52,20 @@
 	export default {
 		data() {
 			return {
+				condition: '',
 				list: [],
 				type: 0
 			}
 		},
-		computed: {
-			...mapState(['hasLogin', 'userInfo']),
-			condition() {
-				return `user_id._id=='${this.userInfo._id}'&&comment_type==${this.type}`
-			}
-		},
+		computed: mapState(['hasLogin', 'userInfo']),
 		onLoad(options) {
 			this.type = parseInt(options.type)
 			uni.setNavigationBarTitle({
 				title: this.type ? '评论' : '赞'
 			})
+		},
+		onReady() {
+			this.condition = `comment_type==${this.type}&&(user_id._id=='${this.userInfo._id}'||reply_user_id._id=='${this.userInfo._id}')`
 		},
 		onReachBottom() {
 			this.$refs.udb.loadMore()

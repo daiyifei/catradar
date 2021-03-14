@@ -1,7 +1,5 @@
 <template>
-	<view>
-		<switch :checked="checked" :class="type + (checked?' checked':'')" @change="onChange" :color="color"></switch>
-	</view>
+	<switch :checked="checked" :class="customClass+(checked?' checked':'')" @change="onChange" :color="color"></switch>
 </template>
 
 <script>
@@ -13,7 +11,7 @@
 				default: false
 			},
 			color: String,
-			type: String
+			customClass: String
 		},
 		model: {
 			prop: 'value',
@@ -36,22 +34,5 @@
 	}
 </script>
 
-<style scoped>
-	.gender>>>.uni-switch-input,
-	.gender>>>wx-switch-input {
-		background: #0081FF !important;
-	}
-	
-	.gender.checked>>>.uni-switch-input,
-	.gender.checked>>>wx-switch-input {
-		background: #e54d42 !important;
-	}
-	
-	.gender::after {
-		content: "\e71a";
-	}
-
-	.gender::before {
-		content: "\e71c";
-	}
+<style>
 </style>

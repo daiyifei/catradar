@@ -1,6 +1,7 @@
 <template>
 	<view class="container bg-white padding">
-		<timeline-item :item="item" />
+		<view class="cu-load loading text-gray" v-if="loading"></view>
+		<timeline-item :item="item" v-else/>
 	</view>
 </template>
 
@@ -8,7 +9,8 @@
 	export default {
 		data() {
 			return {
-				item: {}
+				item: {},
+				loading: true
 			}
 		},
 		async onLoad(options) {
@@ -16,6 +18,7 @@
 				id: options.id
 			})
 			this.item = data
+			this.loading = false
 		}
 	}
 </script>
