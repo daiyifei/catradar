@@ -178,11 +178,11 @@ switch .uni-switch-input {
 	border-radius: 100upx;
 }
 
-switch .wx-switch-input:not([class*="bg-"]),
+/* switch .wx-switch-input:not([class*="bg-"]),
 switch .uni-switch-input:not([class*="bg-"]) {
 	background: #8799a3 !important;
 }
-
+ */
 switch .wx-switch-input::after,
 switch .uni-switch-input::after {
 	margin: auto;
@@ -256,23 +256,23 @@ radio.radio .uni-radio-input-checked::after {
 }
 
 .switch-sex::after {
-	content: "\e71c";
+	content: "\e71a";
 }
 
 .switch-sex::before {
-	content: "\e71a";
+	content: "\e71c";
 }
 
 .switch-sex .wx-switch-input,
 .switch-sex .uni-switch-input {
-	background: #e54d42 !important;
-	border-color: #e54d42 !important;
+	background: #0081ff !important;
+	border-color: #0081ff !important;
 }
 
 .switch-sex[checked] .wx-switch-input,
 .switch-sex.checked .uni-switch-input {
-	background: #0081ff !important;
-	border-color: #0081ff !important;
+	background: #e54d42 !important;
+	border-color: #e54d42 !important;
 }
 
 switch.red[checked] .wx-switch-input.wx-switch-input-checked,

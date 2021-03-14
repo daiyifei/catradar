@@ -304,13 +304,17 @@ exports.main = async (event) => {
 				const {
 					nickname,
 					avatar,
-					gender
+					gender,
+					fav = [],
+					subscribe = []
 				} = params
 				res = await uniID.updateUser({
 					uid: payload.uid,
 					nickname,
 					avatar,
-					gender
+					gender,
+					fav,
+					subscribe
 				});
 				break;
 			}

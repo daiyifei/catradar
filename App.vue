@@ -1,87 +1,90 @@
 <script>
+	const db = uniCloud.database()
 	import Vue from 'vue'
-	import { mapMutations } from 'vuex'
+	import { mapState, mapMutations, mapActions } from 'vuex'
 	export default {
-		methods: {
-			...mapMutations(['login'])
-		},
-		onLaunch: function() {
-			// 自动登录
-			if(!uni.getStorageSync('uni_id_token'))
-				return
+		onLaunch() {
+			this.autoLogin()
 			
-			this.$request('user-center','checkToken')
-				.then(res => {
-					if(res.token) {
-						uni.setStorage({
-							key: 'uni_id_token',
-							data: res.token
-						})
-						uni.setStorage({
-							key: 'uni_id_token',
-							data: res.tokenExpired
-						})
-					}
-					this.login(res.userInfo)
-				})
-				.catch(e => {
-					console.log(e)
-					uni.clearStorageSync('uni_id_token')
-					uni.clearStorageSync('uni_id_token_expired')
-				})
-			
-			// 检查更新
-			// #ifdef APP-PLUS
-			plus.runtime.getProperty(plus.runtime.appid, ({
-				version
-			}) => {
-				this.$request('check-update', '', {
-					version
-				}).then(res => {
-					if (res.update) {
-						uni.showModal({
-							title: '检测到新版本',
-							content: res.version + '\n' + res.note,
-							confirmText: '立即更新',
-							cancelText: '以后再说',
-							success: ({ confirm }) => {
-								if (confirm) {
-									const downloadTask = uni.downloadFile({
-										url: res.url,
-										success: (res) => {
-											if (res.statusCode === 200) {
-												plus.nativeUI.closeWaiting()
-												plus.runtime.install(res.tempFilePath, {
-													force: false
-												}, (e) => {
-													uni.showToast({
-														title: '更新成功',
-														icon: 'none',
-														duration: 1000
-													})
-													setTimeout(() => {
-														plus.runtime.restart()
-													},1000)
-												}, (e) => {
-													uni.showToast({
-														title: e.message,
-														icon: 'none'
-													})
-												})
-											}
-										}
-									})
-									plus.nativeUI.showWaiting()
-								}
-							}
-						})
-					}
-				})
-			});
-			// #endif
 		},
 		onShow: function() {},
-		onHide: function() {}
+		onHide: function() {},
+		methods: {
+			...mapMutations(['login','logout']),
+			...mapActions(['getBaseInfo']),
+			async autoLogin() {
+				if(!uni.getStorageSync('uni_id_token'))
+					return
+				try{
+					const { token, tokenExpired, userInfo } = await this.$request('user-center','checkToken')
+					if(token) {
+						uni.setStorage({
+							key: 'uni_id_token',
+							data: token
+						})
+						uni.setStorage({
+							key: 'uni_id_token',
+							data: tokenExpired
+						})
+					}
+					this.login(userInfo)
+					this.getBaseInfo()
+				}catch(e){
+					console.log(e)
+					this.logout()
+				}
+			},
+			autoUpdate() {
+				// #ifdef APP-PLUS
+				plus.runtime.getProperty(plus.runtime.appid, ({
+					version
+				}) => {
+					this.$request('check-update', '', {
+						version
+					}).then(res => {
+						if (res.update) {
+							uni.showModal({
+								title: '检测到新版本',
+								content: res.version + '\n' + res.note,
+								confirmText: '立即更新',
+								cancelText: '以后再说',
+								success: ({ confirm }) => {
+									if (confirm) {
+										const downloadTask = uni.downloadFile({
+											url: res.url,
+											success: (res) => {
+												if (res.statusCode === 200) {
+													plus.nativeUI.closeWaiting()
+													plus.runtime.install(res.tempFilePath, {
+														force: false
+													}, (e) => {
+														uni.showToast({
+															title: '更新成功',
+															icon: 'none',
+															duration: 1000
+														})
+														setTimeout(() => {
+															plus.runtime.restart()
+														},1000)
+													}, (e) => {
+														uni.showToast({
+															title: e.message,
+															icon: 'none'
+														})
+													})
+												}
+											}
+										})
+										plus.nativeUI.showWaiting()
+									}
+								}
+							})
+						}
+					})
+				});
+				// #endif
+			}
+		}
 	}
 </script>
 

@@ -1,6 +1,6 @@
 <template>
 	<view>
-		<u-index-list :scrollTop="scrollTop" :indexList="indexList" :offset-top="offsetTop">
+		<u-index-list :scrollTop="scrollTop" :indexList="indexList" :offset-top="offset">
 			<!-- 置顶项目 -->
 			<slot></slot>
 			
@@ -70,6 +70,9 @@
 			loading() {
 				return !this.list.length
 			},
+			offset() {
+				return this.offsetTop
+			}
 		},
 		watch: {
 			list(val) {
@@ -91,11 +94,14 @@
 						this.indexData.push(cur)
 					}
 				})
+			},
+			offsetTop(val) {
+				console.log(val)
 			}
 		},
 		methods: {
 			showMenu(id) {
-				if(this.hasLogin || this.userInfo.scope) {
+				if(this.hasLogin && this.userInfo.scope === 9) {
 					this.show = true
 					this.id = id
 				}

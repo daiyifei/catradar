@@ -36,11 +36,7 @@
 		computed: {
 			...mapState(['hasLogin', 'userInfo']),
 			condition() {
-				const favs = []
-				this.userInfo.fav.forEach(item => {
-					favs.push(`'${item}'`)
-				})
-				return `_id in [${favs}]` 
+				return `_id in ${JSON.stringify(this.userInfo.fav)}` 
 			}
 		},
 		methods: {

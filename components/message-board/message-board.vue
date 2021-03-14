@@ -2,7 +2,8 @@
 	<view>
 		<!-- 功能按钮 -->
 		<view class="text-right margin-bottom-sm text-grey" style="margin-top: -50rpx;">
-			<text :class="'cuIcon-like'+(likeId?'fill':'')" @tap="like">{{(likeId?'取消':'赞')}}</text>
+			<text class="like-loading cu-load load-cuIcon loading" v-if="likeLoading"></text>
+			<text :class="'cuIcon-like'+(likeId?'fill':'')" @tap="like" v-else>{{(likeId?'取消':'赞')}}</text>
 			<text class="cuIcon-message margin-left-sm" @tap="comment">评论</text>
 		</view>
 		
@@ -11,7 +12,7 @@
 			<view class="flex padding-sm text-grey text-bold" v-if="likeList.length">
 				<text class="cuIcon-like"></text>
 				<text v-for="(item, index) in likeList" :key="index" class="margin-left-xs">
-					{{index?' , ':''+item.user[0].nickname}}
+					{{(index?' , ':'')+item.user[0].nickname}}
 				</text>
 			</view>
 			<!-- 评论列表 -->
@@ -72,11 +73,10 @@
 				content: '',
 				data: this.list,
 				likeId: '',
+				likeLoading: false,
 				showInput: false,
 				reply_nickname: '',
-				form: {
-					
-				},
+				form: {},
 				sending: false
 			}
 		},
@@ -108,7 +108,7 @@
 				this.data = data
 			},
 			async like() {
-				uni.showLoading()
+				this.likeLoading = true
 				if(this.likeId) {
 					await db.collection('comments').doc(this.likeId).remove()
 				}else {
@@ -118,7 +118,7 @@
 					})
 				}
 				await this.refresh()
-				uni.hideLoading()
+				this.likeLoading = false
 			},
 			comment() {
 				this.form = {}
@@ -170,5 +170,10 @@
 <style>
 	.cu-bar.input {
 		background-color: #f0f0f0;
+	}
+	
+	.like-loading {
+		display: inline-block;
+		line-height: 1em;
 	}
 </style>

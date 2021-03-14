@@ -11,7 +11,7 @@
 <script>
 	export default {
 		props: {
-			value: Number,
+			value: Number | undefined,
 			range: {
 				type: Array,
 				default: () => Array
@@ -36,7 +36,7 @@
 		methods: {
 			onChange(e) {
 				this.label = this.range[e.detail.value]
-				this.$emit('change',e.detail.value)
+				this.$emit('change', parseInt(e.detail.value))
 			}
 		}
 	}

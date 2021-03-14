@@ -10,13 +10,17 @@
 				<view class="title">名字</view>
 				<input placeholder="请输入猫咪名字" v-model="form.name"></input>
 			</view>
+			<view class="cu-form-group required">
+				<view class="title">花色</view>
+				<form-picker v-model="form.color" :range="['三花','橘猫','奶牛','白猫','狸花','玳瑁','黑猫']"  @change="onChange('color', $event)" />
+			</view>
 			<view class="cu-form-group">
 				<view class="title">性别</view>
-				<form-switch type="gender" v-model="form.female" @change="onChange('female', $event)"/>
+				<form-switch custom-class="switch-sex" v-model="form.female" @change="onChange('female', $event)" />
 			</view>
 			<view class="cu-form-group">
 				<view class="title">状态</view>
-				<form-picker v-model="form.state" :range="['流浪中','待领养','已领养','失踪中','回喵星']" />
+				<form-picker v-model="form.state" :range="['流浪中','失踪中','已领养','回喵星']" @change="onChange('state', $event)" />
 			</view>
 			<view class="cu-form-group" v-if="form.state===0">
 				<view class="title">位置</view>
@@ -29,10 +33,6 @@
 			<view class="cu-form-group" v-if="form.neuter">
 				<view class="title">绝育时间</view>
 				<date-picker v-model="form.neuterDate" />
-			</view>
-			<view class="cu-form-group">
-				<view class="title">花色</view>
-				<form-picker v-model="form.color" :range="['三花','橘猫','奶牛','白猫','狸花','玳瑁','黑猫']"  @change="onChange('color', $event)" />
 			</view>
 			<view class="cu-form-group">
 				<view class="title">生日</view>
@@ -51,7 +51,7 @@
 				<relation v-model="form.relation" class="response" @change="onChange('relation', $event)"></relation>
 			</view>
 			<button form-type="submit" class="cu-btn block bg-blue margin lg" :disabled="!form.name" :loading="saving">保存</button>
-			<button class="cu-btn block bg-red margin lg" v-if="id" @tap="onDelete">删除</button>
+			<button class="cu-btn block bg-red margin lg" v-if="id&&userInfo.scope===9" @tap="onDelete">删除</button>
 		</form>
 	</view>
 </template>
@@ -59,24 +59,37 @@
 <script>
 	const db = uniCloud.database()
 	import pinyin from 'pinyin'
+	import {
+		mapState,
+		mapMutations
+	} from 'vuex'
 	export default {
 		data() {
 			return {
 				id: '',
 				form: {
-					name: ''
+					name: '',
+					state: 0,
+					album: [],
+					relation: []
 				},
 				loading: false,
 				saving: false
 			}
 		},
-		onLoad(option) {
-			if(option.id) {
-				this.id = option.id
+		computed: mapState(['hasLogin', 'userInfo']),
+		async onLoad(options) {
+			if(options.id) {
+				this.id = options.id
 				this.loading = true
-				db.collection('list').doc(this.id).get().then(res => {
-					this.form = res.result.data[0]
-					this.loading = false
+				const res = await db.collection('list').doc(options.id).get()
+				this.form = res.result.data[0]
+				this.loading = false
+			}
+			
+			if(options.path) {
+				JSON.parse(options.path).forEach(item => {
+					this.form.album.unshift(item)
 				})
 			}
 			
@@ -109,6 +122,16 @@
 				try {
 					this.form.avatar = await this.$upload(this.form.avatar)
 					this.form.album = await this.$upload(this.form.album)
+					// 重名检查
+					const { result: { data } } = await db.collection('list').where({
+						_id: db.command.neq(this.id),
+						name: this.form.name
+					}).get()
+					if(data.length) {
+						throw({
+							message: '名字已存在'
+						})
+					}
 					
 					if(this.id) {
 						// 编辑
@@ -117,15 +140,6 @@
 						this.form._id = this.id
 					}else {
 						// 新建
-						const { result: { data } } = await db.collection('list').where({
-							name: this.form.name
-						}).get()
-						// 重名
-						if(data.length) {
-							throw({
-								message: '名字已存在'
-							})
-						}
 						await db.collection('list').add(this.form)
 					}
 					uni.showToast({

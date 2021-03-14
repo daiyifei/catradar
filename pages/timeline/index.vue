@@ -11,8 +11,13 @@
 			</view>
 			
 			<view class="need-auth" v-if="!hasLogin">
-				<u-empty text="请先登录" mode="data">
+				<u-empty text="请先登录" mode="permission">
 					<navigator url="/pages/mine/index" class="cu-btn bg-blue margin radius" slot="bottom" open-type="switchTab">去登录</navigator>
+				</u-empty>
+			</view>
+			<view class="need-auth" v-else-if="!hasBase">
+				<u-empty text="未加入基地" mode="list">
+					<navigator url="/pages/radar/index" class="cu-btn bg-blue margin radius" slot="bottom" open-type="switchTab">去选择</navigator>
 				</u-empty>
 			</view>
 			<view v-else>
@@ -31,9 +36,7 @@
 						</navigator>
 						<view class="content">
 							<view class="text-grey">{{item.cat[0].name}}</view>
-							<navigator :url="'detail?id='+item._id">
-								<timeline-item :item="item"/>
-							</navigator>
+							<timeline-item :item="item" is-link/>
 						</view>
 					</view>
 				</view>
@@ -79,7 +82,7 @@
 				}
 			}
 		},
-		computed: mapState(['hasLogin', 'userInfo']),
+		computed: mapState(['hasLogin', 'userInfo', 'hasBase']),
 		onLoad() {
 			this.fetchData()
 			uni.$on('refresh', data => {

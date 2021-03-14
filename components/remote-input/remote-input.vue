@@ -2,7 +2,7 @@
 	<view class="container">
 		<view class="selected flex justify-between align-center" v-if="selected.name">
 			<view class="content">
-				<image class="cu-avatar sm round" :src="selected.avatar"></image>
+				<image class="cu-avatar sm round" :src="selected.avatar"/>
 				<text class="text-grey margin-left-sm">{{selected.name}}</text>
 			</view>
 			<text class="cuIcon-roundclose text-gray padding-tb" @tap="onClear"></text>
@@ -12,6 +12,14 @@
 		<view class="candidates" v-if="showCandidates">
 			<scroll-view scroll-y show-scrollbar style="max-height:500rpx">
 				<view class="cu-list menu sm-border">
+					<!-- 置顶 -->
+					<navigator class="cu-item" url="/pages/list/edit">
+						<view class="content">
+							<text class="cu-avatar sm round bg-gradual-blue">New</text>
+							<text class="margin-left-sm text-blue">新建档案</text>
+						</view>
+					</navigator>
+					<!-- 候选 -->
 					<view class="cu-item" v-for="(item,index) in candidates" :key="index" @tap="onSelect(item)">
 						<view class="content">
 							<image class="cu-avatar sm round" :src="item.avatar"></image>

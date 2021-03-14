@@ -1,8 +1,8 @@
 <template>
 	<view>
 		<!-- 内容区域 -->
-		<view class="text-content">{{item.text}}</view>
-		<view class="grid grid-square col-3 margin-top-sm">
+		<view class="text-content" @tap="toDetail">{{item.text}}</view>
+		<view class="grid grid-square col-3 margin-top-sm" @tap="toDetail">
 			<view class="bg-img" v-for="(pic,idx) in item.album" :key="idx">
 				<image :src="pic" mode="aspectFill" @tap.stop.prevent="preview(item.album, idx)"></image>
 			</view>
@@ -23,7 +23,8 @@
 	export default {
 		name:"timeline-item",
 		props: {
-			item: Object
+			item: Object,
+			isLink: Boolean
 		},
 		data() {
 			return {
@@ -36,6 +37,13 @@
 				  urls,
 				  current
 				})
+			},
+			toDetail() {
+				if(this.isLink) {
+					uni.navigateTo({
+						url: '/pages/timeline/detail?id=' + this.item._id
+					})
+				}
 			}
 		}
 	}
