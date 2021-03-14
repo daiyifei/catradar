@@ -77,17 +77,15 @@
 				"enablePullDownRefresh": false
 			}
 
+		}, {
+			"path": "pages/timeline/detail",
+			"style": {
+				"navigationBarTitleText": "详情",
+				"enablePullDownRefresh": false
+			}
+
 		}
-	    ,{
-            "path" : "pages/timeline/detail",
-            "style" :                                                                                    
-            {
-                "navigationBarTitleText": "",
-                "enablePullDownRefresh": false
-            }
-            
-        }
-    ],
+	],
 	"tabBar": {
 		"color": "#cccccc",
 		"selectedColor": "#1296db",

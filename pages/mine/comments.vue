@@ -8,7 +8,9 @@
 			@load="loaded">
 			<view class="cu-load loading text-gray" v-if="loading"></view>
 			<view class="cu-list menu-avatar" v-else>
-				<view class="cu-item" v-for="(item, index) in data" :key="index">
+				<navigator class="cu-item" 
+					v-for="(item, index) in data" :key="index" 
+					:url="`/pages/timeline/detail?id=${item.timeline_id[0]._id}`">
 					<image class="cu-avatar round lg" :src="item.user_id[0].avatar" />
 					<view class="content">
 						<view class="text-grey">
@@ -16,14 +18,20 @@
 							<text class="text-xs margin-left-xs">{{item.create_date}}</text>
 						</view>
 						<view class="text-gray text-sm flex">
-							<view class="text-cut">{{item.content}}</view>
+							<view class="text-cut">
+								{{(type?'评论了':'赞了')+item.timeline_id[0].cat_id[0].name+(type?': '+item.content:'')}}
+							</view>
 						</view>
 					</view>
-					<view class="action" v-if="item.timeline_id.length ">
+					<navigator 
+						class="action" 
+						:url="`/pages/list/detail?id=${item.timeline_id[0].cat_id[0]._id}`"
+						@tap.stop.prevent
+						v-if="item.timeline_id.length">
 						<view class="text-grey text-xs"></view>
 						<image class="cu-avatar radius" :src="item.timeline_id[0].cat_id[0].avatar"></image>
-					</view>
-				</view>
+					</navigator>
+				</navigator>
 				<view class="cu-load text-gray" v-if="!hasMore">没有更多了</view>
 			</view>
 		</unicloud-db>

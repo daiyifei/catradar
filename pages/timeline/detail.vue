@@ -1,6 +1,6 @@
 <template>
-	<view>
-		
+	<view class="container bg-white padding">
+		<timeline-item :item="item" />
 	</view>
 </template>
 
@@ -8,15 +8,17 @@
 	export default {
 		data() {
 			return {
-				
+				item: {}
 			}
 		},
-		methods: {
-			
+		async onLoad(options) {
+			const { data } = await this.$request('timeline','getList',{
+				id: options.id
+			})
+			this.item = data
 		}
 	}
 </script>
 
 <style>
-
 </style>

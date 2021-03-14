@@ -31,22 +31,9 @@
 						</navigator>
 						<view class="content">
 							<view class="text-grey">{{item.cat[0].name}}</view>
-							<!-- 内容区域 -->
-							<view class="text-content">{{item.text}}</view>
-							<view class="grid grid-square col-3 margin-top-sm">
-								<view class="bg-img" v-for="(pic,idx) in item.album" :key="idx">
-									<image :src="pic" mode="aspectFill" @tap.stop="preview(item.album, idx)"></image>
-								</view>
-							</view>
-							<!-- 发布信息区域 -->
-							<view class="margin-top-sm flex justify-between">
-								<view class="text-gray">
-									<image :src="item.user[0].avatar" mode="aspectFill" class="cu-avatar sm round margin-right-xs"></image>
-									<text>{{item.user[0].nickname}} 发布于{{item.create_date|timeFrom}}</text>
-								</view>
-							</view>
-							<!-- 留言区域 -->
-							<message-board :timeline-id="item._id" :list="item.comments"></message-board>
+							<navigator :url="'detail?id='+item._id">
+								<timeline-item :item="item"/>
+							</navigator>
 						</view>
 					</view>
 				</view>
@@ -145,16 +132,6 @@
 				this.hasMore = res.page <= Math.ceil(res.total / res.limit)
 				this.loading = false
 			},
-			preview(urls, current) {
-				uni.previewImage({
-				  urls,
-				  current
-				})
-			},
-			showMenu(id) {
-				this.id = id
-				this.show = true
-			},
 			add() {
 				uni.chooseImage({
 					success: res => {
@@ -164,6 +141,10 @@
 					}
 				})
 			},
+			showMenu(id) {
+				this.id = id
+				this.show = true
+			},
 			click(index) {
 				if(index === 0) {
 					uni.navigateTo({
@@ -172,17 +153,19 @@
 				}
 				if(index === 1) {
 					uni.showModal({
-						content: '是否删除这条动态？',
-						success: res => {
+						content: '是否删除这条情报？',
+						success: async res => {
 							if(res.confirm) {
-								db.collection('timeline').doc(this.id).remove().then(() => {
-									const index = this.list.findIndex(item => {
-										return item._id === this.id
-									})
-									this.list.splice(index, 1)
-									uni.showToast({
-										title: '删除成功'
-									})
+								await db.collection('timeline').doc(this.id).remove()
+								await db.collection('comments').where({
+									timeline_id: this.id
+								}).remove()
+								const index = this.list.findIndex(item => {
+									return item._id === this.id
+								})
+								this.list.splice(index, 1)
+								uni.showToast({
+									title: '删除成功'
 								})
 							}
 						}
