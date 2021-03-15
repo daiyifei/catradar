@@ -1,6 +1,6 @@
 <template>
 	<view>
-		<u-index-list :scrollTop="scrollTop" :indexList="indexList" :offset-top="offset">
+		<u-index-list :scrollTop="scrollTop" :indexList="indexList" :offset-top="offsetTop">
 			<!-- 置顶项目 -->
 			<slot></slot>
 			
@@ -51,7 +51,7 @@
 			list: {
 				type: Array,
 				default: () => []
-			},
+			}
 		},
 		data() {
 			return {
@@ -65,15 +65,7 @@
 				id: ''
 			}
 		},
-		computed: {
-			...mapState(['hasLogin', 'userInfo']),
-			loading() {
-				return !this.list.length
-			},
-			offset() {
-				return this.offsetTop
-			}
-		},
+		computed: mapState(['hasLogin', 'userInfo']),
 		watch: {
 			list(val) {
 				let letters = 'abcdefghijklmnopqrstuvwxyz'.split('')
@@ -94,9 +86,6 @@
 						this.indexData.push(cur)
 					}
 				})
-			},
-			offsetTop(val) {
-				console.log(val)
 			}
 		},
 		methods: {

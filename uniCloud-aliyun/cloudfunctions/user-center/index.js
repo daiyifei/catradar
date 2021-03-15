@@ -305,8 +305,8 @@ exports.main = async (event) => {
 					nickname,
 					avatar,
 					gender,
-					fav = [],
-					subscribe = []
+					favs = [],
+					subscribes = []
 				} = params
 				res = await uniID.updateUser({
 					uid: payload.uid,

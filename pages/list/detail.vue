@@ -128,7 +128,6 @@
 				</view>
 			</template>
 			
-			
 			<!-- 未登录 -->
 			<view class="need-auth" v-else>
 				<u-empty text="请先登录" mode="data">
@@ -167,7 +166,7 @@
 				return pages.length === 1
 			},
 			isFav() {
-				if(this.hasLogin && ~this.userInfo.fav.indexOf(this.form._id)) {
+				if(this.hasLogin && ~this.userInfo.favs.indexOf(this.form._id)) {
 					return true
 				}else {
 					return false
@@ -223,14 +222,14 @@
 				}
 			},
 			fav() {
-				const { _id, fav = [] } = this.userInfo
+				const { _id, favs = [] } = this.userInfo
 				if(this.isFav) {
-					fav.splice(fav.indexOf(this.form._id),1)
+					favs.splice(fav.indexOf(this.form._id),1)
 				}else {
-					fav.push(this.form._id)
+					favs.push(this.form._id)
 				}
 				db.collection('uni-id-users').doc(_id).update({
-					fav
+					favs
 				})
 				this.$u.toast(this.isFav?'已收藏':'已取消')
 			},

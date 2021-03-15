@@ -140,7 +140,7 @@
 					} else {
 						that.appreciateTotal = appreciateTotal
 						that.commentTotal = commentTotal
-						that.favTotal = that.userInfo.fav.length
+						that.favTotal = that.userInfo.favs.length
 					}
 				}
 			},

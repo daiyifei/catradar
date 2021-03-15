@@ -34,12 +34,12 @@
 			"description": "用户昵称",
 			"trim": "both"
 		},
-		"subscribe": {
+		"subscribes": {
 			"bsonType": "array",
 			"title": "关注列表",
 			"defaultValue": []
 		},
-		"fav": {
+		"favs": {
 			"bsonType": "array",
 			"title": "收藏列表",
 			"defaultValue": []

@@ -36,7 +36,7 @@
 		computed: {
 			...mapState(['hasLogin', 'userInfo']),
 			condition() {
-				return `_id in ${JSON.stringify(this.userInfo.fav)}` 
+				return `_id in ${JSON.stringify(this.userInfo.favs)}` 
 			}
 		},
 		methods: {
@@ -46,10 +46,10 @@
 				})
 			},
 			cancelFav(id) {
-				const { _id, fav } = this.userInfo
-				fav.splice(fav.indexOf(id),1)
+				const { _id, favs } = this.userInfo
+				favs.splice(favs.indexOf(id),1)
 				db.collection('uni-id-users').doc(_id).update({
-					fav
+					favs
 				}).then(() => {
 					this.$u.toast('已取消')
 				})
