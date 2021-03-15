@@ -25,7 +25,7 @@
 			</u-navbar>
 			
 			<!-- 列表 -->
-			<index-list :scrollTop="scrollTop" :offset-top="offsetTop" :list="list" ref="indexList" v-if="offsetTop">
+			<index-list :scrollTop="scrollTop" :offset-top="offsetTop" :list="list">
 				<view class="cu-list menu">
 					<navigator class="cu-item" url="subpage?state=1">
 						<view class="content">
@@ -77,22 +77,18 @@
 				offsetTop: 0
 			}
 		},
-		computed: {
-			...mapState(['hasLogin', 'userInfo', 'hasBase'])
-		},
+		computed: mapState(['hasLogin', 'userInfo', 'hasBase']),
 		watch: {
 			condition(val) {
 				this.fetchData()
 			}
 		},
-		mounted() {
+		onShow() {
 			if(this.$refs.navbar) {
 				const { navbarHeight, statusBarHeight } = this.$refs.navbar
 				this.offsetTop = navbarHeight + statusBarHeight
 			}
-		},
-		onShow() {
-			if(this.hasBase && !this.list.length) {
+			if(!this.list.length) {
 				this.fetchData()
 			}
 			uni.$on('refresh',() => {

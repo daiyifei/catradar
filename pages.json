@@ -84,6 +84,13 @@
 				"enablePullDownRefresh": false
 			}
 
+		}, {
+			"path": "pages/radar/detail",
+			"style": {
+				"navigationBarTitleText": "详情",
+				"enablePullDownRefresh": false
+			}
+
 		}
 	],
 	"tabBar": {

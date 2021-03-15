@@ -157,9 +157,10 @@ async function getList(params) {
 }
 
 async function getCommentList(params) {
+	const { timeline_id = ''} = params
 	const { data } = await db.collection('comments').aggregate()
 		.match({
-			timeline_id: params.timelineId
+			timeline_id
 		})
 		.lookup({
 			from: 'uni-id-users',

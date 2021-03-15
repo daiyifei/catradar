@@ -24,12 +24,6 @@
 				<!--列表主体-->
 				<view class="cu-list menu-avatar comment solids-top">
 					<view class="cu-item" v-for="(item, index) in list" :key="index">
-						<!-- 操作按钮 -->
-						<view 
-							class="btn-more padding cuIcon-moreandroid text-gray"
-							v-if="userInfo.scope==9||userInfo._id==item.user[0]._id"
-							@tap="showMenu(item._id)">
-						</view>
 						<!-- 头像 -->
 						<navigator :url="'/pages/list/detail?id='+item.cat[0]._id" class="cu-avatar">
 							<image :src="item.cat[0].avatar" mode="aspectFill" class="cu-avatar radius"></image>
@@ -45,9 +39,6 @@
 				
 				<!--新建按钮-->
 				<view class="cu-avatar round lg bg-gradual-blue cuIcon-camera btn-new margin" @tap="add"></view>
-				
-				<!--操作菜单-->
-				<u-action-sheet :list="actions" @click="click" v-model="show"></u-action-sheet>
 			</view>
 		</view>
 	</view>
@@ -68,15 +59,6 @@
 				total: 0,
 				hasMore: true,
 				list: [],
-				actions: [{
-					text: '编辑'
-				},{
-					text: '删除',
-					color: 'red'
-				}],
-				show: false,
-				id: '',
-				replyUser: {},
 				background: {
 					background: ''
 				}
@@ -84,7 +66,6 @@
 		},
 		computed: mapState(['hasLogin', 'userInfo', 'hasBase']),
 		onLoad() {
-			this.fetchData()
 			uni.$on('refresh', data => {
 				if(data) {
 					const index = this.list.findIndex(item => {
@@ -143,37 +124,6 @@
 						})
 					}
 				})
-			},
-			showMenu(id) {
-				this.id = id
-				this.show = true
-			},
-			click(index) {
-				if(index === 0) {
-					uni.navigateTo({
-						url: 'edit?id=' + this.id
-					})
-				}
-				if(index === 1) {
-					uni.showModal({
-						content: '是否删除这条情报？',
-						success: async res => {
-							if(res.confirm) {
-								await db.collection('timeline').doc(this.id).remove()
-								await db.collection('comments').where({
-									timeline_id: this.id
-								}).remove()
-								const index = this.list.findIndex(item => {
-									return item._id === this.id
-								})
-								this.list.splice(index, 1)
-								uni.showToast({
-									title: '删除成功'
-								})
-							}
-						}
-					})
-				}
 			}
 		}
 	}

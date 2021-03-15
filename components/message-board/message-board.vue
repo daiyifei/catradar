@@ -66,7 +66,10 @@
 				type: Array,
 				default: () => []
 			},
-			timelineId: String
+			timeline: {
+				type: Object,
+				default: () => {}
+			},
 		},		
 		data() {
 			return {
@@ -103,7 +106,7 @@
 		methods: {
 			async refresh() {
 				const { data } = await this.$request('timeline', 'getCommentList', {
-					timelineId: this.timelineId
+					timeline_id: this.timeline._id
 				})
 				this.data = data
 			},
@@ -113,7 +116,8 @@
 					await db.collection('comments').doc(this.likeId).remove()
 				}else {
 					await db.collection('comments').add({
-						timeline_id: this.timelineId,
+						timeline_id: this.timeline._id,
+						reply_user_id: this.timeline.user_id,
 						comment_type: 0
 					})
 				}
@@ -123,7 +127,7 @@
 			comment() {
 				this.form = {}
 				this.reply_nickname = ''
-				this.form.timeline_id = this.timelineId
+				this.form.timeline_id = this.timeline._id
 				this.form.comment_type = 1
 				this.showInput = true
 				this.$emit('input')
@@ -157,7 +161,7 @@
 				}else {
 					const { _id, nickname, avatar } = item.user[0]
 					this.reply_nickname = nickname
-					this.form.timeline_id = this.timelineId
+					this.form.timeline_id = this.timeline._id
 					this.form.reply_user_id = _id
 					this.form.comment_type = 1
 					this.showInput = true

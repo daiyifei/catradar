@@ -1,12 +1,17 @@
 <template>
 	<view>
+		<view class="nav bg-white">
+			<view class="cu-item" :class="formOther?'text-blue cur':''" @tap="formOther=true">我收到的</view>
+			<view class="cu-item" :class="!formOther?'text-blue cur':''" @tap="formOther=false">我发出的</view>
+		</view>
 		<unicloud-db ref="udb" v-slot:default="{data, loading, error, options, hasMore}" 
 			collection="comments,uni-id-users,list,timeline"
 			field="_id,user_id{_id,nickname,avatar},reply_user_id{_id,nickname,avatar},timeline_id{_id,cat_id{_id,name,avatar}},content,create_date"
 			orderby="create_date desc"
-			:where="condition"
 			manual
+			:where="condition"
 			@load="loaded">
+
 			<view class="cu-load loading text-gray" v-if="loading"></view>
 			<view class="cu-list menu-avatar" v-else>
 				<navigator class="cu-item" 
@@ -52,12 +57,18 @@
 	export default {
 		data() {
 			return {
-				condition: '',
 				list: [],
-				type: 0
+				type: 0,
+				formOther: true //收到的消息
 			}
 		},
-		computed: mapState(['hasLogin', 'userInfo']),
+		computed: {
+			...mapState(['hasLogin', 'userInfo']),
+			condition() {
+				return this.formOther ? `comment_type==${this.type}&&reply_user_id._id=='${this.userInfo._id}'`
+					: `comment_type==${this.type}&&user_id._id=='${this.userInfo._id}'`
+			}
+		},
 		onLoad(options) {
 			this.type = parseInt(options.type)
 			uni.setNavigationBarTitle({
@@ -65,7 +76,7 @@
 			})
 		},
 		onReady() {
-			this.condition = `comment_type==${this.type}&&(user_id._id=='${this.userInfo._id}'||reply_user_id._id=='${this.userInfo._id}')`
+			this.$refs.udb.loadData()
 		},
 		onReachBottom() {
 			this.$refs.udb.loadMore()

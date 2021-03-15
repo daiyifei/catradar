@@ -15,7 +15,7 @@
 			<cover-view class="cu-modal flex justify-center align-center" :class="catList.length?'show':''" @tap="hideCatList" v-if="catList.length">
 				<cover-view class="list">
 					<cover-view class="list-item" :style="[{'animation-delay': ((index)*0.05) + 's'}]"
-						v-for="(item,index) in catList" :key="index" @tap.stop="toDetail(item._id)">
+						v-for="(item,index) in catList" :key="index" @tap.stop="toCatDetail(item._id)">
 						<cover-image :src="item.avatar" class="avatar" />
 						<cover-view class="name">{{item.name}}</cover-view>
 					</cover-view>
@@ -33,9 +33,8 @@
 						</view>
 					</view>
 					<view class="cu-list menu-avatar">
-						<view class="cu-item" v-for="(item,index) in baseList" :key="index">
-							<image class="cu-avatar round lg" :src="item.avatar" v-if="item.avatar" />
-							<view class="cu-avatar round lg" v-else>{{item.name}}</view>
+						<view class="cu-item" v-for="(item,index) in baseList" :key="index" @tap="showBase">
+							<image :src="item.avatar" class="cu-avatar round lg" @tap.stop.prevent="toBaseDetail(item._id)"/>
 							<view class="content">
 								<view class="text-grey">{{item.name}}</view>
 								<view class="text-gray text-sm flex">
@@ -43,7 +42,7 @@
 								</view>
 							</view>
 							<view class="action margin-sm" @tap.stop.prevent="subscribe(item)">
-								<view class="text-gray text-sm" v-if="~userInfo.subscribe.indexOf(item._id)">退出</view>
+								<view class="text-gray text-sm" v-if="~userInfo.subscribes.indexOf(item._id)">退出</view>
 								<view class="action cu-tag round light bg-blue" v-else>加入</view>
 							</view>
 						</view>
@@ -75,7 +74,11 @@
 		computed: mapState(['hasLogin', 'userInfo', 'hasBase', 'baseInfo']),
 		watch: {
 			hasBase(val) {
-				this.showBase()
+				if(val) {
+					this.showBase()
+				}else {
+					this.hideBase()
+				}
 			}
 		},
 		onLoad() {
@@ -98,6 +101,9 @@
 				})
 			},
 			async showBase() {
+				if(!this.hasBase) 
+					return
+				
 				uni.showLoading()
 				
 				const map = uni.createMapContext('map')
@@ -122,6 +128,10 @@
 				this.markers = markers
 				uni.hideLoading()
 			},
+			hideBase() {
+				this.markers = []
+				this.getLocation()
+			},
 			async showBaseList() {
 				if(!this.hasLogin) {
 					this.$u.toast('请先登录')
@@ -135,56 +145,57 @@
 				this.baseList = data
 				uni.hideLoading()
 			},
-			subscribe(item) {
-				const { subscribe = [] } = this.userInfo
+			async subscribe(item) {
+				const { subscribes = [] } = this.userInfo
 				const { _id: id } = item
-				if(~subscribe.indexOf(id)) {
-					subscribe.splice(subscribe.indexOf(id),1)
-					this.baseInfo = ''
-					this.markers = []
+				if(~subscribes.indexOf(id)) {
+					subscribes.splice(subscribes.indexOf(id),1)
 					this.quit()
-					this.getLocation()
 				}else {
-					subscribe.push(id)
+					subscribes.push(id)
 					this.enter(item)
-					this.showBase()
 				}
-				db.collection('uni-id-users').doc(this.userInfo._id).update({
-					subscribe 
-				}).then(() => {
-					this.$u.toast(~subscribe.indexOf(id) ? '已加入' : '已退出')
+				await db.collection('uni-id-users').doc(this.userInfo._id).update({
+					subscribes 
+				})
+				this.$u.toast(~subscribes.indexOf(id) ? '已加入' : '已退出')
+			},
+			toBaseDetail(id) {
+				if(!this.hasBase)
+					return
+				uni.navigateTo({
+					url: '/pages/radar/detail?id=' + id
 				})
 			},
-			showCatList(e) {
+			async showCatList(e) {
 				const location = e.detail.markerId
-				uni.showLoading()
 				this.scale = 19
 				this.latitude = locations[location].latitude
 				this.longitude = locations[location].longitude
-				db.collection('list').where({
+				
+				const { result: { data } } = await db.collection('list').where({
 					state: 0,
 					location: parseInt(location)
-				}).get().then(res => {
-					uni.hideLoading()
-					// #ifdef APP-PLUS
-						const modal = uni.getSubNVueById('modal')
-						modal.show('fade-in', 500)
-						uni.$emit('modal-popup', res.result.data)
-						uni.$on('modal-hide', () => {
-							modal.hide()
-							this.reset()
-						})
-						return
-					// #endif
-					this.showModal = true
-					this.catList = res.result.data
-				})
+				}).get()
+
+				// #ifdef APP-PLUS
+					const modal = uni.getSubNVueById('modal')
+					modal.show('fade-in', 500)
+					uni.$emit('modal-popup', data)
+					uni.$on('modal-hide', () => {
+						modal.hide()
+						this.getLocation()
+					})
+					return
+				// #endif
+				this.showModal = true
+				this.catList = data
 			},
 			hideCatList() {
 				this.catList = []
 				this.scale = 17
 			},
-			toDetail(id) {
+			toCatDetail(id) {
 				uni.navigateTo({
 					url: '/pages/list/detail?id=' + id
 				})
@@ -203,9 +214,7 @@
 				return s; //km
 			}
 		},
-		onShareAppMessage() {
-			
-		}
+		onShareAppMessage() {}
 	}
 </script>
 
