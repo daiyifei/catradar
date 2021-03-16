@@ -35,10 +35,12 @@
 		<!-- 输入区域 -->
 		<view class="cu-modal bottom-modal" :class="showInput ? 'show' : ''" @tap.stop="hideInput">
 			<view class="cu-dialog" @tap.stop.prevent>
-				<view class="cu-bar input">
+				<view class="cu-bar input" :style="{'margin-bottom': keyboardHeight+'px'}">
 					<input
 					<!-- #ifdef MP  -->
 					:focus="showInput"
+					:adjust-position="false"
+					@keyboardheightchange="onFocus"
 					<!-- #endif -->
 					:placeholder="reply_nickname?'回复'+reply_nickname:'评论'" 
 					v-model="content" 
@@ -81,6 +83,7 @@
 				reply_nickname: '',
 				form: {},
 				sending: false,
+				keyboardHeight: 0
 			}
 		},
 		computed: {
@@ -123,16 +126,25 @@
 				await this.refresh()
 				this.likeLoading = false
 			},
+			onFocus(e) {
+				const { screenHeight, windowHeight } = uni.getSystemInfoSync()
+				const bottom = screenHeight - windowHeight
+				if(getCurrentPages().length > 1) {
+					this.keyboardHeight = e.detail.height
+				}else {
+					this.keyboardHeight = e.detail.height - (bottom > 0 ? bottom : 0)
+				}
+			},
 			comment() {
 				this.form = {}
 				this.reply_nickname = ''
 				this.form.timeline_id = this.timeline._id
 				this.form.comment_type = 1
 				this.showInput = true
-				this.$emit('input')
 			},
 			hideInput() {
 				this.form = {}
+				this.content = ''
 				this.showInput = false
 			},
 			async addComment() {
@@ -141,7 +153,7 @@
 				const { result: { id } } = await db.collection('comments').add(this.form)
 				const { result: { data }} = await db.collection('comments').doc(id).get()
 				this.sending = false
-				this.showInput = false
+				this.hideInput()
 				this.refresh()
 			},
 			replyOrRemove(item) {

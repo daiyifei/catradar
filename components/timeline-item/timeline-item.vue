@@ -4,17 +4,19 @@
 		<view class="flex padding bg-white solid-bottom wrapper">
 			<!-- 头像 -->
 			<view>
-				<navigator :url="'/pages/list/detail?id='+item.cat[0]._id" class="margin-right-sm" v-if="isLink">
+				<navigator :url="'/pages/list/detail?id='+item.cat[0]._id" class="margin-right-sm">
 					<image :src="item.cat[0].avatar" mode="aspectFill" class="cu-avatar radius"></image>
 				</navigator>
 			</view>
 			<!-- 主体 -->
 			<view class="response">
 				<!-- 操作按钮 -->
-				<view class="margin-top-xs fr cuIcon-moreandroid text-gray text-xxl"
-					v-if="userInfo.scope==9||userInfo._id==item.user[0]._id" @tap="showMenu(item._id)">
+				<view class="margin-top-xs fr text-xl" 
+					v-if="userInfo.scope==9||userInfo._id==item.user[0]._id" 
+					@tap="showMenu(item._id)">
+					<text  class="cuIcon-moreandroid text-gray"></text>
 				</view>
-				<view class="text-grey text-lg" v-if="isLink">{{item.cat[0].name}}</view>
+				<view class="text-grey text-lg">{{item.cat[0].name}}</view>
 				<view class="text-content" @tap="toDetail">{{item.text}}</view>
 				<view class="grid grid-square col-3 margin-top-sm" @tap="toDetail">
 					<view class="bg-img" v-for="(pic,idx) in item.album" :key="idx">
