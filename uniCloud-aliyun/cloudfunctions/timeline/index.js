@@ -131,11 +131,11 @@ async function getList(params) {
 				.done(),
 			as: 'comments',
 		})
-		.skip(limit * (page - 1))
-		.limit(limit)
 		.sort({
 			create_date: -1
 		})
+		.skip(limit * (page - 1))
+		.limit(limit)
 		.end()
 		
 	if(id) {

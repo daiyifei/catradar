@@ -46,22 +46,22 @@
 			hideDrawer() {
 				this.show = false
 			},
-			fetchData() {
-				this.keys.forEach(item => {
-					this.$request('list', 'getStat', {
-						key: item.key
-					}).then(({data}) => {
-						this.total = data.total
+			async fetchData() {
+				uni.showLoading()
+				await Promise.all(
+					this.keys.map(async ({key}) => {
+						const { data: { data, total } } = await this.$request('list', 'getStat', { key })
+						this.total = total
 						const series = []
-						data.data.forEach(data => {
+						data.map(item => {
 							series.push({
-								name: this.$root.$options.filters[item.key](data._id),
-								data: data.num
+								name: this.$root.$options.filters[key](item._id),
+								data: item.num
 							})
 						})
-						this.$set(this.charts, item.key, series)
-					})
-				})
+						this.$set(this.charts, key, series)
+					}))
+				uni.hideLoading()
 			}
 		}
 	}

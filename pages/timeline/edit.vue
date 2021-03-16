@@ -13,7 +13,6 @@
 			</view>
 			<button form-type="submit" class="cu-btn block bg-blue margin lg" :loading="saving" :disabled="!form.cat_id||!form.text||!form.album.length">{{id?'保存':'发布'}}</button>
 		</form>
-		<button class="cu-btn block bg-green margin lg" v-if="id&&userInfo.scope===9" @tap="syncToAlbum">同步到相册</button>
 	</view>
 </template>
 
@@ -90,11 +89,6 @@
 					})
 					this.saving = false
 				}
-			},
-			syncToAlbum() {
-				uni.navigateTo({
-					url: '/pages/list/edit?id=' + this.form.cat_id + '&path=' + JSON.stringify(this.form.album)
-				})
 			}
 		}
 	}

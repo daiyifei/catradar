@@ -1,5 +1,5 @@
 <template>
-	<view class="container bg-white padding">
+	<view>
 		<view class="cu-load loading text-gray" v-if="loading"></view>
 		<timeline-item :item="item" v-else/>
 	</view>

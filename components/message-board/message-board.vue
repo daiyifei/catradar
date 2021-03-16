@@ -1,13 +1,13 @@
 <template>
-	<view>
+	<view class="text-content" style="margin-top: -50rpx;">
 		<!-- 功能按钮 -->
-		<view class="text-right margin-bottom-sm text-grey" style="margin-top: -50rpx;">
+		<view class="text-right text-grey">
 			<text class="like-loading cu-load load-cuIcon loading" v-if="likeLoading"></text>
 			<text :class="'cuIcon-like'+(likeId?'fill':'')" @tap="like" v-else>{{(likeId?'取消':'赞')}}</text>
 			<text class="cuIcon-message margin-left-sm" @tap="comment">评论</text>
 		</view>
 		
-		<view class="bg-gray radius">
+		<view class="bg-gray radius margin-top-sm" v-if="list.length">
 			<!-- 点赞列表 -->
 			<view class="flex padding-sm text-grey text-bold" v-if="likeList.length">
 				<text class="cuIcon-like"></text>
@@ -16,7 +16,7 @@
 				</text>
 			</view>
 			<!-- 评论列表 -->
-			<view class="padding-sm" 
+			<view class="padding-sm"
 				v-for="(item, index) in commentList" :key="index" 
 				@tap="replyOrRemove(item)">
 				<view>
@@ -36,8 +36,8 @@
 		<view class="cu-modal bottom-modal" :class="showInput ? 'show' : ''" @tap.stop="hideInput">
 			<view class="cu-dialog" @tap.stop.prevent>
 				<view class="cu-bar input">
-					<input 
-					<!-- #ifdef MP-WEIXIN -->
+					<input
+					<!-- #ifdef MP  -->
 					:focus="showInput"
 					<!-- #endif -->
 					:placeholder="reply_nickname?'回复'+reply_nickname:'评论'" 
@@ -80,7 +80,7 @@
 				showInput: false,
 				reply_nickname: '',
 				form: {},
-				sending: false
+				sending: false,
 			}
 		},
 		computed: {
@@ -117,7 +117,6 @@
 				}else {
 					await db.collection('comments').add({
 						timeline_id: this.timeline._id,
-						reply_user_id: this.timeline.user_id,
 						comment_type: 0
 					})
 				}

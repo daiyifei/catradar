@@ -27,16 +27,16 @@
 				<form-picker v-model="form.location" :range="Array.from(Array(19),(v,k)=>k+17+'幢')" @change="onChange('location', $event)" />
 			</view>
 			<view class="cu-form-group">
+				<view class="title">生日</view>
+				<date-picker v-model="form.birthday" @change="onChange('birthday', $event)" />
+			</view>
+			<view class="cu-form-group">
 				<view class="title">绝育</view>
 				<form-switch v-model="form.neuter" @change="onChange('neuter', $event)" />
 			</view>
 			<view class="cu-form-group" v-if="form.neuter">
 				<view class="title">绝育时间</view>
-				<date-picker v-model="form.neuterDate" />
-			</view>
-			<view class="cu-form-group">
-				<view class="title">生日</view>
-				<date-picker v-model="form.birthday" />
+				<date-picker v-model="form.neuterDate" @change="onChange('neuterDate', $event)" />
 			</view>
 			<view class="cu-form-group">
 				<view class="title">简介</view>
@@ -82,8 +82,8 @@
 			if(options.id) {
 				this.id = options.id
 				this.loading = true
-				const res = await db.collection('list').doc(options.id).get()
-				this.form = res.result.data[0]
+				const { result: { data } } = await db.collection('list').doc(options.id).get()
+				this.form = data[0]
 				this.loading = false
 			}
 			
