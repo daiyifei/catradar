@@ -1,6 +1,6 @@
 <template>
 	<view>
-		<u-index-list :scrollTop="scrollTop" :indexList="indexList" :offset-top="offsetTop">
+		<u-index-list :scrollTop="scrollTop" :offsetTop="offsetTop" :indexList="indexList" >
 			<!-- 置顶项目 -->
 			<slot></slot>
 			
@@ -40,14 +40,8 @@
 	} from 'vuex'
 	export default {
 		props: {
-			scrollTop: {
-				type: Number,
-				default: 0
-			},
-			offsetTop: {
-				type: Number,
-				default: 0
-			},
+			scrollTop: Number,
+			offsetTop: Number,
 			list: {
 				type: Array,
 				default: () => []
@@ -67,25 +61,31 @@
 		},
 		computed: mapState(['hasLogin', 'userInfo']),
 		watch: {
-			list(val) {
-				let letters = 'abcdefghijklmnopqrstuvwxyz'.split('')
-				this.indexList = []
-				this.indexData = []
-				letters.map(letter => {
-					let cur = {
-						name: letter.toUpperCase(),
-						data: []
-					}
-					val.map(item => {
-						if (item.py.substr(0,1) === letter) {
-							cur.data.push(item)
+			list: {
+				handler(val) {
+					const letters = 'abcdefghijklmnopqrstuvwxyz'.split('')
+					const indexList = []
+					const indexData = []
+					letters.map(letter => {
+						let cur = {
+							name: letter.toUpperCase(),
+							data: []
+						}
+						val.map(item => {
+							if (item.py.substr(0,1) === letter) {
+								cur.data.push(item)
+							}
+						})
+						if(cur.data.length) {
+							indexList.push(cur.name)
+							indexData.push(cur)
 						}
 					})
-					if(cur.data.length) {
-						this.indexList.push(cur.name)
-						this.indexData.push(cur)
-					}
-				})
+					this.indexList = indexList
+					this.indexData = indexData
+				},
+				deep: true,
+				immediate: true
 			}
 		},
 		methods: {

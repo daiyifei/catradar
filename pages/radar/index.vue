@@ -12,15 +12,15 @@
 			<!-- 定位按钮 -->
 			<image class="reset" @tap="getLocation" src="/static/reset.png"></image>
 			<!-- 猫咪列表 -->
-			<cover-view class="cu-modal flex justify-center align-center" :class="catList.length?'show':''" @tap="hideCatList" v-if="catList.length">
-				<cover-view class="list">
-					<cover-view class="list-item" :style="[{'animation-delay': ((index)*0.05) + 's'}]"
+			<view class="cu-modal flex justify-center align-center" :class="catList.length?'show':''" @tap="hideCatList" v-if="catList.length">
+				<view class="list">
+					<view class="list-item" :style="[{'animation-delay': ((index)*0.05) + 's'}]"
 						v-for="(item,index) in catList" :key="index" @tap.stop="toCatDetail(item._id)">
-						<cover-image :src="item.avatar" class="avatar" />
-						<cover-view class="name">{{item.name}}</cover-view>
-					</cover-view>
-				</cover-view>
-			</cover-view>
+						<image :src="item.avatar" class="avatar" />
+						<view class="name">{{item.name}}</view>
+					</view>
+				</view>
+			</view>
 			<!-- 基地列表 -->
 			<view class="cu-modal bottom-modal" :class="baseList.length?'show':''" @tap="baseList=[]" v-if="baseList.length">
 				<view class="cu-dialog" @tap.stop.prevent>

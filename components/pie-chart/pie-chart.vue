@@ -12,6 +12,9 @@
 <script>
 	import uCharts from '@/uni_modules/u-charts/u-charts/u-charts.js'
 	export default {
+		options: {
+	    pureDataPattern: /^_/ // 指定所有 _ 开头的数据字段为纯数据字段
+	  },
 		props: {
 			width: {
 				type: Number,
@@ -25,8 +28,8 @@
 		},
 		data() {
 			return {
-				id: '',
-				chart: '',
+				id: this.$u.guid(10),
+				_chart: '',
 				cWidth: '',
 				cHeight: '',
 				pixelRatio: 1,
@@ -34,7 +37,6 @@
 			}
 		},
 		created() {
-			this.id = Math.ceil(Math.random()*1000000) + ''
 			this.cWidth = uni.upx2px(this.width)
 			this.cHeight = uni.upx2px(this.height ? this.height : this.width)
 			// #ifdef MP-ALIPAY
@@ -42,13 +44,13 @@
 			// #endif
 		},
 		watch: {
-			series(newValue, oldValue) {
+			series(val) {
 				this.showChart()
 			}
 		},
 		methods: {
 			showChart() {
-				this.chart = new uCharts({
+				this._chart = new uCharts({
 					$this: this,
 					canvasId: this.id,
 					type: 'ring',
@@ -73,8 +75,8 @@
 				})
 			},
 			showTip(e) {
-				if(this.chart) {
-					this.chart.showToolTip(e, {
+				if(this._chart) {
+					this._chart.showToolTip(e, {
 						format: function(item) {
 							return item.name + ':' + item.data
 						}

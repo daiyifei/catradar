@@ -1,20 +1,33 @@
 diff --git a/node_modules/uview-ui/components/u-index-list/u-index-list.vue b/node_modules/uview-ui/components/u-index-list/u-index-list.vue
-index 9084be5..21e9939 100644
+index 9084be5..c307602 100644
 --- a/node_modules/uview-ui/components/u-index-list/u-index-list.vue
 +++ b/node_modules/uview-ui/components/u-index-list/u-index-list.vue
-@@ -74,10 +74,10 @@
+@@ -73,12 +73,6 @@
+ 			}
  		},
  		created() {
- 			// #ifdef H5
+-			// #ifdef H5
 -			this.stickyOffsetTop = this.offsetTop ? uni.upx2px(this.offsetTop) : 44;
-+			this.stickyOffsetTop = this.offsetTop ? this.offsetTop : 44;
- 			// #endif
- 			// #ifndef H5
+-			// #endif
+-			// #ifndef H5
 -			this.stickyOffsetTop = this.offsetTop ? uni.upx2px(this.offsetTop) : 0;
-+			this.stickyOffsetTop = this.offsetTop ? this.offsetTop : 0;
- 			// #endif
+-			// #endif
  			// 只能在created生命周期定义children，如果在data定义，会因为循环引用而报错
  			this.children = [];
+ 		},
+@@ -104,6 +98,12 @@
+ 		},
+ 		methods: {
+ 			updateData() {
++				// #ifdef H5
++				this.stickyOffsetTop = this.offsetTop ? this.offsetTop : 44;
++				// #endif
++				// #ifndef H5
++				this.stickyOffsetTop = this.offsetTop ? this.offsetTop : 0;
++				// #endif
+ 				this.timer && clearTimeout(this.timer);
+ 				this.timer = setTimeout(() => {
+ 					this.showSidebar = !!this.children.length;
 @@ -133,7 +133,7 @@
  				return this.$uGetRect('.u-index-bar').then((rect) => {
  					Object.assign(this, {

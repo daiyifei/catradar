@@ -2,7 +2,7 @@
 	<view>
 		<picker :value="value" :range="range" @change="onChange">
 			<view class="picker">
-				{{value!==undefined?label:placeholder}}
+				{{value>0?label:placeholder}}
 			</view>
 		</picker>
 	</view>

@@ -4,8 +4,8 @@
 		<drag-sort v-model="list" :showDelete="false">
 			<template v-slot="{ item,index }">
 				<view class="grid" @tap="showModal(item, index)">
-					<image :src="item.detail.avatar" mode="aspectFill"></image>
-					<view class="name">{{item.tag}} - {{item.detail.name}}</view>
+					<image :src="item.avatar" mode="aspectFill"></image>
+					<view class="name">{{item.tag}} - {{item.name}}</view>
 					<view class="close" @tap.prevent.stop="delItem(index)">
 						<text class='cuIcon-close'></text>
 					</view>
@@ -28,7 +28,7 @@
 				<view class="form padding-xl">
 					<view class="cu-form-group">
 						<view class="title">猫咪</view>
-						<remote-input placeholder="请输入猫咪姓名" v-model="form.detail._id" ref="remote" :limit="5" class="text-left" style="width: 100%;"/>
+						<remote-input placeholder="请输入猫咪姓名" v-model="form._id" ref="remote" :limit="5" class="text-left" style="width: 100%;"/>
 					</view>
 					<view class="cu-form-group">
 						<view class="title">关系</view>
@@ -38,7 +38,7 @@
 				<view class="cu-bar bg-white justify-end">
 					<view class="action">
 						<button class="cu-btn line-green text-green" @tap="hideModal">取消</button>
-						<button class="cu-btn bg-green margin-left" @tap="onConfirm">确定</button>
+						<button class="cu-btn bg-green margin-left" @tap="onConfirm" :disabled="!form._id||!form.tag">确定</button>
 					</view>
 				</view>
 			</view>
@@ -67,9 +67,7 @@
 			return {
 				list: [],
 				show: false,
-				form: {
-					detail: {}
-				},
+				form: {},
 				index: -1
 			}
 		},
@@ -91,7 +89,6 @@
 					this.index = index
 				}else {
 					this.form = {
-						detail: {},
 						tag: ''
 					}
 				}
@@ -102,22 +99,7 @@
 				this.show = false
 			},
 			onConfirm() {
-				if(!this.form.detail || !this.form.tag) {
-					uni.showToast({
-						title: '请填写完整信息',
-						icon: 'none'
-					})
-					return
-				}
-				const { _id, name, avatar } = this.$refs.remote.selected
-				const form = {
-					tag: this.form.tag,
-					detail: {
-						_id,
-						name,
-						avatar
-					}
-				}
+				const form = Object.assign(this.form, this.$refs.remote.selected)
 				if(this.index > -1) {
 					this.$set(this.list,this.index,form)
 				}else {

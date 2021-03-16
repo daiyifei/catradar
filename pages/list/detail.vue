@@ -22,7 +22,7 @@
 			
 			<template v-if="hasLogin">
 				<!-- 头部 -->
-				<view class="header padding flex align-center bg-white margin-sm radius shadow shadow-blur" @tap="fav">
+				<view class="header padding flex align-center bg-white margin-sm radius shadow shadow-blur">
 					<image :src="form.avatar" class="cu-avatar xl round margin-right-sm u-skeleton-circle"></image>
 					<view class="u-skeleton-rect">
 						<view class="text-xxl u-skeleton-circle">{{form.name}}</view>
@@ -35,8 +35,16 @@
 						<view class="cu-tag round u-skeleton-rect" :class="'bg-'+['gray','green','orange','blue','grey'][form.state]">
 							{{form.state | state}}
 						</view>
-						<view class="fav u-skeleton-rect">
-							<text :class="isFav?'cuIcon-favorfill text-orange':'cuIcon-favor'"></text>
+						<view class="flex u-skeleton-rect">
+							<view class="flex flex-direction align-center padding-lr solid-right" @tap="fav">
+								<text :class="isFav?'cuIcon-favorfill text-orange':'cuIcon-favor'"></text>
+								<text class="text-xs" :class="isFav?'text-orange':'text-gray'">{{isFav?'已':''}}收藏</text>
+							</view>
+							<view class="flex flex-direction align-center padding-left" style="position: relative;">
+								<text class="cuIcon-share"></text>
+								<text class="text-xs text-gray">分享</text>
+								<button class="btn-transparent" open-type="share" @tap="share"></button>
+							</view>
 						</view>
 					</view>
 				</view>
@@ -91,12 +99,11 @@
 					</view>
 					<view class="cu-list grid col-4 no-border">
 						<view class="cu-item" v-for="(item, index) in form.relation" :key="index">
-							<navigator :url="'detail?id='+item.detail._id" class="flex flex-direction align-center">
-								<image :src="item.detail.avatar" mode="aspectFill" class="cu-avatar xl round margin-bottom-xs" v-if="item.detail.avatar"></image>
-								<view class="cu-avatar xl round margin-bottom-xs" v-else>{{item.detail.name}}</view>
-								<view class="flex">
+							<navigator :url="'detail?id='+item._id" class="flex flex-direction align-center">
+								<image :src="item.avatar" mode="aspectFill" class="cu-avatar xl round margin-bottom-xs" />
+								<view class="flex text-sm">
 									<view class="margin-right-xs">{{item.tag}}</view>
-									<view class="text-blue">{{item.detail.name}}</view>
+									<view class="text-blue">{{item.name}}</view>
 								</view>
 							</navigator>
 						</view>
@@ -111,20 +118,29 @@
 							<text class="text-ABC text-orange">timeline</text>
 						</view>
 					</view>
-					<view v-for="(item,index) in timeline" :key="index" class="cu-timeline">
-						<view class="cu-time margin-left">{{item.create_date|timeFrom('yy/mm/dd')}}</view>
-						<view class="cu-item" :class="index?'':'text-blue'">
-							<view class="content">
-								<view class="text-content">{{item.text}}</view>
-								<view class="grid grid-square col-3 margin-top-sm">
-									<view class="bg-img" v-for="(pic,idx) in item.album" :key="idx">
-										<image :src="pic" mode="aspectFill" @tap.stop="preview(item.album, idx)"></image>
+					<unicloud-db 
+						v-slot:default="{data, loading, hasMore}" 
+						collection="timeline" 
+						:where="whereTimeline" 
+						orderby="create_date desc"
+						manual
+						@load="timelineLoad">
+							<navigator v-for="(item,index) in data" :key="index" class="cu-timeline" 
+								:url="`/pages/timeline/detail?id=${item._id}`">
+								<view class="cu-time margin-left">{{item.create_date}}</view>
+								<view class="cu-item" :class="index?'':'text-blue'">
+									<view class="content">
+										<view class="text-content">{{item.text}}</view>
+										<view class="grid grid-square col-3 margin-top-sm">
+											<view class="bg-img" v-for="(pic,idx) in item.album" :key="idx">
+												<image :src="pic" mode="aspectFill" @tap.stop="preview(item.album, idx)"></image>
+											</view>
+										</view>
 									</view>
 								</view>
-							</view>
-						</view>
-					</view>
-					<view class="text-sm text-gray text-center padding-bottom">暂无更多</view>
+							</navigator>
+							<view class="text-sm text-gray text-center padding-bottom" v-if="!hasMore">暂无更多</view>
+					</unicloud-db>
 				</view>
 			</template>
 			
@@ -150,7 +166,7 @@
 				current: 0,
 				id: '',
 				form: {},
-				timeline: [],
+				whereTimeline: '',
 				loading: true,
 				background: {
 					background: ''
@@ -177,6 +193,9 @@
 			this.id = option.id
 			this.fetchData()
 		},
+		onReady() {
+			this.whereTimeline = `cat_id=='${this.id}'`
+		},
 		onPageScroll(e) {
 			const opacity = e.scrollTop/100
 			this.title = this.form.name
@@ -186,18 +205,16 @@
 				`linear-gradient(45deg, rgba(0,129,255,${opacity}), rgba(28,187,180,${opacity}))`
 		},
 		methods: {
-			fetchData() {
-				const db = uniCloud.database()
-				db.collection('list').doc(this.id).get().then(res => {
-					this.form = res.result.data[0]
-					uni.setNavigationBarTitle({
-						title: this.form.name
-					})
+			async fetchData() {
+				const { result: { data } } = await db.collection('list').doc(this.id).get()
+				this.form = data[0]
+				uni.setNavigationBarTitle({
+					title: this.form.name
 				})
-				db.collection('timeline').where({
-					cat_id: this.id
-				}).orderBy('create_date','desc').get().then(res => {
-					this.timeline = res.result.data
+			},
+			timelineLoad(data) {
+				data.map(item => {
+					item.create_date = this.$u.timeFrom(item.create_date)
 				})
 			},
 			imgLoad() {
@@ -224,7 +241,7 @@
 			fav() {
 				const { _id, favs = [] } = this.userInfo
 				if(this.isFav) {
-					favs.splice(fav.indexOf(this.form._id),1)
+					favs.splice(favs.indexOf(this.form._id),1)
 				}else {
 					favs.push(this.form._id)
 				}
@@ -232,6 +249,19 @@
 					favs
 				})
 				this.$u.toast(this.isFav?'已收藏':'已取消')
+			},
+			share() {
+				// #ifdef APP-PLUS
+				uni.share({
+					provider: "weixin",
+					scene: "WXSceneSession",
+				  type: 2,
+				  imageUrl: this.form.album[this.current],
+				  fail(err) {
+						this.$u.toast(err.message)
+				  }
+				})
+				// #endif
 			},
 			onNavigationBarButtonTap(e) {
 				switch(e.type) {
@@ -284,11 +314,6 @@
 		top: 0;
 		right: 0;
 		bottom: 0;
-	}
-	
-	.header .fav {
-		margin-right: 10rpx;
-		font-size: 40rpx;
 	}
 	
 	.cu-list .action {

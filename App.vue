@@ -3,9 +3,9 @@
 	import Vue from 'vue'
 	import { mapState, mapMutations, mapActions } from 'vuex'
 	export default {
-		onLaunch() {
+		async onLaunch() {
+			this.checkUpdate()
 			this.autoLogin()
-			
 		},
 		onShow: function() {},
 		onHide: function() {},
@@ -34,7 +34,22 @@
 					this.logout()
 				}
 			},
-			autoUpdate() {
+			checkUpdate() {
+				// #ifdef MP
+				const updateManager = uni.getUpdateManager();
+				updateManager.onUpdateReady(function (res) {
+				  uni.showModal({
+				    title: '更新提示',
+				    content: '新版本已经准备好，是否重启应用？',
+				    success(res) {
+				      if (res.confirm) {
+				        updateManager.applyUpdate()
+				      }
+				    }
+				  })
+				})
+				// #endif
+				
 				// #ifdef APP-PLUS
 				plus.runtime.getProperty(plus.runtime.appid, ({
 					version
@@ -92,16 +107,32 @@
 	/* #ifndef APP-PLUS-NVUE */
 	@import "colorui/main.css";
 	@import "colorui/icon.css";
-
+	
+	.fullscreen {
+		width: 100vw;
+		height: calc(100vh - var(--window-bottom));
+	}
 	.cu-form-group .title {
 		min-width: calc(4em + 15px);
 	}
 	.gender {
 		color: #87CEEB;
 	}
-	
 	.gender.female {
 		color: #FFC0CB;
+	}
+	.btn-transparent {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		z-index: 1;
+		background: transparent;
+		border: none;
+	}
+	.btn-transparent::after {
+		border: none;
 	}
 	/* #endif */
 </style>

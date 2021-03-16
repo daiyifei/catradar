@@ -183,16 +183,6 @@
   text-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
 }
 
-.btn-transparent {
-	position: absolute;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	z-index: 9;
-	background: transparent;
-}
-
 .UCenter-bg text {
   opacity: 0.8;
 }

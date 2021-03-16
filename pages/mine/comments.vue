@@ -6,12 +6,11 @@
 		</view>
 		<unicloud-db ref="udb" v-slot:default="{data, loading, error, options, hasMore}" 
 			collection="comments,uni-id-users,list,timeline"
-			field="_id,user_id{_id,nickname,avatar},reply_user_id{_id,nickname,avatar},timeline_id{_id,cat_id{_id,name,avatar}},content,create_date"
+			field="_id,user_id{_id,nickname,avatar},reply_user_id{_id,nickname,avatar},timeline_id{_id,user_id{_id,nickname,avatar},cat_id{_id,name,avatar}},content,create_date"
 			orderby="create_date desc"
 			manual
 			:where="condition"
 			@load="loaded">
-
 			<view class="cu-load loading text-gray" v-if="loading"></view>
 			<view class="cu-list menu-avatar" v-else>
 				<navigator class="cu-item" 
@@ -65,7 +64,7 @@
 		computed: {
 			...mapState(['hasLogin', 'userInfo']),
 			condition() {
-				return this.formOther ? `comment_type==${this.type}&&reply_user_id._id=='${this.userInfo._id}'`
+				return this.formOther ? `comment_type==${this.type}&&timeline_id.user_id._id=='${this.userInfo._id}'`
 					: `comment_type==${this.type}&&user_id._id=='${this.userInfo._id}'`
 			}
 		},
