@@ -65,18 +65,13 @@
 						// 编辑
 						delete this.form._id
 						await db.collection('timeline').doc(this.id).update(this.form)
-						uni.showToast({
-							title: '保存成功'
-						})
 						this.form._id = this.id
 						this.form.cat = [this.$refs.remote.selected]
-						uni.$emit('refresh', this.form)
+						uni.$emit('refresh', this.id)
 					}else {
 						// 新建
 						await db.collection('timeline').add(this.form)
-						uni.showToast({
-							title: '发布成功'
-						})
+						uni.$emit('refresh')
 					}
 					this.saving = false
 					setTimeout(() => {

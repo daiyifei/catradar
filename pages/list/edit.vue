@@ -145,8 +145,8 @@
 					uni.showToast({
 						title: '保存成功'
 					})
-					uni.$emit('refresh')
 					setTimeout(() => {
+						uni.$emit('refresh')
 						uni.navigateBack()
 					}, 500)
 				}catch(err) {
