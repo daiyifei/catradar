@@ -103,7 +103,7 @@
 			async showBase() {
 				if(!this.hasBase) 
 					return
-				
+
 				uni.showLoading()
 				
 				const map = uni.createMapContext('map')

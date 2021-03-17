@@ -28,7 +28,7 @@
 				<view class="form padding-xl">
 					<view class="cu-form-group">
 						<view class="title">猫咪</view>
-						<remote-input placeholder="请输入猫咪姓名" v-model="form._id" ref="remote" :limit="5" class="text-left" style="width: 100%;"/>
+						<remote-input placeholder="请输入猫咪姓名" v-model="form._id" ref="remote" :limit="5" class="text-left response" @change="onChange('_id',$event)"/>
 					</view>
 					<view class="cu-form-group">
 						<view class="title">关系</view>
@@ -72,7 +72,7 @@
 			}
 		},
 		created() {
-			this.list = this.value
+			this.list = this.value || []
 		},
 		watch: {
 			list(val) {
@@ -98,6 +98,9 @@
 				this.index = -1
 				this.show = false
 			},
+			onChange(key, value) {
+				this.$set(this.form,key,value)
+			},
 			onConfirm() {
 				const form = Object.assign(this.form, this.$refs.remote.selected)
 				if(this.index > -1) {
@@ -116,10 +119,6 @@
 		flex: 1;
 		margin-top: 15px;
 		margin-bottom: 15px;
-	}
-	
-	.cu-modal {
-		z-index: 99 !important;
 	}
 	
 	.form {

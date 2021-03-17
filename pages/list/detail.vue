@@ -1,30 +1,23 @@
 <template>
 	<view>
-		<!-- 未登录 -->
-		<view class="fullscreen" v-if="!hasLogin">
-			<u-empty text="请先登录" mode="data">
-				<navigator url="/pages/mine/index" class="cu-btn bg-blue margin radius" slot="bottom"
-					open-type="switchTab">去登录</navigator>
-			</u-empty>
-		</view>
-		<view else>
-			<u-skeleton :loading="loading" animation bgColor="#FFF"></u-skeleton>
-			<u-navbar :back-icon-name="isSingle?'home':'nav-back'" :custom-back="customBack" :background="background"
-				:title="title" back-icon-color="#fff" :title-color="titleColor">
-			</u-navbar>
-			<view class="container u-skeleton">
-				<!-- 封面 -->
-				<swiper class="swiper screen-swiper square-dot u-skeleton-rect" :indicator-dots="true" :circular="true"
-					@change="imgChange">
-					<swiper-item v-for="(item,index) in form.album" :key="index">
-						<view class="swiper-item" @tap="preview(form.album, index)">
-							<video :src="item" autoplay loop :show-play-btn="false" :controls="false" objectFit="cover"
-								v-if="item.split('.')[form.album.length]=='mp4'" />
-							<image :src="item" mode="aspectFill" v-else @load="imgLoad" />
-						</view>
-					</swiper-item>
-				</swiper>
+		<u-skeleton :loading="loading" animation bgColor="#FFF"></u-skeleton>
+		<u-navbar :back-icon-name="isSingle?'home':'nav-back'" :custom-back="customBack" :background="background"
+			:title="title" back-icon-color="#fff" :title-color="titleColor">
+		</u-navbar>
+		<view class="container u-skeleton">
+			<!-- 封面 -->
+			<swiper class="swiper screen-swiper square-dot u-skeleton-rect" :indicator-dots="true" :circular="true"
+				@change="imgChange">
+				<swiper-item v-for="(item,index) in form.album" :key="index">
+					<view class="swiper-item" @tap="preview(form.album, index)">
+						<video :src="item" autoplay loop :show-play-btn="false" :controls="false" objectFit="cover"
+							v-if="item.split('.')[form.album.length]=='mp4'" />
+						<image :src="item" mode="aspectFill" v-else @load="imgLoad" />
+					</view>
+				</swiper-item>
+			</swiper>
 
+			<template v-if="hasLogin">
 				<!-- 头部 -->
 				<view class="header padding flex align-center bg-white margin-sm radius shadow shadow-blur">
 					<image :src="form.avatar" class="cu-avatar xl round margin-right-sm u-skeleton-circle"></image>
@@ -37,8 +30,8 @@
 						</view>
 					</view>
 					<view class="action padding flex flex-direction justify-between align-end">
-						<view class="cu-tag round u-skeleton-rect"
-							:class="'bg-'+['gray','green','orange','blue','grey'][form.state]">
+						<view class="cu-tag round u-skeleton-rect light"
+							:class="'bg-'+['gray','blue','orange','black'][form.state]">
 							{{form.state | state}}
 						</view>
 						<view class="flex u-skeleton-rect">
@@ -84,7 +77,7 @@
 							<view class="content text-grey">绝育时间</view>
 							<view class="action">{{form.neuterDate}}</view>
 						</view>
-						<view class="cu-item" v-if="form.location">
+						<view class="cu-item" v-if="form.state===0">
 							<view class="content text-grey">位置</view>
 							<view class="action">{{form.location|location}}</view>
 						</view>
@@ -145,6 +138,14 @@
 						<view class="text-sm text-gray text-center padding-bottom" v-if="!hasMore">暂无更多</view>
 					</unicloud-db>
 				</view>
+			</template>
+
+			<!-- 未登录 -->
+			<view class="need-auth" v-else>
+				<u-empty text="请先登录" mode="data">
+					<navigator url="/pages/mine/index" class="cu-btn bg-blue margin radius" slot="bottom"
+						open-type="switchTab">去登录</navigator>
+				</u-empty>
 			</view>
 		</view>
 	</view>
@@ -325,5 +326,9 @@
 		text-align: left;
 		line-height: 1.75em;
 		width: 480rpx;
+	}
+
+	.need-auth {
+		height: calc(100vh - 750rpx);
 	}
 </style>

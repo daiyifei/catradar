@@ -4,6 +4,12 @@
 	import { mapState, mapMutations, mapActions } from 'vuex'
 	export default {
 		async onLaunch() {
+			uni.onNetworkStatusChange((res) => {
+				if(!res.isConnected) {
+					uni.hideLoading()
+					this.$u.toast('网络断开')
+				}
+			})
 			this.checkUpdate()
 			this.autoLogin()
 		},
