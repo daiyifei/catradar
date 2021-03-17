@@ -70,13 +70,12 @@
 				loadingCandidates: false
 			}
 		},
-		created() {
+		async created() {
 			if(this.value) {
 				this.loading = true
-				db.collection('list').doc(this.value).field('_id,name,avatar').get().then(res => {
-					this.selected = res.result.data[0]
-					this.loading = false
-				})
+				const { result: { data } } = await db.collection('list').doc(this.value).field('_id,name,avatar').get()
+				this.selected = data.length ? data[0] : {}
+				this.loading = false
 			}else {
 				this.selected = {}
 			}

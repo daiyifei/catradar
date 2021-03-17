@@ -25,6 +25,8 @@
 						<image class="cu-avatar radius lg margin-left-sm" :src="userInfo.avatar"></image>
 					</view>
 				</view>
+				
+				<u-gap bg-color="#fff"></u-gap>
 
 				<!--列表主体-->
 				<timeline-item :item="item" is-link v-for="(item, index) in list" :key="index" />
