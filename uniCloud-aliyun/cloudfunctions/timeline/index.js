@@ -141,7 +141,7 @@ async function getList(params) {
 	if(id) {
 		return {
 			code: 0,
-			data: data[0]
+			data: data.length ? data[0] : null
 		}
 	}
 	

@@ -122,6 +122,7 @@
 	},
 	"globalStyle": {
 		"navigationBarTitleText": "猫雷达",
+		"backgroundColor": "#f1f1f1",
 		"app-plus": {
 			"titleNView": {
 				"backgroundImage": "linear-gradient(to right, #0081ff, #1cbbb4)"

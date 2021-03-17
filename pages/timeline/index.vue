@@ -62,15 +62,22 @@
 		},
 		computed: mapState(['hasLogin', 'userInfo', 'hasBase']),
 		onLoad() {
-			uni.$on('refresh', data => {
-				if (data) {
+			uni.$on('refresh', async id => {
+				if(id) {
 					const index = this.list.findIndex(item => {
-						return item._id === data._id
+						return item._id === id
 					})
-					data.user = this.list[index].user
-					this.list.splice(index, 1, data)
+				 	const { data } = await this.$request('timeline','getList',{id})
+					if(data) {
+						this.list.splice(index, 1, data)
+						this.$u.toast('更新成功')
+					}else {
+						this.list.splice(index, 1)
+						this.$u.toast('删除成功')
+					}
 				} else {
 					this.fetchData()
+					this.$u.toast('发布成功')
 				}
 			})
 		},

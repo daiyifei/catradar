@@ -43,6 +43,7 @@
 </template>
 
 <script>
+	const db = uniCloud.database()
 	import {
 		mapState,
 		mapMutations
@@ -101,17 +102,11 @@
 							content: '是否删除这条情报？',
 							success: async res => {
 								if (res.confirm) {
-									await db.collection('timeline').doc(this.id).remove()
+									await db.collection('timeline').doc(this.item._id).remove()
 									await db.collection('comments').where({
-										timeline_id: this.id
+										timeline_id: this.item._id
 									}).remove()
-									const index = this.list.findIndex(item => {
-										return item._id === this.id
-									})
-									this.list.splice(index, 1)
-									uni.showToast({
-										title: '删除成功'
-									})
+									uni.$emit('refresh', this.item._id)
 								}
 							}
 						})
