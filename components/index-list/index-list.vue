@@ -8,7 +8,7 @@
 			<view v-for="(group, index) in indexData" :key="index">
 				<u-index-anchor :index="group.name" />
 				<view class="cu-list menu-avatar no-padding">
-					<navigator class="cu-item" :url="'detail?id='+item._id" @longpress="showMenu(item._id)" v-for="(item,idx) in group.data" :key="idx">
+					<navigator class="cu-item" :url="'detail?id='+item._id" @longpress="showMenu(item)" v-for="(item,idx) in group.data" :key="idx">
 						<image :src="item.avatar" mode="aspectFill" lazy-load class="cu-avatar round lg"></image>
 						<view class="content">
 							<view class="text-xl">{{item.name}}</view>
@@ -89,10 +89,14 @@
 			}
 		},
 		methods: {
-			showMenu(id) {
-				if(this.hasLogin && this.userInfo.scope === 9) {
+			showMenu(item) {
+				if(!this.hasLogin)
+					return
+					
+				if(this.userInfo._id === item.uid || this.userInfo.role) {
+					uni.vibrateShort()
 					this.show = true
-					this.id = id
+					this.id = item._id
 				}
 			},
 			click(index) {

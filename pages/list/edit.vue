@@ -51,7 +51,7 @@
 				<relation v-model="form.relation" class="response" @change="onChange('relation', $event)"></relation>
 			</view>
 			<button form-type="submit" class="cu-btn block bg-blue margin lg" :disabled="!form.name" :loading="saving">保存</button>
-			<button class="cu-btn block bg-red margin lg" v-if="id&&userInfo.scope===9" @tap="onDelete">删除</button>
+			<button class="cu-btn block bg-red margin lg" @tap="onDelete">删除</button>
 		</form>
 	</view>
 </template>

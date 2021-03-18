@@ -16,6 +16,7 @@
 				if(!uni.getStorageSync('uni_id_token'))
 					return
 				try{
+					uni.showLoading()
 					const { token, tokenExpired, userInfo } = await this.$request('user-center','checkToken')
 					if(token) {
 						uni.setStorage({
@@ -29,6 +30,7 @@
 					}
 					this.login(userInfo)
 					this.getBaseInfo()
+					uni.hideLoading()
 				}catch(e){
 					console.log(e)
 					this.logout()
