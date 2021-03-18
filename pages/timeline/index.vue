@@ -13,7 +13,7 @@
 			</u-empty>
 		</view>
 		<view v-else>
-			<u-navbar :is-back="false" :background="background" title="情报" back-icon-color="#fff" title-color="#fff">
+			<u-navbar :is-back="false" :background="background" title="情报" back-icon-color="#fff" title-color="#fff" class="navbar">
 			</u-navbar>
 			<view class="container">
 				<view class="header-bg">
@@ -29,7 +29,7 @@
 				<u-gap bg-color="#fff"></u-gap>
 
 				<!--列表主体-->
-				<timeline-item :item="item" is-link v-for="(item, index) in list" :key="index" />
+				<timeline-item :item="item" is-link v-for="(item, index) in list" :key="index" @focus="onFocus" />
 				<view class="cu-load loading text-gray" v-if="loading"></view>
 				<view class="cu-load text-gray text-sm" v-if="!hasMore">没有更多了</view>
 
@@ -51,7 +51,7 @@
 			return {
 				loading: false,
 				page: 1,
-				limit: 4,
+				limit: 10,
 				total: 0,
 				hasMore: false,
 				list: [],
@@ -127,6 +127,16 @@
 						})
 					}
 				})
+			},
+			onFocus(e) {
+				uni.createSelectorQuery().select('.navbar').boundingClientRect(({height}) => {
+					uni.createSelectorQuery().select('.container').boundingClientRect(({top}) => {
+						uni.pageScrollTo({
+							duration: 0,
+							scrollTop: e.top - top - height
+						})
+					}).exec()
+				}).exec()
 			}
 		}
 	}
