@@ -30,12 +30,12 @@
 					</view>
 				</view>
 			</view>
-			<!-- 基地列表 -->
+			<!--猫区列表 -->
 			<view class="cu-modal bottom-modal" :class="baseList.length?'show':''" @tap="baseList=[]" v-if="baseList.length">
 				<view class="cu-dialog" @tap.stop.prevent>
 					<view class="cu-bar bg-white solid-bottom">
 						<view class="action">
-							<text class="cuIcon-title text-blue"></text> 基地列表
+							<text class="cuIcon-title text-blue"></text>猫区列表
 						</view>
 						<view class="action" @tap="baseList=[]">
 							<text class="cuIcon-close text-red"></text>

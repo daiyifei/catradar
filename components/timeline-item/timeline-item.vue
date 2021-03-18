@@ -1,7 +1,7 @@
 <template>
 	<view>
 		<!-- 内容区域 -->
-		<view class="flex padding bg-white solid-bottom wrapper">
+		<view class="flex padding bg-white solid-bottom item">
 			<!-- 头像 -->
 			<view>
 				<navigator :url="'/pages/list/detail?id='+item.cat[0]._id" class="margin-right-sm">
@@ -33,7 +33,7 @@
 				</view>
 
 				<!-- 留言区域 -->
-				<message-board :timeline="item" :list="item.comments"></message-board>
+				<message-board :timeline="item" :list="item.comments" @focus="onFocus"></message-board>
 			</view>
 		</view>
 
@@ -69,6 +69,11 @@
 		},
 		computed: mapState(['hasLogin', 'userInfo']),
 		methods: {
+			onFocus() {
+				uni.createSelectorQuery().in(this).select('.item').boundingClientRect(data => {
+					this.$emit('focus', data)
+				}).exec()
+			},
 			preview(urls, current) {
 				uni.previewImage({
 					urls,

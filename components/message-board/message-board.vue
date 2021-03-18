@@ -141,6 +141,7 @@
 				this.form.timeline_id = this.timeline._id
 				this.form.comment_type = 1
 				this.showInput = true
+				this.$emit('focus')
 			},
 			hideInput() {
 				this.form = {}
