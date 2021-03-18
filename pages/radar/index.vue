@@ -7,8 +7,17 @@
 				<text :class="baseList.length ? 'cuIcon-triangleupfill' : 'cuIcon-triangledownfill'"></text>
 			</view>
 		</u-navbar>
-		<map id="map" ref="map" class="map" :latitude="latitude" :longitude="longitude" :markers="markers"
-			:scale="scale" @markertap="showCatList" show-location @controltap="getLocation">
+		<map 
+			id="map" 
+			ref="map" 
+			class="map" 
+			:latitude="latitude" 
+			:longitude="longitude" 
+			:markers="markers" 
+			:scale="scale" 
+			@markertap="showCatList" 
+			show-location 
+			@controltap="getLocation">
 			<!-- 定位按钮 -->
 			<image class="reset" @tap="getLocation" src="/static/reset.png"></image>
 			<!-- 猫咪列表 -->
@@ -94,11 +103,10 @@
 						this.longitude = res.longitude
 						const map = uni.createMapContext('map')
 						map.moveToLocation()
-					},
-					fail(err) {
-						this.$u.toast(err.message)
 					}
 				})
+				const map = uni.createMapContext('map')
+				map.moveToLocation()
 			},
 			async showBase() {
 				if(!this.hasBase) 

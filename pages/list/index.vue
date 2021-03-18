@@ -55,7 +55,7 @@
 			<navigator 
 				class="cu-avatar round lg bg-gradual-blue cuIcon-add btn-new margin"
 				url="edit"
-				v-if="hasLogin&&userInfo.scope===9"></navigator>
+				v-if="hasLogin"></navigator>
 		</view>
 	</view>
 </template>
@@ -82,7 +82,6 @@
 		computed: mapState(['hasLogin', 'userInfo', 'hasBase']),
 		onLoad() {
 			uni.$on('refresh',() => {
-				console.log(123)
 				this.fetchData()
 			})
 		},

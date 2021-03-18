@@ -12,7 +12,7 @@
 			<view class="response">
 				<!-- 操作按钮 -->
 				<view class="margin-top-xs fr text-xl" 
-					v-if="userInfo.scope==9||userInfo._id==item.user[0]._id" 
+					v-if="userInfo.role||userInfo._id==item.user[0]._id" 
 					@tap="showMenu(item._id)">
 					<text  class="cuIcon-moreandroid text-gray"></text>
 				</view>

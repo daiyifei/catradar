@@ -6,7 +6,7 @@
 			<image v-if="userInfo.avatar" :src="userInfo.avatar" class="avatar"/>
 			<view class="avatar cuIcon-my text-white" v-else></view>
 			<view class="text-xl">{{hasLogin?userInfo.nickname:'请登录'}}</view>
-			<view class="margin-top-sm" v-if="userInfo.scope===9">
+			<view class="margin-top-sm" v-if="userInfo.role">
 				<text>猫司令</text>
 			</view>
 			<image src="https://vkceyugu.cdn.bspapp.com/VKCEYUGU-6ee74e1a-9337-4754-92e2-f7b377cdd878/39d05c55-569f-4916-8ee3-59a12eeb5e3b.gif" mode="scaleToFill" class="gif-wave"></image>
