@@ -3,7 +3,7 @@
 		<u-navbar :is-back="false" ref="navbar" :background="{background:`linear-gradient(45deg, rgba(0,129,255,1), rgba(28,187,180,1))`}">
 			<view class="padding text-white" @tap="showBaseList">
 				<text class="cuIcon-locationfill margin-right-xs"></text>
-				<text>{{hasBase?baseInfo.name:'选择基地'}}</text>
+				<text>{{hasBase?baseInfo.name:'选择猫区'}}</text>
 				<text :class="baseList.length ? 'cuIcon-triangleupfill' : 'cuIcon-triangledownfill'"></text>
 			</view>
 		</u-navbar>

@@ -3136,7 +3136,7 @@
 				},
 				"name": {
 					"bsonType": "string",
-					"description": "基地名称",
+					"description": "猫区名称",
 					"trim": "both"
 				},
 				"latitude": {
@@ -3149,7 +3149,7 @@
 				},
 				"description": {
 					"bsonType": "string",
-					"description": "基地描述",
+					"description": "猫区描述",
 					"trim": "both"
 				},
 				"avatar": {
