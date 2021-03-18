@@ -7,7 +7,7 @@
 			</u-empty>
 		</view>
 		<view class="fullscreen" v-else-if="!hasBase">
-			<u-empty text="未加入基地" mode="list">
+			<u-empty text="未加入猫区" mode="list">
 				<navigator url="/pages/radar/index" class="cu-btn bg-blue margin radius" slot="bottom"
 					open-type="switchTab">去选择</navigator>
 			</u-empty>
