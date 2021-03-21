@@ -187,12 +187,4 @@
 		right: 0;
 		z-index: 1;
 	}
-
-	.btn-new {
-		position: fixed;
-		right: 0;
-		bottom: var(--window-bottom);
-		opacity: .9;
-		line-height: 80rpx;
-	}
 </style>

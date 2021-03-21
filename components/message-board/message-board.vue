@@ -1,10 +1,10 @@
 <template>
-	<view class="text-content" style="margin-top: -50rpx;">
+	<view class="text-content" style="margin-top: -54rpx;">
 		<!-- 功能按钮 -->
-		<view class="text-right text-grey">
-			<text class="like-loading cu-load load-cuIcon loading" v-if="likeLoading"></text>
-			<text :class="'cuIcon-like'+(likeId?'fill':'')" @tap="like" v-else>{{(likeId?'取消':'赞')}}</text>
-			<text class="cuIcon-message margin-left-sm" @tap="comment">评论</text>
+		<view class="text-right text-grey text-lg text-bold">
+			<text class="padding-lr like-loading cu-load load-cuIcon loading" v-if="likeLoading"></text>
+			<text class="padding" :class="'cuIcon-like'+(likeId?'fill':'')" @tap="like" v-else>{{(likeId?'取消':'赞')}}</text>
+			<text class="padding-tb cuIcon-message" @tap="comment">评论</text>
 		</view>
 		
 		<view class="bg-gray radius margin-top-sm" v-if="list.length">
@@ -17,40 +17,46 @@
 			</view>
 			<!-- 评论列表 -->
 			<view class="padding-sm"
-				v-for="(item, index) in commentList" :key="index" 
-				@tap="replyOrRemove(item)">
-				<view>
+				v-for="(item, idx) in commentList" :key="idx" @tap="replyOrRemove(item)">
+				<view class="comment-wrp">
 					<image :src="item.user[0].avatar" mode="aspectFill" class="cu-avatar sm round margin-right-xs"></image>
-					<text>{{item.user[0].nickname}}</text>
+					<text class="margin-right-xs">{{item.user[0].nickname}}:</text>
 					<text v-if="item.reply_user.length">回复{{item.reply_user[0].nickname}}</text>
-					<text>: {{item.content}}</text>
+					<text v-for="(i, idx) in item.content" :key="idx">
+						<text v-if="i.type === 1">{{i.content}}</text>
+						<text class="emoji-wrp" v-if="i.type === 2">
+							<text class="emoji-icon" :class="i.imageClass"></text>
+						</text>
+					</text>
 				</view>
-				<view class="text-gray text-xs">
+				<view class="text-gray text-sm margin-top-xs">
 					<text>{{item.create_date|timeFrom}}</text>
-					<text class="margin-left">{{item.user_id===userInfo._id?'删除':'回复'}}</text>
+					<text class="margin-left">{{item.uid===userInfo._id?'删除':'回复'}}</text>
 				</view>
 			</view>
 		</view>
 		
 		<!-- 输入区域 -->
-		<view class="cu-modal bottom-modal" :class="showInput ? 'show' : ''" @tap.stop="hideInput">
+		<view class="cu-modal bottom-modal" :class="showInput ? 'show' : ''" @tap.stop="hideInput" @touchmove.stop.prevent>
 			<view class="cu-dialog" @tap.stop.prevent>
 				<view class="cu-bar input" :style="{'margin-bottom': keyboardHeight+'px'}">
 					<input
-					<!-- #ifdef MP  -->
-					:focus="showInput"
-					:adjust-position="false"
-					@keyboardheightchange="onFocus"
-					<!-- #endif -->
-					:placeholder="reply_nickname?'回复'+reply_nickname:'评论'" 
-					v-model="content" 
-					cursor-spacing="10" 
-					class="bg-white round text-left padding-lr" />
-					<!-- <view class="action">
-						<text class="cuIcon-emojifill text-grey"></text>
-					</view> -->
-					<button class="cu-btn bg-blue round" :disabled="!content" :loading="sending" @tap="addComment">发送</button>
+						confirm-type="send"
+						:focus="focus"
+						:adjust-position="false"
+						hold-keyboard
+						@keyboardheightchange="keyboardheightchange"
+						@confirm="addComment"
+						:placeholder="reply_nickname?'回复'+reply_nickname:'评论'" 
+						v-model="content" 
+						cursor-spacing="10" 
+						class="bg-white round text-left padding-lr" />
+					<view class="action" @tap="showEmoji=!showEmoji">
+						<text class="text-grey" :class="showEmoji?'cuIcon-keyboard':'cuIcon-emoji'"></text>
+					</view>
+					<button class="cu-btn bg-blue round" :disabled="!content" @tap="addComment">发送</button>
 				</view>
+				<emoji ref="emoji" v-if="showEmoji" class="text-left" :showDel="content!==''" :showSend="false" @insertemoji="insertemoji" @delemoji="delemoji"/>
 			</view>
 		</view>
 	</view>
@@ -58,6 +64,7 @@
 
 <script>
 	const db = uniCloud.database()
+	import { parseEmoji } from '../emoji/parser.js'
 	import {
 		mapState,
 		mapMutations
@@ -80,9 +87,10 @@
 				likeId: '',
 				likeLoading: false,
 				showInput: false,
+				showEmoji: false,
+				focus: false,
 				reply_nickname: '',
 				form: {},
-				sending: false,
 				keyboardHeight: 0
 			}
 		},
@@ -94,16 +102,31 @@
 				})
 				this.likeId = ''
 				likeList.forEach(item => {
-					if(item.user_id === this.userInfo._id) {
+					if(item.uid === this.userInfo._id) {
 						this.likeId = item._id
 					}
 				})
 				return likeList
 			},
 			commentList() {
-				return this.data.filter(item => {
+				const commentList = this.data.filter(item => {
 					return item.comment_type === 1
 				})
+				commentList.forEach(item => {
+					item.content = parseEmoji(item.content)
+				})
+				return commentList
+			},
+		},
+		watch: {
+			showEmoji(val) {
+				if(val) {
+					this.focus = false
+					uni.hideKeyboard()
+					this.keyboardHeight = 0
+				}else {
+					this.focus = true
+				}
 			}
 		},
 		methods: {
@@ -126,14 +149,29 @@
 				await this.refresh()
 				this.likeLoading = false
 			},
-			onFocus(e) {
-				const { screenHeight, windowHeight } = uni.getSystemInfoSync()
-				const bottom = screenHeight - windowHeight
-				if(getCurrentPages().length > 1) {
-					this.keyboardHeight = e.detail.height
+			keyboardheightchange(e) {
+				const { height } = e.detail
+				if(height > 0) {
+					const { screenHeight, windowHeight } = uni.getSystemInfoSync()
+					const bottom = screenHeight - windowHeight
+					if(getCurrentPages().length > 1) {
+						this.keyboardHeight = height
+					}else {
+						this.keyboardHeight = height - (bottom > 0 ? bottom : 0)
+					}
+					this.showEmoji = false
 				}else {
-					this.keyboardHeight = e.detail.height - (bottom > 0 ? bottom : 0)
+					this.keyboardHeight = 0
 				}
+			},
+			insertemoji(e) {
+				this.content += e
+			},
+			delemoji(e) {
+				const str = this.content
+				const matchs = str.match(/\[([\u4e00-\u9fa5\w]+)\]$/g)
+				this.content = matchs ? str.substring(0, str.lastIndexOf(matchs[0]))
+					: str.substring(0, str.length - 1)
 			},
 			comment() {
 				this.form = {}
@@ -141,24 +179,26 @@
 				this.form.timeline_id = this.timeline._id
 				this.form.comment_type = 1
 				this.showInput = true
+				this.focus = true
 				this.$emit('focus')
 			},
 			hideInput() {
 				this.form = {}
 				this.content = ''
+				this.focus = false
 				this.showInput = false
 			},
 			async addComment() {
-				this.sending = true
-				this.form.content = this.content
-				const { result: { id } } = await db.collection('comments').add(this.form)
-				const { result: { data }} = await db.collection('comments').doc(id).get()
-				this.sending = false
+				uni.showLoading()
+				let form = this.form
+				form.content = this.content
 				this.hideInput()
-				this.refresh()
+				await db.collection('comments').add(form)
+				await this.refresh()
+				uni.hideLoading()
 			},
 			replyOrRemove(item) {
-				if(item.user_id === this.userInfo._id) {
+				if(item.uid === this.userInfo._id) {
 					uni.showModal({
 						content: '是否删除？',
 						success: async res => {
@@ -174,7 +214,7 @@
 					const { _id, nickname, avatar } = item.user[0]
 					this.reply_nickname = nickname
 					this.form.timeline_id = this.timeline._id
-					this.form.reply_user_id = _id
+					this.form.reply_uid = _id
 					this.form.comment_type = 1
 					this.showInput = true
 				}
@@ -184,12 +224,37 @@
 </script>
 
 <style>
+	@import '../emoji/emoji_positon.css';
+	
 	.cu-bar.input {
+		margin-right: 0;
 		background-color: #f0f0f0;
+	}
+	
+	.cu-bar.input input {
+		margin-right: 0;
 	}
 	
 	.like-loading {
 		display: inline-block;
 		line-height: 1em;
+	}
+	
+	.emoji-wrp {
+		display: inline-block;
+	  width: 24px;
+	  height: 24px;
+		overflow: hidden;
+		line-height: 24px;
+		vertical-align: middle;
+	}
+	
+	.emoji-icon {
+		display: block;
+		width: 64px;
+		height: 64px;
+	  transform-origin: 0 0;
+	  transform: scale(0.375);
+		background-image: url("https://res.wx.qq.com/wxdoc/dist/assets/img/emoji-sprite.b5bd1fe0.png");
 	}
 </style>

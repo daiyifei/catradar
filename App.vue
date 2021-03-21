@@ -109,6 +109,7 @@
 	/* #ifndef APP-PLUS-NVUE */
 	@import "colorui/main.css";
 	@import "colorui/icon.css";
+	/* #endif */
 	
 	.fullscreen {
 		width: 100vw;
@@ -136,5 +137,11 @@
 	.btn-transparent::after {
 		border: none;
 	}
-	/* #endif */
+	.btn-new {
+		position: fixed;
+		right: 0;
+		bottom: var(--window-bottom);
+		opacity: .9;
+		line-height: 80rpx;
+	}
 </style>

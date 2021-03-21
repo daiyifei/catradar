@@ -1,8 +1,8 @@
 <template>
 	<view>
 		<unicloud-db ref="udb" v-slot:default="{data, loading, pagination}" collection="uni-id-users" :where="condition2"
-			field="_id,avatar,nickname,subscribes" getcount manual orderby="desc">
-			<unicloud-db v-slot:default="{data, loading, options}" :options="pagination" collection="bases" getone :where="condition1">
+			field="_id,avatar,nickname,subscribes" getcount manual>
+			<unicloud-db v-slot:default="{data, loading, options}" :options="pagination" collection="bases" getone :where="condition1" orderby="subscribes desc">
 				<view class="cu-list menu-avatar" v-if="!loading">
 					<view class="cu-item">
 						<image class="cu-avatar round lg" :src="data.avatar" />

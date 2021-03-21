@@ -48,7 +48,7 @@
 				}, {
 					key: 'color',
 					name: '花色',
-					value: Array.from(Array(7), (v, k) => k),
+					value: Array.from(Array(8), (v, k) => k),
 				}, {
 					key: 'location',
 					name: '位置',

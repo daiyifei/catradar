@@ -134,11 +134,4 @@
 </script>
 
 <style>
-	.btn-new {
-		position: fixed;
-		right: 0;
-		bottom: var(--window-bottom);
-		opacity: .9;
-		line-height: 80rpx;
-	}
 </style>

@@ -68,7 +68,7 @@ async function getList(params) {
 		.lookup({
 			from: 'uni-id-users',
 			let: {
-				id: '$user_id'
+				id: '$uid'
 			},
 			pipeline: $.pipeline()
 				.match(_.expr(
@@ -94,7 +94,7 @@ async function getList(params) {
 				.lookup({
 					from: 'uni-id-users',
 					let: {
-						id: '$user_id'
+						id: '$uid'
 					},
 					pipeline: $.pipeline()
 						.match(_.expr(
@@ -111,7 +111,7 @@ async function getList(params) {
 				.lookup({
 					from: 'uni-id-users',
 					let: {
-						id: '$reply_user_id'
+						id: '$reply_uid'
 					},
 					pipeline: $.pipeline()
 						.match(_.expr(
@@ -165,7 +165,7 @@ async function getCommentList(params) {
 		.lookup({
 			from: 'uni-id-users',
 			let: {
-				id: '$user_id'
+				id: '$uid'
 			},
 			pipeline: $.pipeline()
 				.match(_.expr(
@@ -182,7 +182,7 @@ async function getCommentList(params) {
 		.lookup({
 			from: 'uni-id-users',
 			let: {
-				id: '$reply_user_id'
+				id: '$reply_uid'
 			},
 			pipeline: $.pipeline()
 				.match(_.expr(

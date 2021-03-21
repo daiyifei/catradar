@@ -35,9 +35,11 @@ const store = new Vuex.Store({
 		async getBaseInfo({ commit, state }) {
 			const { subscribes } = state.userInfo
 			if(subscribes.length) {
+				uni.showLoading()
 				const db = uniCloud.database()
 				const { result: { data } } = await db.collection('bases').doc(subscribes[0]).get()
 				commit('enter', data[0])
+				uni.hideLoading()
 			}
 		}
 	}

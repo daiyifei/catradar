@@ -118,11 +118,11 @@
 			async fetchData() {
 				const that = this
 				const { result: { total: appreciateTotal } } = await db.collection('comments').where({
-					user_id: this.userInfo._id,
+					uid: this.userInfo._id,
 					comment_type: 0
 				}).count()
 				const { result: { total: commentTotal } } = await db.collection('comments').where({
-					user_id: this.userInfo._id,
+					uid: this.userInfo._id,
 					comment_type: 1
 				}).count()
 				
