@@ -31,7 +31,7 @@
 		},
 		"color": {
 			"bsonType": "number",
-			"description": "花色: 0 三花 1 橘猫 2 奶牛 3 白猫 4 狸花 5 玳瑁 6 黑猫"
+			"description": "花色: 0 三花 1 橘猫 2 奶牛 3 白猫 4 狸花 5 玳瑁 6 黑猫 7 其他"
 		},
 		"state": {
 			"bsonType": "number",

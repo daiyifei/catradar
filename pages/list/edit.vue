@@ -12,7 +12,7 @@
 			</view>
 			<view class="cu-form-group required">
 				<view class="title">花色</view>
-				<form-picker v-model="form.color" :range="['三花','橘猫','奶牛','白猫','狸花','玳瑁','黑猫']"  @change="onChange('color', $event)" />
+				<form-picker v-model="form.color" :range="['三花','橘猫','奶牛','白猫','狸花','玳瑁','黑猫','其他']"  @change="onChange('color', $event)" />
 			</view>
 			<view class="cu-form-group">
 				<view class="title">性别</view>
@@ -51,7 +51,7 @@
 				<relation v-model="form.relation" class="response" @change="onChange('relation', $event)"></relation>
 			</view>
 			<button form-type="submit" class="cu-btn block bg-blue margin lg" :disabled="!form.name" :loading="saving">保存</button>
-			<button class="cu-btn block bg-red margin lg" @tap="onDelete">删除</button>
+			<button class="cu-btn block bg-red margin lg" v-if="id" @tap="onDelete">删除</button>
 		</form>
 	</view>
 </template>
@@ -81,10 +81,16 @@
 		async onLoad(options) {
 			if(options.id) {
 				this.id = options.id
+				
 				this.loading = true
 				const { result: { data } } = await db.collection('list').doc(options.id).get()
 				this.form = data[0]
 				this.loading = false
+				
+				if(this.userInfo._id!==this.form.uid && !this.userInfo.scope) {
+					this.$u.toast('没有编辑权限')
+					uni.navigateBack()
+				}
 			}
 			
 			if(options.path) {
@@ -146,8 +152,14 @@
 						title: '保存成功'
 					})
 					setTimeout(() => {
+						if(this.form.state>0) {
+							uni.navigateTo({
+								url: '/pages/list/subpage?state='+this.form.state
+							})
+						}else {
+							uni.navigateBack()
+						}
 						uni.$emit('refresh')
-						uni.navigateBack()
 					}, 500)
 				}catch(err) {
 					uni.showToast({

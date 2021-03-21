@@ -47,7 +47,7 @@ Vue.filter('neuter', function (value) {
 
 Vue.filter('color', function (value) {
   if (value === undefined) return '未知'
-  return ['三花', '橘猫', '奶牛', '白猫', '狸花', '玳瑁', '黑猫'][value]
+  return ['三花', '橘猫', '奶牛', '白猫', '狸花', '玳瑁', '黑猫', '其他'][value]
 })
 
 Vue.filter('location', function (value) {

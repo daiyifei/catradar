@@ -17,7 +17,7 @@
 			"description": "文章ID，timeline 表中的`_id`字段",
 			"foreignKey": "timeline._id"
 		},
-		"user_id": {
+		"uid": {
 			"bsonType": "string",
 			"description": "评论者ID，参考`uni-id-users` 表",
 			"forceDefaultValue": {
@@ -35,7 +35,7 @@
 			"bsonType": "int",
 			"description": "回复类型：0 点赞 1 评论"
 		},
-		"reply_user_id": {
+		"reply_uid": {
 			"bsonType": "string",
 			"description": "被回复的评论用户ID",
 			"foreignKey": "uni-id-users._id"

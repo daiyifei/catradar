@@ -6,7 +6,7 @@
 		</view>
 		<unicloud-db ref="udb" v-slot:default="{data, loading, error, options, hasMore}" 
 			collection="comments,uni-id-users,list,timeline"
-			field="_id,user_id{_id,nickname,avatar},reply_user_id{_id,nickname,avatar},timeline_id{_id,user_id{_id,nickname,avatar},cat_id{_id,name,avatar}},content,create_date"
+			field="_id,uid{_id,nickname,avatar},reply_uid{_id,nickname,avatar},timeline_id{_id,uid{_id,nickname,avatar},cat_id{_id,name,avatar}},content,create_date"
 			orderby="create_date desc"
 			manual
 			:where="condition"
@@ -16,16 +16,16 @@
 				<navigator class="cu-item" 
 					v-for="(item, index) in data" :key="index" 
 					:url="`/pages/timeline/detail?id=${item.timeline_id[0]._id}`">
-					<image class="cu-avatar round lg" :src="item.user_id[0].avatar" />
+					<image class="cu-avatar round lg" :src="item.uid[0].avatar" />
 					<view class="content">
 						<view class="text-grey">
-							<text>{{item.user_id[0].nickname}}</text>
+							<text>{{item.uid[0].nickname}}</text>
 							<text class="text-xs margin-left-xs">{{item.create_date}}</text>
 						</view>
 						<view class="text-gray text-sm flex">
 							<view class="text-cut">
 								<text v-if="item.content">
-									<text v-if="item.reply_user_id.length">回复了{{item.reply_user_id[0].nickname}}</text>
+									<text v-if="item.reply_uid.length">回复了{{item.reply_uid[0].nickname}}</text>
 									<text v-else>评论了{{item.timeline_id[0].cat_id[0].name}}</text>
 									<text>: {{item.content}}</text>
 								</text>
@@ -64,8 +64,8 @@
 		computed: {
 			...mapState(['hasLogin', 'userInfo']),
 			condition() {
-				return this.formOther ? `comment_type==${this.type}&&timeline_id.user_id._id=='${this.userInfo._id}'`
-					: `comment_type==${this.type}&&user_id._id=='${this.userInfo._id}'`
+				return this.formOther ? `comment_type==${this.type}&&timeline_id.uid._id=='${this.userInfo._id}'`
+					: `comment_type==${this.type}&&uid._id=='${this.userInfo._id}'`
 			}
 		},
 		onLoad(options) {

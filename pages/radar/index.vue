@@ -16,10 +16,13 @@
 			:markers="markers" 
 			:scale="scale" 
 			@markertap="showCatList" 
-			show-location 
+			show-location
 			@controltap="getLocation">
-			<!-- 定位按钮 -->
-			<image class="reset" @tap="getLocation" src="/static/reset.png"></image>
+			<!-- 控制区域 -->
+			<view class="control flex align-center justify-between">
+				<image class="reset radius margin" src="/static/reset.png" @tap="getLocation"></image>
+				<image class="back-base cu-avatar round lg margin" :src="baseInfo.avatar" @tap="showBase"  v-if="hasBase"></image>
+			</view>
 			<!-- 猫咪列表 -->
 			<view class="cu-modal flex justify-center align-center" :class="catList.length?'show':''" @tap="hideCatList" v-if="catList.length">
 				<view class="list">
@@ -222,25 +225,36 @@
 				return s; //km
 			}
 		},
-		onShareAppMessage() {}
+		onShareAppMessage() {
+			return {
+				title: '猫雷达: 发现身边的猫',
+				imageUrl: 'https://static-6ee74e1a-9337-4754-92e2-f7b377cdd878.bspapp.com/img/share.jpg'
+			}
+		}
 	}
 </script>
 
 <style>
 	.map {
 		position: fixed;
-		top: 0;
+		bottom: -10vh;
 		width: 100%;
-		height: 100vh;
+		height: 110vh;
 		mix-blend-mode: normal;
 	}
 	
-	.reset {
-		position: absolute;
+	.control {
+		position: fixed;
+		bottom: var(--window-bottom);;
+		left: 0;
 		right: 0;
-		bottom: var(--window-bottom);
-		margin-right: 35rpx;
-		margin-bottom: 70rpx;
+	}
+	
+	.control image {
+		box-shadow: 3px 3px 4px rgba(26, 26, 26, 0.2);
+	}
+	
+	.reset {
 		width: 70rpx;
 		height: 70rpx;
 	}

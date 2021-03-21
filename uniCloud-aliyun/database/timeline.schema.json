@@ -17,7 +17,7 @@
 			"description": "猫咪ID，list 表中的`_id`字段",
 			"foreignKey": "list._id"
 		},
-		"user_id": {
+		"uid": {
 			"bsonType": "string",
 			"description": "发布者ID，参考`uni-id-users` 表",
 			"forceDefaultValue": {
