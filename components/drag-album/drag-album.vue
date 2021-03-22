@@ -3,7 +3,7 @@
 		<drag-sort v-model="list" :showDelete="false">
 			<template v-slot="{ item,index }">
 				<view class="grid" @tap="preview">
-					<image :src="item" mode="aspectFill" />
+					<image :src="item" mode="aspectFill"/>
 					<view class="close" @tap.prevent.stop="delItem(index)">
 						<text class='cuIcon-close'></text>
 					</view>
@@ -67,29 +67,6 @@
 			},
 			delItem(index) {
 				this.list.splice(index,1)
-			},
-			// 上传图片
-			upload() {
-				return new Promise(async (resolve, reject) => {
-					try {
-						await Promise.all(this.value.map(async (item, index) => {
-							if(!~item.indexOf('https://')) {
-								const { fileID } = await uniCloud.uploadFile({
-									filePath: item,
-									cloudPath: new Date().getTime() + '.jpg'
-								})
-								this.value[index] = fileID
-							}
-						}))
-						resolve()
-					}catch (err) {
-						uni.showToast({
-							title: '上传出错',
-							icon: 'none'
-						})
-						reject()
-					}
-				})
 			},
 			preview(item) {
 				if(this.custom) {

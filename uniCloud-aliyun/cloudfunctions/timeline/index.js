@@ -60,7 +60,8 @@ async function getList(params) {
 				.project({
 					_id: 1,
 					name: 1,
-					avatar: 1
+					avatar: 1,
+					uid: 1
 				})
 				.done(),
 			as: 'cat',

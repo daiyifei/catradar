@@ -20,7 +20,10 @@
 				</view>
 				<view class="text-grey text-lg text-bold">{{item.cat[0].name}}</view>
 				<view class="text-content text-lg" @tap="toDetail">{{item.text}}</view>
-				<view class="grid grid-square col-3 margin-top-sm" @tap="toDetail">
+				<view class="flex" v-if="item.content_type">
+					<video-item :src="item.album[0]" class="basis-lg"/>
+				</view>
+				<view class="grid grid-square col-3 margin-top-sm" @tap="toDetail" v-else>
 					<view class="bg-img" v-for="(pic,idx) in item.album" :key="idx">
 						<image :src="pic" mode="aspectFill" @tap.stop.prevent="preview(item.album, idx)"></image>
 					</view>
@@ -53,18 +56,30 @@
 		},
 		data() {
 			return {
-				actions: [{
-					text: '编辑'
-				},{
-					text: '同步到相册'
-				}, {
-					text: '删除',
-					color: 'red'
-				}],
 				show: false,
+				fullscreen: false
 			}
 		},
-		computed: mapState(['hasLogin', 'userInfo']),
+		computed: {
+			...mapState(['hasLogin', 'userInfo']),
+			actions() {
+				const actions = [{
+					text: '编辑',
+					action: 'edit'
+				}, {
+					text: '删除',
+					color: 'red',
+					action: 'del'
+				}]
+				if((this.userInfo._id === this.item.cat[0].uid || this.userInfo.role) && !this.item.content_type) {
+					actions.unshift({
+						text: '同步到相册',
+						action: 'sync'
+					})
+				}
+				return actions
+			}
+		},
 		methods: {
 			onFocus() {
 				uni.createSelectorQuery().in(this).select('.item').boundingClientRect(data => {
@@ -88,18 +103,18 @@
 				this.show = true
 			},
 			click(index) {
-				switch(index) {
-					case 0:
+				switch(this.actions[index].action) {
+					case 'edit':
 						uni.navigateTo({
 							url: 'edit?id=' + this.item._id
 						})
 						break
-					case 1:
+					case 'sync':
 						uni.navigateTo({
 							url: `/pages/list/edit?id=${this.item.cat_id}&path=${JSON.stringify(this.item.album)}`
 						})
 						break
-					case 2:
+					case 'del':
 						uni.showModal({
 							content: '是否删除这条情报？',
 							success: async res => {

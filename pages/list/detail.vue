@@ -120,13 +120,13 @@
 					</view>
 					<unicloud-db v-slot:default="{data, loading, hasMore}" collection="timeline" :where="whereTimeline"
 						orderby="create_date desc" manual @load="timelineLoad">
-						<navigator v-for="(item,index) in data" :key="index" class="cu-timeline"
-							:url="`/pages/timeline/detail?id=${item._id}`">
+						<view v-for="(item,index) in data" :key="index" class="cu-timeline" @tap="toDetail(item._id)">
 							<view class="cu-time margin-left">{{item.create_date}}</view>
 							<view class="cu-item" :class="index?'':'text-blue'">
 								<view class="content">
 									<view class="text-content">{{item.text}}</view>
-									<view class="grid grid-square col-3 margin-top-sm">
+									<video-item :src="item.album[0]" v-if="item.content_type" />
+									<view class="grid grid-square col-3 margin-top-sm" v-else>
 										<view class="bg-img" v-for="(pic,idx) in item.album" :key="idx">
 											<image :src="pic" mode="aspectFill" @tap.stop="preview(item.album, idx)">
 											</image>
@@ -134,7 +134,7 @@
 									</view>
 								</view>
 							</view>
-						</navigator>
+						</view>
 						<view class="text-sm text-gray text-center padding-bottom" v-if="!hasMore">暂无更多</view>
 					</unicloud-db>
 				</view>
@@ -253,6 +253,11 @@
 					favs
 				})
 				this.$u.toast(this.isFav ? '已收藏' : '已取消')
+			},
+			toDetail(id) {
+				uni.navigateTo({
+					url: `/pages/timeline/detail?id=${id}`
+				})
 			},
 			share() {
 				// #ifdef APP-PLUS

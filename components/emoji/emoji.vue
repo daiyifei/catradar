@@ -25,9 +25,11 @@
 		</scroll-view>
 		
 		<!--操作-->
-		<view class="weui-emoji__operation">
-			<view class="cu-btn cuIcon-backdelete bg-white radius margin-right-sm shadow" @tap="deleteEmoji" v-if="showDel"></view>
-			<view class="cu-btn bg-blue round" @tap="send" v-if="showSend">发送</view>
+		<view 
+			class="weui-emoji__operation" 
+			:style="{'width':750*3/perLine+'rpx','background-color': backgroundColor,'box-shadow': '0 -1px 20px 20px '+backgroundColor}">
+			<view class="cu-btn cuIcon-backdelete bg-white radius" @tap="deleteEmoji" v-if="showDel"></view>
+			<view class="cu-btn bg-blue radius margin-left-sm" @tap="send" v-if="showSend">发送</view>
 		</view>
 	</view>
 </template>
@@ -193,10 +195,10 @@
 
 	.weui-emoji__operation {
 		position: absolute;
-		bottom: 14px;
-		right: 12px;
-		width: 120px;
-		height: 44px;
+		padding-bottom: 15px;
+		padding-right: 15px;
+		bottom: 0;
+		right: 0;
 		display: flex;
 		align-items: center;
 		justify-content: flex-end;
@@ -204,8 +206,7 @@
 
 	.weui-emoji__operation__delete,
 	.weui-emoji__operation__send {
-		display: inline-block;
-		width: 56px;
+		width: 54px;
 		height: 44px;
 		line-height: 44px;
 		text-align: center;
