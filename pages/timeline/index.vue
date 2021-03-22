@@ -120,13 +120,25 @@
 				this.loading = false
 			},
 			add() {
-				uni.chooseImage({
+				// #ifdef MP-WEIXIN
+				uni.chooseMedia({
 					success: res => {
 						uni.navigateTo({
-							url: 'edit?paths=' + JSON.stringify(res.tempFilePaths)
+							url: 'edit?files=' + JSON.stringify(res)
 						})
 					}
 				})
+				// #endif
+				// #ifndef MP-WEIXIN
+				uni.chooseImage({
+					success: res => {
+						console.log(res)
+						uni.navigateTo({
+							url: 'edit?files=' + JSON.stringify(res)
+						})
+					}
+				})
+				// #endif
 			},
 			onFocus(e) {
 				uni.createSelectorQuery().select('.navbar').boundingClientRect(({height}) => {

@@ -85,7 +85,7 @@ Vue.prototype.$upload = data => {
 				if(item && !~item.indexOf('https://')) {
 					const { fileID } = await uniCloud.uploadFile({
 						filePath: item,
-						cloudPath: new Date().getTime() + '.jpg'
+						cloudPath: new Date().getTime() + ~item.indexOf('.mp4') ? '.mp4' : '.jpg'
 					})
 					list[index] = fileID
 				}

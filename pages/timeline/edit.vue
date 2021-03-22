@@ -3,13 +3,14 @@
 		<view class="cu-load loading text-gray" v-if="loading"></view>
 		<form @submit="onSubmit" v-else>
 			<view class="cu-form-group">
-				<remote-input placeholder="照片中的是谁？" ref="remote" v-model="form.cat_id" class="response" @change="onChange('cat_id', $event)" />
+				<remote-input :placeholder="(form.content_type?'视频':'照片')+'中的是谁？'" ref="remote" v-model="form.cat_id" class="response" @change="onChange('cat_id', $event)" />
 			</view>
 			<view class="cu-form-group">
 				<textarea name="text" placeholder="写点什么吧..." maxlength="140" v-model="form.text" @change="onChange('text', $event)"></textarea>
 			</view>
-			<view class="cu-form-group"> 
-				<drag-album name="album" ref="album" v-model="form.album" class="response" @change="onChange('album', $event)" />
+			<view class="cu-form-group">
+				<video-item :src="form.album[0]" v-if="form.content_type" style="width: 60%;"/>
+				<drag-album name="album" v-model="form.album" class="response" @change="onChange('album', $event)" v-else />
 			</view>
 			<button form-type="submit" class="cu-btn block bg-blue margin lg" :loading="saving" :disabled="!form.cat_id||!form.text||!form.album.length">{{id?'保存':'发布'}}</button>
 		</form>
@@ -29,7 +30,8 @@
 				form: {
 					cat_id: '',
 					text: '',
-					album: []
+					album: [],
+					content_type: 0,
 				},
 				data: {},
 				loading: false,
@@ -38,8 +40,22 @@
 		},
 		computed: mapState(['hasLogin', 'userInfo']),
 		async onLoad(options) {
-			if(options.paths) {
-				this.$set(this.form, 'album', JSON.parse(options.paths))
+			if(options.files) {
+				const files = JSON.parse(options.files)
+				if(files.type === 'video') {
+					this.form.content_type = 1
+					this.form.album = [files.tempFiles[0].tempFilePath]
+				}else {
+					if(files.tempFilePaths) {
+						this.form.album = files.tempFilePaths
+					}else {
+						const paths = []
+						files.tempFiles.forEach(item => {
+							paths.push(item.tempFilePath)
+						})
+						this.form.album = paths
+					}
+				}
 			}
 			
 			if(options.id) {
@@ -60,7 +76,7 @@
 			async onSubmit() {
 				this.saving = true
 				try{
-					await this.$refs.album.upload()
+					this.form.album = await this.$upload(this.form.album)
 					if(this.id) {
 						// 编辑
 						delete this.form._id
@@ -90,5 +106,4 @@
 </script>
 
 <style>
-
 </style>
