@@ -80,11 +80,6 @@
 			}
 		},
 		computed: mapState(['hasLogin', 'userInfo', 'hasBase']),
-		onLoad() {
-			uni.$on('refresh',() => {
-				this.fetchData()
-			})
-		},
 		watch: {
 			condition(val) {
 				this.fetchData()
@@ -93,10 +88,10 @@
 				this.$u.debounce(this.onSearch, 500)
 			}
 		},
-		onShow() {
-			if(!this.list.length) {
+		onLoad() {
+			uni.$on('refresh',() => {
 				this.fetchData()
-			}
+			})
 		},
 		onReady() {
 			this.$u.getRect('.navbar').then(res => {

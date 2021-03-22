@@ -81,11 +81,6 @@
 				}
 			})
 		},
-		onShow() {
-			if (!this.list.length) {
-				this.fetchData()
-			}
-		},
 		async onPullDownRefresh() {
 			await this.fetchData()
 			uni.stopPullDownRefresh()
