@@ -152,14 +152,8 @@
 						title: '保存成功'
 					})
 					setTimeout(() => {
-						if(this.form.state>0) {
-							uni.navigateTo({
-								url: '/pages/list/subpage?state='+this.form.state
-							})
-						}else {
-							uni.navigateBack()
-						}
-						uni.$emit('refresh')
+						uni.$emit('listUpdate')
+						uni.navigateBack()
 					}, 500)
 				}catch(err) {
 					uni.showToast({
@@ -180,7 +174,7 @@
 								uni.showToast({
 									title: '删除成功'
 								})
-								uni.$emit('refresh')
+								uni.$emit('listUpdate')
 								setTimeout(() => {
 									uni.navigateBack()
 								}, 500)

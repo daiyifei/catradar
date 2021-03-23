@@ -13,7 +13,6 @@ const store = new Vuex.Store({
 		login(state, userInfo) {
 			state.hasLogin = true
 			state.userInfo = userInfo
-			uni.$emit('refresh')
 		},
 		logout(state) {
 			state.userInfo = {}

@@ -62,7 +62,7 @@
 		},
 		computed: mapState(['hasLogin', 'userInfo', 'hasBase']),
 		onLoad() {
-			uni.$on('refresh', async id => {
+			uni.$on('timelineUpdate', async id => {
 				if(id) {
 					const index = this.list.findIndex(item => {
 						return item._id === id
@@ -80,6 +80,11 @@
 					this.$u.toast('发布成功')
 				}
 			})
+		},
+		onShow() {
+			if(!this.loading && !this.list.length) {
+				this.fetchData()
+			}
 		},
 		async onPullDownRefresh() {
 			await this.fetchData()

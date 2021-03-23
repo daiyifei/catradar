@@ -83,11 +83,11 @@
 						await db.collection('timeline').doc(this.id).update(this.form)
 						this.form._id = this.id
 						this.form.cat = [this.$refs.remote.selected]
-						uni.$emit('refresh', this.id)
+						uni.$emit('timelineUpdate', this.id)
 					}else {
 						// 新建
 						await db.collection('timeline').add(this.form)
-						uni.$emit('refresh')
+						uni.$emit('timelineUpdate')
 					}
 					this.saving = false
 					setTimeout(() => {

@@ -1,6 +1,6 @@
 <template>
 	<view>
-		<video id="video" :src="src" objectFit="cover" :controls="false" class="margin-tb-sm video" @ended="onEnd"
+		<video id="video" :src="src" objectFit="cover" :controls="false" class="margin-tb-sm video radius" @ended="onEnd"
 			@tap.stop.prevent="onTap"></video>
 	</view>
 </template>
