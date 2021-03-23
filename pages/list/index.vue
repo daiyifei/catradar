@@ -89,9 +89,14 @@
 			}
 		},
 		onLoad() {
-			uni.$on('refresh',() => {
+			uni.$on('listUpdate',() => {
 				this.fetchData()
 			})
+		},
+		onShow() {
+			if(!this.loading && !this.list.length) {
+				this.fetchData()
+			}
 		},
 		onReady() {
 			this.$u.getRect('.navbar').then(res => {

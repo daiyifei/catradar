@@ -21,7 +21,7 @@
 		async onLoad(options) {
 			this.state = parseInt(options.state)
 			this.fetchData()
-			uni.$on('refresh',() => {
+			uni.$on('listUpdate',() => {
 				this.fetchData()
 			})
 		},

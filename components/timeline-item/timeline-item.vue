@@ -123,7 +123,7 @@
 									await db.collection('comments').where({
 										timeline_id: this.item._id
 									}).remove()
-									uni.$emit('refresh', this.item._id)
+									uni.$emit('timelineUpdate', this.item._id)
 								}
 							}
 						})
