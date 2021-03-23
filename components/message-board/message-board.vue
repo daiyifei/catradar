@@ -1,29 +1,29 @@
 <template>
-	<view class="text-content" style="margin-top: -54rpx;">
+	<view class="text-content" style="margin-top: -50rpx;">
 		<!-- 功能按钮 -->
-		<view class="text-right text-grey text-lg">
+		<view class="text-right text-grey">
 			<text class="padding-lr like-loading cu-load load-cuIcon loading" v-if="likeLoading"></text>
 			<text class="padding" :class="'cuIcon-like'+(likeId?'fill':'')" @tap="like" v-else>{{(likeId?'取消':'赞')}}</text>
 			<text class="padding-tb cuIcon-message" @tap="comment">评论</text>
 		</view>
 		
-		<view class="bg-gray radius margin-top-sm" v-if="list.length">
+		<view class="bg-gray radius margin-top-sm" v-if="data.length">
 			<!-- 点赞列表 -->
-			<view class="flex padding-sm text-grey text-bold" v-if="likeList.length">
+			<view class="flex flex-wrap padding-sm text-grey text-bold" v-if="likeList.length">
 				<text class="cuIcon-like"></text>
-				<text v-for="(item, index) in likeList" :key="index" class="margin-left-xs">
+				<text v-for="(item, index) in likeList" :key="index" class="margin-left-xs" v-if="item.comment_type===0">
 					{{(index?' , ':'')+item.user[0].nickname}}
 				</text>
 			</view>
 			<!-- 评论列表 -->
 			<view class="padding-sm"
-				v-for="(item, idx) in commentList" :key="idx" @tap="replyOrRemove(item)" @longpress="adminRemove(item)">
+				v-for="(item, index) in data" v-if="item.comment_type===1" :key="index" @tap="replyOrRemove(item)" @longpress="adminRemove(item)">
 				<view class="comment-wrp">
 					<image :src="item.user[0].avatar" mode="aspectFill" class="cu-avatar sm round margin-right-xs"></image>
 					<text class="text-grey text-bold">{{item.user[0].nickname}}</text>
 					<text v-if="item.reply_user.length">回复<text class="text-grey text-bold">{{item.reply_user[0].nickname}}</text></text>
 					<text class="margin-right-xs">:</text>
-					<text v-for="(i, idx) in item.content" :key="idx">
+					<text v-for="(i, idx) in parseEmoji(item.content)" :key="idx">
 						<text v-if="i.type === 1">{{i.content}}</text>
 						<text class="emoji-wrp" v-if="i.type === 2">
 							<text class="emoji-icon" :class="i.imageClass"></text>
@@ -89,7 +89,6 @@
 			return {
 				content: '',
 				data: this.list,
-				likeId: '',
 				likeLoading: false,
 				showInput: false,
 				showEmoji: false,
@@ -102,26 +101,16 @@
 		computed: {
 			...mapState(['hasLogin', 'userInfo']),
 			likeList() {
-				const likeList = this.data.filter(item => {
+				return this.data.filter(item => {
 					return item.comment_type === 0
 				})
-				this.likeId = ''
-				likeList.forEach(item => {
-					if(item.uid === this.userInfo._id) {
-						this.likeId = item._id
-					}
-				})
-				return likeList
 			},
-			commentList() {
-				const commentList = this.data.filter(item => {
-					return item.comment_type === 1
+			likeId() {
+				const liked = this.likeList.filter(item => {
+					return item.uid===this.userInfo._id
 				})
-				commentList.forEach(item => {
-					item.content = parseEmoji(item.content)
-				})
-				return commentList
-			},
+				return liked.length ? liked[0]._id : ''
+			}
 		},
 		watch: {
 			showEmoji(val) {
@@ -135,6 +124,9 @@
 			}
 		},
 		methods: {
+			parseEmoji(data) {
+				return parseEmoji(data)
+			},
 			async refresh() {
 				const { data } = await this.$request('timeline', 'getCommentList', {
 					timeline_id: this.timeline._id

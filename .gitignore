@@ -16,3 +16,4 @@ node_modules/
 # uniapp
 .project
 unpackage/
+/.hbuilderx/
