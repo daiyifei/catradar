@@ -26,118 +26,82 @@
 					</view>
 				</view>
 				
-				<u-gap bg-color="#fff"></u-gap>
+				<u-gap bg-color="#fff" height="100"></u-gap>
 
 				<!--列表主体-->
-				<timeline-item :item="item" is-link v-for="(item, index) in list" :key="index" @focus="onFocus" />
-				<view class="cu-load loading text-gray" v-if="loading"></view>
-				<view class="cu-load text-gray text-sm" v-if="!hasMore">没有更多了</view>
-
-				<!--新建按钮-->
-				<view class="cu-avatar round lg bg-gradual-blue cuIcon-camera btn-new margin" @tap="add"></view>
+				<unicloud-db
+					ref="udb"
+					v-slot:default="{data, loading, hasMore}" 
+					collection="timeline,list,uni-id-users"
+					field="cat_id{_id,name,avatar},uid{_id,nickname,avatar},content_type,text,album,create_date"
+					orderby="create_date desc">
+					<timeline-item :item="item" is-link v-for="(item, index) in data" :key="item._id" @focus="onFocus" @del="onDel" />
+					<view class="cu-load loading text-gray" v-if="loading"></view>
+					<view class="cu-load text-gray text-sm" v-else-if="!hasMore">没有更多了</view>
+				</unicloud-db>
+				
+				<!--操作按钮-->
+				<view class="btn-float cu-avatar round lg bg-gradual-blue margin" :class="scrollTop?'cuIcon-top':'cuIcon-camera'" @tap="scrollTop?backTop():add()" ></view>
 			</view>
 		</view>
 	</view>
 </template>
 
 <script>
-	const db = uniCloud.database()
-	import {
-		mapState,
-		mapMutations
-	} from 'vuex'
 	export default {
 		data() {
 			return {
-				loading: false,
-				page: 1,
-				limit: 5,
-				total: 0,
-				hasMore: false,
-				list: [],
 				background: {
 					background: ''
-				}
-			}
-		},
-		computed: mapState(['hasLogin', 'userInfo', 'hasBase']),
-		onLoad() {
-			uni.$on('timelineUpdate', async id => {
-				if(id) {
-					const index = this.list.findIndex(item => {
-						return item._id === id
-					})
-				 	const { data } = await this.$request('timeline','getList',{id})
-					if(data) {
-						this.list.splice(index, 1, data)
-						this.$u.toast('更新成功')
-					}else {
-						this.list.splice(index, 1)
-						this.$u.toast('删除成功')
-					}
-				} else {
-					this.fetchData()
-					this.$u.toast('发布成功')
-				}
-			})
-		},
-		onShow() {
-			if(!this.loading && !this.list.length) {
-				this.fetchData()
+				},
+				scrollTop: false
 			}
 		},
 		async onPullDownRefresh() {
-			await this.fetchData()
-			uni.stopPullDownRefresh()
+			this.$refs.udb.loadData({
+				clear: true
+			},() => {
+				uni.stopPullDownRefresh()
+			})
 		},
 		onPageScroll(e) {
 			const opacity = e.scrollTop / 100
 			this.background.background = `linear-gradient(45deg, rgba(57,181,74,${opacity}), rgba(141,198,63,${opacity}))`
+			if(e.scrollTop > 1000) {
+				this.scrollTop = true
+			}else {
+				this.scrollTop = false
+			}
 		},
 		onReachBottom() {
-			this.loadMore()
+			this.$refs.udb.loadMore()
 		},
 		methods: {
-			async fetchData() {
-				this.list = []
-				this.page = 1
-				this.total = 0
-				this.hasMore = true
-				await this.loadMore()
-			},
-			async loadMore() {
-				if (!this.hasMore) {
-					return
-				}
-				this.loading = true
-				const res = await this.$request('timeline', 'getList', {
-					page: this.page++,
-					limit: this.limit
+			backTop() {
+				uni.pageScrollTo({
+					scrollTop: 0
 				})
-				this.list = this.list.concat(res.data)
-				this.total = res.total
-				this.hasMore = this.page <= Math.ceil(res.total / res.limit)
-				this.loading = false
 			},
 			add() {
-				// #ifdef MP-WEIXIN
-				uni.chooseMedia({
+				const option = {
+					sizeType: ['compressed'],
 					success: res => {
 						uni.navigateTo({
 							url: 'edit?files=' + JSON.stringify(res)
 						})
+					}
+				}
+				
+				// #ifdef MP-WEIXIN
+				uni.requestSubscribeMessage({
+					tmplIds: ['73TwwDG5U8hoQT_WCOC85kt7Rr5lr_v8aZb-a9M_hl8'],
+					success: () => {
+						uni.chooseMedia(option)
 					}
 				})
 				// #endif
 				// #ifndef MP-WEIXIN
-				uni.chooseImage({
-					success: res => {
-						console.log(res)
-						uni.navigateTo({
-							url: 'edit?files=' + JSON.stringify(res)
-						})
-					}
-				})
+				uni.chooseImage(option)
 				// #endif
 			},
 			onFocus(e) {
@@ -149,6 +113,9 @@
 						})
 					}).exec()
 				}).exec()
+			},
+			onDel(id) {
+				this.$refs.udb.remove(id)
 			}
 		}
 	}

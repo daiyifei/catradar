@@ -1,5 +1,5 @@
 {
-	"name": "timeline",
+	"name": "weixin",
 	"version": "1.0.0",
 	"description": "",
 	"main": "index.js",
@@ -9,6 +9,7 @@
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
+		"mp-cloud-openapi": "file:../common/mp-cloud-openapi",
 		"uni-id": "file:../../../uni_modules/uni-id/uniCloud/cloudfunctions/common/uni-id"
 	}
 }

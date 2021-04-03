@@ -9,7 +9,7 @@
 				<u-index-anchor :index="group.name" />
 				<view class="cu-list menu-avatar no-padding">
 					<navigator class="cu-item" :url="'detail?id='+item._id" @longpress="showMenu(item)" v-for="(item,idx) in group.data" :key="idx">
-						<image :src="item.avatar" mode="aspectFill" lazy-load class="cu-avatar round lg"></image>
+						<u-lazy-load :image="item.avatar" class="cu-avatar round lg" height="100rpx" border-radius="100"></u-lazy-load>
 						<view class="content">
 							<view class="text-xl">{{item.name}}</view>
 							<view class="text-gray text-sm">
@@ -109,4 +109,7 @@
 </script>
 
 <style>
+	.cu-list.menu-avatar>.cu-item>.cu-avatar {
+		display: block;
+	}
 </style>

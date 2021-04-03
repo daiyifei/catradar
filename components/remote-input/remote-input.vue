@@ -70,17 +70,15 @@
 				loadingCandidates: false
 			}
 		},
-		async created() {
-			if(this.value) {
-				this.loading = true
-				const { result: { data } } = await db.collection('list').doc(this.value).field('_id,name,avatar').get()
-				this.selected = data.length ? data[0] : {}
-				this.loading = false
-			}else {
-				this.selected = {}
-			}
-		},
 		watch: {
+			async value(val) {
+				if(val && !this.selected.name) {
+					this.loading = true
+					const { result: { data } } = await db.collection('list').doc(this.value).field('_id,name,avatar').get()
+					this.selected = data.length ? data[0] : {}
+					this.loading = false
+				}
+			},
 			showCandidates(val) {
 				if(val) {
 					this.fetchCandidates()

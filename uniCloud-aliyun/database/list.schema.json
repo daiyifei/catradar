@@ -70,18 +70,23 @@
 			},
 			"foreignKey": "uni-id-users._id"
 		},
+		"base_id": {
+			"bsonType": "string",
+			"description": "猫区ID，参考`bases` 表",
+			"foreignKey": "bases._id"
+		},
 		"intro": {
 			"bsonType": "string",
 			"description": "简介"
 		},
-		"created": {
+		"create_date": {
 			"bsonType": "timestamp",
 			"description": "发布时间",
 			"defaultValue": {
 				"$env": "now"
 			}
 		},
-		"updated": {
+		"update_date": {
 			"bsonType": "timestamp",
 			"description": "更新时间",
 			"forceDefaultValue": {

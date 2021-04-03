@@ -53,7 +53,7 @@
 			
 			<!--新建按钮-->
 			<navigator 
-				class="cu-avatar round lg bg-gradual-blue cuIcon-add btn-new margin"
+				class="btn-float cu-avatar round lg bg-gradual-blue cuIcon-add margin"
 				url="edit"
 				v-if="hasLogin"></navigator>
 		</view>

@@ -56,7 +56,7 @@
 					this.$emit('add')
 				}else {
 					uni.chooseImage({
-						count: 9,
+						sizeType: ['compressed'],
 						success: res => {
 							res.tempFilePaths.forEach(item => {
 								this.list.push(item)

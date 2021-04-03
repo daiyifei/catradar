@@ -34,6 +34,11 @@
 			"description": "用户昵称",
 			"trim": "both"
 		},
+		"base_id": {
+			"bsonType": "string",
+			"description": "猫区ID，参考`bases` 表",
+			"foreignKey": "bases._id"
+		},
 		"subscribes": {
 			"bsonType": "array",
 			"title": "关注列表",
