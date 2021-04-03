@@ -1,6 +1,6 @@
 <template>
 	<view>
-		<video id="video" :src="src" objectFit="cover" :controls="false" class="margin-tb-sm video radius" @ended="onEnd"
+		<video id="video" :src="src" objectFit="cover" :controls="false" loop class="margin-tb-sm video radius" @ended="onEnd"
 			@tap.stop.prevent="onTap"></video>
 	</view>
 </template>
@@ -13,30 +13,48 @@
 		},
 		data() {
 			return {
+				videoCtx: uni.createVideoContext('video', this),
 				playing: false,
 				fullscreen: false,
 				ended: true
 			}
 		},
+		mounted() {
+			setTimeout(() => {
+				const observer = uni.createIntersectionObserver(this)
+				observer.relativeToViewport({
+					top: -200,
+					bottom: -200,
+				}).observe('#video', res => {
+					if (res.intersectionRatio > 0) {
+						// 进入视口
+						this.videoCtx.play()
+						this.playing = true
+					}else {
+						// 离开视口
+						this.videoCtx.pause()
+						this.playing = false
+					}
+				})
+			},30)
+		},
 		methods: {
 			onEnd() {
-				const videoContext = uni.createVideoContext('video', this)
-				videoContext.seek(0)
+				this.videoCtx.seek(0)
 				this.ended = true
 				this.playing = false
 			},
 			onTap() {
-				const videoContext = uni.createVideoContext('video', this)
 				if (this.playing) {
 					if (this.fullscreen) {
-						videoContext.exitFullScreen()
+						this.videoCtx.exitFullScreen()
 						this.fullscreen = false
 					} else {
-						videoContext.requestFullScreen()
+						this.videoCtx.requestFullScreen()
 						this.fullscreen = true
 					}
 				} else {
-					videoContext.play()
+					this.videoCtx.play()
 					this.playing = true
 				}
 			}

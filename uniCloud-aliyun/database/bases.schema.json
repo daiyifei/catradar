@@ -6,10 +6,10 @@
     "longitude"
   ],
   "permission": {
-    "read": true,
-    "create": true,
-    "update": "doc.uid == auth.uid",
-    "delete": "doc.uid == auth.uid"
+  	"read": true,
+  	"create": true,
+  	"update": "doc.uid == auth.uid",
+  	"delete": "doc.uid == auth.uid"
   },
   "properties": {
     "_id": {
@@ -43,16 +43,27 @@
       "bsonType": "array",
       "description": "位置列表"
     },
-    "count": {
-      "bsonType": "int",
-      "description": "该社区猫咪总数"
+    "uid": {
+    	"bsonType": "string",
+    	"description": "创建者ID，参考`uni-id-users` 表",
+    	"forceDefaultValue": {
+    		"$env": "uid"
+    	},
+    	"foreignKey": "uni-id-users._id"
     },
-    "created_date": {
+    "create_date": {
       "bsonType": "timestamp",
       "description": "创建时间",
-      "forceDefaultValue": {
+      "defaultValue": {
         "$env": "now"
       }
-    }
+    },
+		"update_date": {
+		  "bsonType": "timestamp",
+		  "description": "更新时间",
+		  "forceDefaultValue": {
+		    "$env": "now"
+		  }
+		}
   }
 }

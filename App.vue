@@ -3,7 +3,7 @@
 	import Vue from 'vue'
 	import { mapState, mapMutations, mapActions } from 'vuex'
 	export default {
-		async onLaunch() {
+		async onLaunch() {	
 			this.checkUpdate()
 			this.autoLogin()
 		},
@@ -16,7 +16,9 @@
 				if(!uni.getStorageSync('uni_id_token'))
 					return
 				try{
-					uni.showLoading()
+					uni.showLoading({
+						title: '登录中'
+					})
 					const { token, tokenExpired, userInfo } = await this.$request('user-center','checkToken')
 					if(token) {
 						uni.setStorage({
@@ -32,6 +34,7 @@
 					this.getBaseInfo()
 					uni.hideLoading()
 				}catch(e){
+					uni.hideLoading()
 					console.log(e)
 					this.logout()
 				}
@@ -54,8 +57,7 @@
 				
 				// #ifdef APP-PLUS
 				plus.runtime.getProperty(plus.runtime.appid, ({
-					version
-				}) => {
+     0  				}) => {
 					this.$request('check-update', '', {
 						version
 					}).then(res => {
@@ -137,11 +139,18 @@
 	.btn-transparent::after {
 		border: none;
 	}
-	.btn-new {
+	.btn-float {
 		position: fixed;
 		right: 0;
 		bottom: var(--window-bottom);
 		opacity: .9;
 		line-height: 80rpx;
+	}
+	.cu-form-group.required .title::after {
+		content: '*';
+		display: inline-block;
+		margin-left: 6rpx;
+		color: #e54d42;
+		font-size: 34rpx;
 	}
 </style>

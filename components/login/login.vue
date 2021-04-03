@@ -17,7 +17,10 @@
 			
 			<!-- 微信登录 -->
 			<!-- #ifdef APP-PLUS || MP-WEIXIN -->
-			<button class="weixin cuIcon-weixin text-green" @getuserinfo="loginByWeixin" open-type="getUserInfo"></button>
+			<view class="btn-bottom">
+				<button class="weixin cuIcon-weixin text-green" @getuserinfo="loginByWeixin" open-type="getUserInfo"></button>
+				<view class="text-center text-sm text-gray">微信登录</view>
+			</view>
 			<!-- #endif -->
 		</template>
 	</view>
@@ -61,7 +64,9 @@
 				this.$request('user-center','register',e.detail.value)
 			},
 			loginByPwd() {
-				uni.showLoading()
+				uni.showLoading({
+					title: '登录中'
+				})
 				this.$request('user-center','login', this.form)
 					.then(res => {
 						uni.setStorageSync('uni_id_token', res.token)
@@ -79,7 +84,9 @@
 					})
 			},
 			async loginByWeixin(e) {
-				uni.showLoading()
+				uni.showLoading({
+					title: '登录中'
+				})
 				// #ifdef MP-WEIXIN
 				if(!e.detail.userInfo) {
 					uni.hideLoading()
@@ -201,7 +208,9 @@
 					showCancel: true,
 					success: res => {
 						if(res.confirm) {
-							uni.showLoading()
+							uni.showLoading({
+								title: '退出中'
+							})
 							this.$request('user-center','logout')
 								.then(res => {
 									this.logout()
@@ -220,11 +229,16 @@
 </script>
 
 <style>
-	.weixin {
+	.btn-bottom {
 		position: absolute;
-		left: 50%;
-		transform: translateX(-50%);
-		bottom: 50rpx;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		margin: 30rpx auto;
+	}
+	
+	.weixin {
+		margin-bottom: 10rpx;
 		width: 100rpx;
 		height: 100rpx;
 		display: flex;

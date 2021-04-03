@@ -4,8 +4,8 @@
 		<view class="flex padding bg-white solid-bottom item">
 			<!-- 头像 -->
 			<view>
-				<navigator :url="'/pages/list/detail?id='+item.cat[0]._id" class="margin-right-sm">
-					<image :src="item.cat[0].avatar" mode="aspectFill" class="cu-avatar radius"></image>
+				<navigator :url="'/pages/list/detail?id='+item.cat_id[0]._id" class="margin-right-sm">
+					<image :src="item.cat_id[0].avatar" mode="aspectFill" class="cu-avatar radius"></image>
 				</navigator>
 			</view>
 			<!-- 主体 -->
@@ -14,26 +14,25 @@
 					<view class="text-sm">{{item.create_date|timeFrom}}</view>
 					<!-- 操作按钮 -->
 					<view class="padding-xs cuIcon-moreandroid text-gray" 
-						v-if="userInfo.role||userInfo._id==item.user[0]._id" 
+						v-if="userInfo.role||userInfo._id==item.uid[0]._id" 
 						@tap="showMenu(item._id)">
 					</view>
 				</view>
-				<view class="text-grey text-lg text-bold">{{item.cat[0].name}}</view>
+				<view class="text-grey text-lg text-bold">{{item.cat_id[0].name}}</view>
 				<view class="text-content text-lg" @tap="toDetail">{{item.text}}</view>
-				<view class="flex" v-if="item.content_type">
-					<video-item :src="item.album[0]" class="basis-lg"/>
+				<view class="flex" v-if="item.content_type" @tap="toDetail">
+					<video-item :src="item.album[0]" class="basis-lg" @tap.stop/>
 				</view>
 				<view class="grid grid-square col-3 margin-top-sm" @tap="toDetail" v-else>
-					<view class="bg-img" v-for="(pic,idx) in item.album" :key="idx">
-						<image :src="pic" mode="aspectFill" @tap.stop.prevent="preview(item.album, idx)"></image>
+					<view v-for="(pic,idx) in item.album" :key="idx" @tap.stop.prevent="preview(item.album,idx)">
+						<u-lazy-load :image="pic" img-mode="aspectFill" height="200rpx" border-radius="6"></u-lazy-load>
 					</view>
 				</view>
 				<!-- 作者信息 -->
-				<image :src="item.user[0].avatar" mode="aspectFill" class="cu-avatar sm round margin-right-xs">
-				</image>
-				<text class="text-gray">{{item.user[0].nickname}}</text>
+				<image :src="item.uid[0].avatar" mode="aspectFill" class="cu-avatar sm round margin-right-xs" />
+				<text class="text-gray">{{item.uid[0].nickname}}</text>
 				<!-- 留言区域 -->
-				<message-board :timeline="item" :list="item.comments" @focus="onFocus"></message-board>
+				<message-board :timeline="item" :list="item.comments" @focus="onFocus" />
 			</view>
 		</view>
 
@@ -71,7 +70,7 @@
 					color: 'red',
 					action: 'del'
 				}]
-				if((this.userInfo._id === this.item.cat[0].uid || this.userInfo.role) && !this.item.content_type) {
+				if((this.userInfo._id === this.item.cat_id[0].uid || this.userInfo.role) && !this.item.content_type) {
 					actions.unshift({
 						text: '同步到相册',
 						action: 'sync'
@@ -111,22 +110,11 @@
 						break
 					case 'sync':
 						uni.navigateTo({
-							url: `/pages/list/edit?id=${this.item.cat_id}&path=${JSON.stringify(this.item.album)}`
+							url: `/pages/list/edit?id=${this.item.cat_id[0]._id}&path=${JSON.stringify(this.item.album)}`
 						})
 						break
 					case 'del':
-						uni.showModal({
-							content: '是否删除这条情报？',
-							success: async res => {
-								if (res.confirm) {
-									await db.collection('timeline').doc(this.item._id).remove()
-									await db.collection('comments').where({
-										timeline_id: this.item._id
-									}).remove()
-									uni.$emit('timelineUpdate', this.item._id)
-								}
-							}
-						})
+						this.$emit('del', this.item._id)
 						break
 					default:
 						break

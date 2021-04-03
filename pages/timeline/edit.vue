@@ -1,28 +1,21 @@
 <template>
 	<view>
 		<view class="cu-load loading text-gray" v-if="loading"></view>
-		<form @submit="onSubmit" v-else>
-			<view class="cu-form-group">
-				<remote-input :placeholder="(form.content_type?'视频':'照片')+'中的是谁？'" ref="remote" v-model="form.cat_id" class="response" @change="onChange('cat_id', $event)" />
-			</view>
-			<view class="cu-form-group">
-				<textarea name="text" placeholder="写点什么吧..." maxlength="140" v-model="form.text" @change="onChange('text', $event)"></textarea>
-			</view>
-			<view class="cu-form-group">
-				<video-item :src="form.album[0]" v-if="form.content_type" style="width: 60%;"/>
-				<drag-album name="album" v-model="form.album" class="response" @change="onChange('album', $event)" v-else />
-			</view>
-			<button form-type="submit" class="cu-btn block bg-blue margin lg" :loading="saving" :disabled="!form.cat_id||!form.text||!form.album.length">{{id?'保存':'发布'}}</button>
-		</form>
+		<view class="cu-form-group" v-else>
+			<remote-input :placeholder="(form.content_type?'视频':'照片')+'中的是谁？'" ref="remote" v-model="form.cat_id" class="response" @change="onChange('cat_id', $event)" />
+		</view>
+		<view class="cu-form-group">
+			<textarea name="text" placeholder="写点什么吧..." maxlength="140" v-model="form.text" @change="onChange('text', $event)"></textarea>
+		</view>
+		<view class="cu-form-group">
+			<video-item :src="form.album[0]" v-if="form.content_type" style="width: 60%;"/>
+			<drag-album name="album" v-model="form.album" class="response" @change="onChange('album', $event)" v-else />
+		</view>
+		<button class="cu-btn block bg-blue margin lg" :loading="saving" :disabled="disabled" @tap="onSubmit">{{id?'保存':'发布'}}</button>
 	</view>
 </template>
 
 <script>
-	const db = uniCloud.database()
-	import {
-		mapState,
-		mapMutations
-	} from 'vuex'
 	export default {
 		data() {
 			return {
@@ -38,7 +31,11 @@
 				saving: false
 			}
 		},
-		computed: mapState(['hasLogin', 'userInfo']),
+		computed: {
+			disabled() {
+				return !this.form.cat_id||!this.form.text||!this.form.album.length
+			}
+		},
 		async onLoad(options) {
 			if(options.files) {
 				const files = JSON.parse(options.files)
@@ -63,10 +60,19 @@
 					title: "编辑"
 				})
 				this.id = options.id
-				this.loading = true
-				const { result: { data }} = await db.collection('timeline').doc(options.id).get()
-				this.form = data[0]
-				this.loading = false
+			}
+		},
+		mounted() {
+			if(this.id) {
+				const pages = getCurrentPages(),
+					prevPage = pages[pages.length - 2]
+				const data = prevPage.$vm.$refs.udb.dataList.find(v => v._id == this.id)
+				this.form = {
+					cat_id: data.cat_id[0]._id,
+					text: data.text,
+					album: this.$u.deepClone(data.album),
+					content_type: data.content_type
+				}
 			}
 		},
 		methods: {
@@ -75,30 +81,42 @@
 			},
 			async onSubmit() {
 				this.saving = true
+				const pages = getCurrentPages(),
+					prevPage = pages[pages.length - 2],
+					{ udb } = prevPage.$vm.$refs,
+					{ selected } = this.$refs.remote
+				
 				try{
 					this.form.album = await this.$upload(this.form.album)
 					if(this.id) {
 						// 编辑
-						delete this.form._id
-						await db.collection('timeline').doc(this.id).update(this.form)
-						this.form._id = this.id
-						this.form.cat = [this.$refs.remote.selected]
-						uni.$emit('timelineUpdate', this.id)
+						udb.update(this.id, this.form, {
+							success: () => {
+								const target = udb.dataList.find(v => v._id == this.id)
+								target.cat_id = [selected]
+								target.text = this.form.text
+								target.album = this.form.album
+							}
+						})
 					}else {
 						// 新建
-						await db.collection('timeline').add(this.form)
-						uni.$emit('timelineUpdate')
+						udb.add(this.form, {
+							toastTitle: '发布成功',
+							success: () => {
+								udb.loadData({
+									clear: true
+								})
+							}
+						})
+						this.saving = false
 					}
-					this.saving = false
-					setTimeout(() => {
-						uni.navigateBack()
-					}, 500)
+					uni.navigateBack()
 				}catch(err){
+					this.saving = false
 					uni.showToast({
 						title: err.message,
 						icon: 'none'
 					})
-					this.saving = false
 				}
 			}
 		}

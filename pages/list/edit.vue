@@ -126,8 +126,6 @@
 				}).join('')
 				
 				try {
-					this.form.avatar = await this.$upload(this.form.avatar)
-					this.form.album = await this.$upload(this.form.album)
 					// 重名检查
 					const { result: { data } } = await db.collection('list').where({
 						_id: db.command.neq(this.id),
@@ -138,6 +136,9 @@
 							message: '名字已存在'
 						})
 					}
+					
+					this.form.avatar = await this.$upload(this.form.avatar)
+					this.form.album = await this.$upload(this.form.album)
 					
 					if(this.id) {
 						// 编辑
@@ -188,11 +189,5 @@
 </script>
 
 <style>
-	.cu-form-group.required .title::after {
-		content: '*';
-		display: inline-block;
-		margin-left: 6rpx;
-		color: #e54d42;
-		font-size: 34rpx;
-	}
+
 </style>

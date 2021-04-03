@@ -7,6 +7,12 @@ import moment from 'moment'
 import uView from 'uview-ui'
 Vue.use(uView)
 
+import { mapState, mapMutations } from 'vuex'
+Vue.mixin({
+	computed: mapState(['hasLogin', 'userInfo', 'hasBase', 'baseInfo']),
+	methods: mapMutations(['login','logout','enter','quit'])
+})
+
 import radar from './pages/radar/index.vue'
 Vue.component('radar', radar)
 
@@ -17,11 +23,6 @@ import mine from './pages/mine/index.vue'
 Vue.component('mine', mine)
 
 Vue.config.productionTip = false
-
-Vue.filter('distance', function (value) {
-	if (value === undefined) return '未知'
-	return value < 1 ? Math.ceil(value*1000) + 'm' : Math.ceil(value) + 'km'
-})
 
 Vue.filter('state', function (value) {
 	if (value === undefined) return '未知'
@@ -81,11 +82,11 @@ Vue.prototype.$upload = data => {
 	return new Promise(async (resolve, reject) => {
 		try {
 			const list = data instanceof Array ? data : [data]
-			await Promise.all(list.map(async (item, index) => {
-				if(item && !~item.indexOf('https://')) {
+			await Promise.all(list.map(async (filePath, index) => {
+				if(filePath && !~filePath.indexOf('https://')) {
 					const { fileID } = await uniCloud.uploadFile({
-						filePath: item,
-						cloudPath: new Date().getTime() + ~item.indexOf('.mp4') ? '.mp4' : '.jpg'
+						filePath,
+						cloudPath: new Date().getTime() + (~filePath.indexOf('.') ? '.' + filePath.split('.').pop() : '')
 					})
 					list[index] = fileID
 				}

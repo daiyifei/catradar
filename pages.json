@@ -91,6 +91,13 @@
 				"enablePullDownRefresh": false
 			}
 
+		}, {
+			"path": "pages/radar/bases",
+			"style": {
+				"navigationBarTitleText": "猫区列表",
+				"enablePullDownRefresh": false
+			}
+
 		}
 	],
 	"tabBar": {
