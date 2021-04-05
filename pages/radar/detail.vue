@@ -5,7 +5,8 @@
 			<unicloud-db v-slot:default="{data, loading, options}" :options="pagination" collection="bases" getone :where="condition1" orderby="desc">
 				<view class="cu-list menu-avatar" v-if="!loading">
 					<view class="cu-item">
-						<image class="cu-avatar round lg" :src="data.avatar" />
+						<image class="cu-avatar round lg" :src="data.avatar" v-if="data.avatar"/>
+						<text class="cu-avatar round lg" v-else>{{data.name[0]}}</text>
 						<view class="content">
 							<view class="text-grey">{{data.name}}</view>
 							<view class="text-gray text-sm flex">
@@ -23,6 +24,7 @@
 					</view>
 				</view>
 				<view class="cu-load loading text-gray" v-if="loading"></view>
+				<view class="cu-load text-gray" v-else>共{{pagination.count}}人</view>
 			</view>
 		</unicloud-db>
 	</view>

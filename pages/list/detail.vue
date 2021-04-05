@@ -12,7 +12,7 @@
 					<view class="swiper-item" @tap="preview(form.album, index)">
 						<video :src="item" autoplay loop :show-play-btn="false" :controls="false" objectFit="cover"
 							v-if="item.split('.').pop()=='mp4'" />
-						<image :src="item" mode="aspectFill" v-else @load="imgLoad" />
+						<image :src="item" mode="aspectFill" v-else />
 					</view>
 				</swiper-item>
 			</swiper>
@@ -20,37 +20,31 @@
 			<template v-if="hasLogin">
 				<!-- 头部 -->
 				<view class="header padding flex align-center bg-white margin-sm radius shadow shadow-blur">
-					<image :src="form.avatar" class="cu-avatar xl round margin-right-sm u-skeleton-circle"></image>
-					<view class="u-skeleton-rect">
+					<image :src="form.avatar" class="cu-avatar xl round margin-right-sm u-skeleton-circle" ></image>
+					<view>
 						<view class="text-xxl u-skeleton-circle">{{form.name}}</view>
-						<view class="u-skeleton-rect">
+						<view>
 							<text class="gender margin-right-xs"
 								:class="form.female ? 'cuIcon-female female' : 'cuIcon-male'"></text>
-							<text class="text-grey text-lg">{{form.birthday | age}}</text>
+							<text class="text-grey text-lg u-skeleton-rect">{{form.birthday | age}}</text>
 						</view>
 					</view>
 					<view class="action padding flex flex-direction justify-between align-end">
+						<!-- 主人信息 -->
+						<view class="flex align-center u-skeleton-rect" v-if="form.state<3">
+							<view class="cu-avatar round" :class="form.state===1?'bg-gradual-green shadow-blur':''" 
+								:style="{backgroundImage: form.state===2? 'url('+owner.avatar+')':''}">
+								<text v-if="form.state===0">?</text>
+								<text class="cuIcon-service" v-if="form.state===1"></text>
+								<view class="cu-tag badge cuIcon-selectionfill bg-orange" v-if="form.state===2"></view>
+							</view>
+							<text class="margin-left-xs" :class="form.state===1?'text-green':''">{{['等待主人...','提供线索',owner.nickname][form.state]}}</text>
+							<button class="btn-transparent" open-type="contact" v-if="form.state===1"></button>
+						</view>
+						<!-- 状态 -->
 						<view class="cu-tag round u-skeleton-rect light"
 							:class="'bg-'+['gray','blue','orange','black'][form.state]">
 							{{form.state | state}}
-						</view>
-						<view class="flex u-skeleton-rect">
-							<navigator 
-								:url="'/pages/list/edit?id='+form._id"
-								class="flex flex-direction align-center padding-lr solid-right"
-								v-if="form.uid==userInfo._id||userInfo.role">
-									<text class="cuIcon-edit"></text>
-									<text class="text-xs text-gray">编辑</text>
-							</navigator>
-							<view class="flex flex-direction align-center padding-lr solid-right" @tap="fav">
-								<text :class="isFav?'cuIcon-favorfill text-orange':'cuIcon-favor'"></text>
-								<text class="text-xs" :class="isFav?'text-orange':'text-gray'">{{isFav?'已':''}}收藏</text>
-							</view>
-							<view class="flex flex-direction align-center padding-left" style="position: relative;">
-								<text class="cuIcon-share"></text>
-								<text class="text-xs text-gray">分享</text>
-								<button class="btn-transparent" open-type="share" @tap="share"></button>
-							</view>
 						</view>
 					</view>
 				</view>
@@ -155,8 +149,26 @@
 						<view class="text-sm text-gray text-center padding-bottom" v-if="!hasMore">暂无更多</view>
 					</unicloud-db>
 				</view>
+				
+				<!-- 操作条 -->
+				<view class="action-bar cu-bar bg-white tabbar shop border">
+					<view class="action" @tap="fav">
+						<view :class="isFav?'cuIcon-favorfill text-orange':'cuIcon-favor'"></view>
+						<text :class="isFav?'text-orange':''">{{isFav?'已':''}}收藏</text>
+					</view>
+					<button class="action" style="color:#666" open-type="share" @tap="share">
+						<view class="cuIcon-share"></view>分享
+					</button>
+					<navigator :url="'/pages/list/edit?id='+form._id" class="action" v-if="form.state>0&&(form.uid==userInfo._id||userInfo.role)">
+						<view class="cuIcon-edit"></view>编辑
+					</navigator>
+					<view class="btn-group margin-lr-sm">
+						<button class="cu-btn bg-gradual-orange round shadow-blur" @tap="addTimeline">发布动态</button>
+						<button class="cu-btn bg-gradual-blue round shadow-blur" v-if="form.state===0" @tap="goAdopt">我想领养</button>
+					</view>
+				</view>
 			</template>
-
+			
 			<!-- 未登录 -->
 			<view class="need-auth" v-else>
 				<u-empty text="请先登录" mode="data">
@@ -177,6 +189,7 @@
 				id: '',
 				form: {},
 				base: {},
+				owner: {},
 				loading: true,
 				background: {
 					background: ''
@@ -190,6 +203,9 @@
 				const pages = getCurrentPages()
 				return pages.length === 1
 			},
+			condition() {
+				return `cat_id=='${this.id}'`
+			},
 			isFav() {
 				if (this.hasLogin && ~this.userInfo.favs.indexOf(this.form._id)) {
 					return true
@@ -197,9 +213,6 @@
 					return false
 				}
 			},
-			condition() {
-				return `cat_id=='${this.id}'`
-			}
 		},
 		onLoad(option) {
 			this.id = option.id
@@ -246,13 +259,17 @@
 				const {result: {data: base}} = await db.collection('bases').doc(form.base_id).get({
 					getOne: true
 				})
+				if(form.state === 2) {
+					const {result: {data: owner}} = await db.collection('uni-id-users').doc(form.uid).field('nickname,avatar').get({
+						getOne: true
+					})
+					this.owner = owner
+				}
 				this.form = form
 				this.base = base
 				uni.setNavigationBarTitle({
 					title: this.form.name
 				})
-			},
-			imgLoad() {
 				this.loading = false
 			},
 			timelineLoaded(data) {
@@ -312,6 +329,39 @@
 				})
 				// #endif
 			},
+			addTimeline() {
+				const option = {
+					sizeType: ['compressed'],
+					success: res => {
+						uni.navigateTo({
+							url: `/pages/timeline/edit?cat_id=${this.form._id}&&files=${JSON.stringify(res)}`
+						})
+					}
+				}
+				
+				// #ifdef MP-WEIXIN
+				uni.requestSubscribeMessage({
+					tmplIds: ['73TwwDG5U8hoQT_WCOC85kt7Rr5lr_v8aZb-a9M_hl8'],
+					success: () => {
+						uni.chooseMedia(option)
+					}
+				})
+				// #endif
+				// #ifndef MP-WEIXIN
+				uni.chooseImage(option)
+				// #endif
+			},
+			goAdopt() {
+				// #ifdef H5
+				location.href = 'https://wj.qq.com/s2/8284755/e3cf/'
+				// #endif
+				// #ifdef MP-WEIXIN
+				uni.navigateToMiniProgram({
+					appId: 'wxebadf544ddae62cb',
+					path: 'pages/survey/index?sid=8284755&&hash=e3cf'
+				})
+				//#endif
+			},
 			onNavigationBarButtonTap(e) {
 				switch (e.type) {
 					case 'share':
@@ -344,6 +394,12 @@
 	.container {
 		position: absolute;
 		top: 0;
+	}
+	
+	.action-bar {
+		position: sticky;
+		bottom: 0;
+		z-index: 9;
 	}
 
 	/* swiper */

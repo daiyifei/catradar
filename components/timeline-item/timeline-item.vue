@@ -10,18 +10,17 @@
 			</view>
 			<!-- 主体 -->
 			<view class="response">
-				<view class="fr text-xl flex flex-direction align-end" >
+				<view class="fr flex flex-direction align-end">
 					<view class="text-sm">{{item.create_date|timeFrom}}</view>
 					<!-- 操作按钮 -->
-					<view class="padding-xs cuIcon-moreandroid text-gray" 
-						v-if="userInfo.role||userInfo._id==item.uid[0]._id" 
-						@tap="showMenu(item._id)">
+					<view class="margin-top-xs margin-left-xs padding-xs cuIcon-moreandroid bg-gray radius"
+						v-if="userInfo.role||userInfo._id==item.uid[0]._id" @tap="showMenu(item._id)">
 					</view>
 				</view>
 				<view class="text-grey text-lg text-bold">{{item.cat_id[0].name}}</view>
 				<view class="text-content text-lg" @tap="toDetail">{{item.text}}</view>
 				<view class="flex" v-if="item.content_type" @tap="toDetail">
-					<video-item :src="item.album[0]" class="basis-lg" @tap.stop/>
+					<video-item :src="item.album[0]" class="basis-lg" @tap.stop />
 				</view>
 				<view class="grid grid-square col-3 margin-top-sm" @tap="toDetail" v-else>
 					<view v-for="(pic,idx) in item.album" :key="idx" @tap.stop.prevent="preview(item.album,idx)">
@@ -52,8 +51,12 @@
 		data() {
 			return {
 				show: false,
-				fullscreen: false,
-				actions: [{
+				fullscreen: false
+			}
+		},
+		computed: {
+			actions() {
+				const actions = [{
 					text: '编辑',
 					action: 'edit'
 				}, {
@@ -61,17 +64,14 @@
 					color: 'red',
 					action: 'del'
 				}]
-			}
-		},
-		watch: {
-			item(val) {
 				const { _id, role } = this.userInfo
-				if(val && val.content_type === 0 && (_id === val.cat_id[0].uid || role)) {
-					this.actions.splice(0 ,0, {
+				if (this.item.content_type === 0 && (_id === this.item.cat_id[0].uid || role)) {
+					actions.unshift({
 						text: '同步到相册',
 						action: 'sync'
 					})
 				}
+				return actions
 			}
 		},
 		methods: {
@@ -97,7 +97,7 @@
 				this.show = true
 			},
 			click(index) {
-				switch(this.actions[index].action) {
+				switch (this.actions[index].action) {
 					case 'edit':
 						uni.navigateTo({
 							url: 'edit?id=' + this.item._id
