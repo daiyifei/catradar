@@ -125,8 +125,8 @@
 					bottom: 100,
 				}).observe('#comments', res => {
 					if (res.intersectionRatio > 0) {
-						this.$refs.udb.loadData()
 						observer.disconnect()
+						this.$refs.udb.loadData()
 					}
 				})
 			}, 30)
@@ -149,12 +149,18 @@
 			async like() {
 				this.likeLoading = true
 				if(this.likeId) {
+					// 取消
 					await db.collection('comments').doc(this.likeId).remove()
 				}else {
-					await db.collection('comments').add({
+					// 点赞
+					await db.collection('comments').where({
+						timeline_id: this.timeline._id,
+						comment_type: 0
+					}).update({
 						timeline_id: this.timeline._id,
 						comment_type: 0
 					})
+					this.sendMsg()
 				}
 				this.refresh(() => {
 					this.likeLoading = false
@@ -230,18 +236,19 @@
 			async addComment() {
 				this.commentLoading = true
 				await db.collection('comments').add(this.form)
-				// 发送订阅消息
+				this.refresh(() => {
+					this.hideInput()
+				})
+				this.sendMsg()
+			},
+			// 发送订阅消息
+			sendMsg() {
 				this.$request('weixin','sendMsg', {
 					touser: this.form.reply_uid || this.timeline.uid[0]._id,
 					subject: this.timeline.cat_id[0].name,
-					content: this.form.content,
+					content: this.form.content || '赞了您',
 					username: this.userInfo.nickname,
-					date: this.$u.timeFormat(Date.now(), 'yyyy-mm-dd hh:MM'),
-					url: '/pages/timeline/detail?id=' + this.timeline._id
-				})
-				
-				this.refresh(() => {
-					this.hideInput()
+					date: this.$u.timeFormat(Date.now(), 'yyyy-mm-dd hh:MM')
 				})
 			},
 			remove(id) {

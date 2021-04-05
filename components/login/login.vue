@@ -1,7 +1,9 @@
 <template>
 	<view>
 		<template v-if="!hasLogin">
-			<form @submit="loginByPwd" class="cu-list menu card-menu margin-top-xl margin-bottom-xl shadow-lg radius">
+			<!-- 账号登录 -->
+			<!-- #ifndef APP-PLUS || MP-WEIXIN -->
+			<form @submit="loginByPwd" class="cu-list menu card-menu margin-xl shadow-lg radius">
 				<view class="cu-form-group">
 					<view class="title">用户名</view>
 					<input placeholder="请输入用户名" name="username" v-model="form.username"></input>
@@ -14,13 +16,14 @@
 					<button form-type="submit" class="cu-btn block bg-blue" style="width: 100%;" :disabled="!form.username||!form.password">登录</button>
 				</view>
 			</form>
+			<!-- #endif -->
 			
 			<!-- 微信登录 -->
 			<!-- #ifdef APP-PLUS || MP-WEIXIN -->
-			<view class="btn-bottom">
-				<button class="weixin cuIcon-weixin text-green" @getuserinfo="loginByWeixin" open-type="getUserInfo"></button>
-				<view class="text-center text-sm text-gray">微信登录</view>
-			</view>
+			<button class="margin-xl cu-btn bg-green block lg" @getuserinfo="loginByWeixin" open-type="getUserInfo">
+				<text class="cuIcon-weixin margin-right-xs"></text>
+				<text>微信登录</text>
+			</button>
 			<!-- #endif -->
 		</template>
 	</view>
@@ -28,11 +31,6 @@
 
 <script>
 	let weixinAuthService
-	import {
-		mapState,
-		mapMutations,
-		mapActions
-	} from 'vuex'
 	export default {
 		name: 'login',
 		data() {
@@ -44,7 +42,6 @@
 				}
 			}
 		},
-		computed: mapState(['hasLogin', 'userInfo']),
 		created() {
 			// #ifdef APP-PLUS
 			plus.oauth.getServices((services) => {
@@ -58,8 +55,6 @@
 			// #endif	
 		},
 		methods: {
-			...mapMutations(['login','logout']),
-			...mapActions(['getBaseInfo']),
 			register(e) {
 				this.$request('user-center','register',e.detail.value)
 			},
@@ -72,11 +67,11 @@
 						uni.setStorageSync('uni_id_token', res.token)
 						uni.setStorageSync('uni_id_token_expired', res.tokenExpired)
 						this.login(res.userInfo)
-						this.getBaseInfo()
 						uni.hideLoading()
 					})
 					.catch(msg => {
 						uni.hideLoading()
+						this.logout()
 						uni.showToast({
 							title: msg,
 							icon: 'none'
@@ -101,18 +96,16 @@
 					uni.setStorageSync('uni_id_token_expired', tokenExpired)
 					if(userInfo.nickname && userInfo.avatar) {
 						this.login(userInfo)
-						this.getBaseInfo()
 					}else {
 						await this.updateUser()
 					}
 					uni.hideLoading()
-				}catch(e) {
-					console.log(e)
-					this.logout()
+				}catch(msg) {
 					uni.hideLoading()
-					uni.showModal({
-						showCancel: false,
-						content: '微信登录失败，请稍后再试'
+					this.logout()
+					uni.showToast({
+						title: msg,
+						icon: 'none'
 					})
 				}
 			},

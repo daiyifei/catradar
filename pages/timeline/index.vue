@@ -31,13 +31,15 @@
 				<!--列表主体-->
 				<unicloud-db
 					ref="udb"
-					v-slot:default="{data, loading, hasMore}" 
+					v-slot:default="{data, loading, hasMore}"
+					:where="condition"
 					collection="timeline,list,uni-id-users"
 					field="cat_id{_id,name,avatar},uid{_id,nickname,avatar},content_type,text,album,create_date"
-					orderby="create_date desc">
+					orderby="create_date desc"
+					:page-size="5">
 					<timeline-item :item="item" is-link v-for="(item, index) in data" :key="item._id" @focus="onFocus" @del="onDel" />
 					<view class="cu-load loading text-gray" v-if="loading"></view>
-					<view class="cu-load text-gray text-sm" v-else-if="!hasMore">没有更多了</view>
+					<view class="cu-load text-gray text-sm padding" v-if="!loading&&!hasMore">没有更多了</view>
 				</unicloud-db>
 				
 				<!--操作按钮-->
@@ -55,6 +57,16 @@
 					background: ''
 				},
 				scrollTop: false
+			}
+		},
+		computed: {
+			condition() {
+				return `base_id=='${this.baseInfo._id}'`
+			}
+		},
+		onShow() {
+			if(this.$refs.udb && !this.$refs.udb.dataList.length) {
+				this.$refs.udb.loadData()
 			}
 		},
 		async onPullDownRefresh() {

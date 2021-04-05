@@ -11,7 +11,7 @@
 				<swiper-item v-for="(item,index) in form.album" :key="index">
 					<view class="swiper-item" @tap="preview(form.album, index)">
 						<video :src="item" autoplay loop :show-play-btn="false" :controls="false" objectFit="cover"
-							v-if="item.split('.')[form.album.length]=='mp4'" />
+							v-if="item.split('.').pop()=='mp4'" />
 						<image :src="item" mode="aspectFill" v-else @load="imgLoad" />
 					</view>
 				</swiper-item>
@@ -35,6 +35,13 @@
 							{{form.state | state}}
 						</view>
 						<view class="flex u-skeleton-rect">
+							<navigator 
+								:url="'/pages/list/edit?id='+form._id"
+								class="flex flex-direction align-center padding-lr solid-right"
+								v-if="form.uid==userInfo._id||userInfo.role">
+									<text class="cuIcon-edit"></text>
+									<text class="text-xs text-gray">编辑</text>
+							</navigator>
 							<view class="flex flex-direction align-center padding-lr solid-right" @tap="fav">
 								<text :class="isFav?'cuIcon-favorfill text-orange':'cuIcon-favor'"></text>
 								<text class="text-xs" :class="isFav?'text-orange':'text-gray'">{{isFav?'已':''}}收藏</text>
@@ -77,9 +84,13 @@
 							<view class="content text-grey">绝育时间</view>
 							<view class="action">{{form.neuterDate}}</view>
 						</view>
+						<view class="cu-item">
+							<view class="content text-grey">猫区</view>
+							<view class="action">{{base.name}}</view>
+						</view>
 						<view class="cu-item" v-if="form.state===0">
 							<view class="content text-grey">位置</view>
-							<view class="action">{{form.location|location}}</view>
+							<view class="action">{{location(form.location)}}</view>
 						</view>
 						<view class="cu-item" v-if="form.intro">
 							<view class="content text-grey">简介</view>
@@ -111,17 +122,23 @@
 				</view>
 
 				<!-- 动态 -->
-				<view class="margin-sm bg-white radius shadow shadow-blur">
+				<view class="margin-sm bg-white radius shadow shadow-blur" id="timeline">
 					<view class="cu-bar">
 						<view class="action sub-title">
 							<text class="text-xl text-bold text-orange">动态</text>
 							<text class="text-ABC text-orange">timeline</text>
 						</view>
 					</view>
-					<unicloud-db v-slot:default="{data, loading, hasMore}" collection="timeline" :where="whereTimeline"
-						orderby="create_date desc" manual @load="timelineLoad">
+					<unicloud-db 
+						ref="timeline"
+						v-slot:default="{data, loading, hasMore}" 
+						collection="timeline"
+						manual
+						:where="condition"
+						orderby="create_date desc" 
+						@load="timelineLoaded">
 						<view v-for="(item,index) in data" :key="index" class="cu-timeline" @tap="toDetail(item._id)">
-							<view class="cu-time margin-left">{{item.create_date}}</view>
+							<view class="cu-time margin-left">{{item.time}}</view>
 							<view class="cu-item" :class="index?'':'text-blue'">
 								<view class="content">
 									<view class="text-content">{{item.text}}</view>
@@ -153,17 +170,13 @@
 
 <script>
 	const db = uniCloud.database()
-	import {
-		mapState,
-		mapMutations
-	} from 'vuex'
 	export default {
 		data() {
 			return {
 				current: 0,
 				id: '',
 				form: {},
-				whereTimeline: '',
+				base: {},
 				loading: true,
 				background: {
 					background: ''
@@ -173,7 +186,6 @@
 			}
 		},
 		computed: {
-			...mapState(['hasLogin', 'userInfo']),
 			isSingle() {
 				const pages = getCurrentPages()
 				return pages.length === 1
@@ -184,14 +196,31 @@
 				} else {
 					return false
 				}
+			},
+			condition() {
+				return `cat_id=='${this.id}'`
 			}
 		},
 		onLoad(option) {
 			this.id = option.id
 			this.fetchData()
+			uni.$on('listUpdate',() => {
+				this.fetchData()
+			})
 		},
 		onReady() {
-			this.whereTimeline = `cat_id=='${this.id}'`
+			const observer = uni.createIntersectionObserver(this)
+			observer.relativeToViewport({
+				bottom: 100,
+			}).observe('#timeline', res => {
+				if (res.intersectionRatio > 0) {
+					// 进入视口
+					observer.disconnect()
+					this.$refs.timeline.loadData({
+						clear: true
+					})
+				}
+			})
 		},
 		onPageScroll(e) {
 			const opacity = e.scrollTop / 100
@@ -201,25 +230,35 @@
 				`linear-gradient(45deg, rgba(236,0,140,${opacity}), rgba(103,57,182,${opacity}))` :
 				`linear-gradient(45deg, rgba(0,129,255,${opacity}), rgba(28,187,180,${opacity}))`
 		},
+		onReachBottom() {
+			this.$refs.timeline.loadMore()
+		},
 		methods: {
+			location(value) {
+				if (typeof value === undefined) return '未知'
+				const location = this.base.locations.find(v => v.id == value)
+				return location.name
+			},
 			async fetchData() {
-				const {
-					result: {
-						data
-					}
-				} = await db.collection('list').doc(this.id).get()
-				this.form = data[0]
+				const {result: {data: form}} = await db.collection('list').doc(this.id).get({
+					getOne: true
+				})
+				const {result: {data: base}} = await db.collection('bases').doc(form.base_id).get({
+					getOne: true
+				})
+				this.form = form
+				this.base = base
 				uni.setNavigationBarTitle({
 					title: this.form.name
 				})
 			},
-			timelineLoad(data) {
-				data.map(item => {
-					item.create_date = this.$u.timeFrom(item.create_date)
-				})
-			},
 			imgLoad() {
 				this.loading = false
+			},
+			timelineLoaded(data) {
+				data.map(item => {
+					item.time = this.$u.timeFrom(item.create_date, 'yyyy/mm/dd')
+				})
 			},
 			imgChange(e) {
 				this.current = e.detail.current
@@ -251,8 +290,9 @@
 				}
 				db.collection('uni-id-users').doc(_id).update({
 					favs
+				}).then(() => {
+					this.$u.toast(this.isFav ? '已收藏' : '已取消')
 				})
-				this.$u.toast(this.isFav ? '已收藏' : '已取消')
 			},
 			toDetail(id) {
 				uni.navigateTo({

@@ -9,7 +9,7 @@
 				<u-index-anchor :index="group.name" />
 				<view class="cu-list menu-avatar no-padding">
 					<navigator class="cu-item" :url="'detail?id='+item._id" @longpress="showMenu(item)" v-for="(item,idx) in group.data" :key="idx">
-						<u-lazy-load :image="item.avatar" class="cu-avatar round lg" height="100rpx" border-radius="100"></u-lazy-load>
+						<image :src="item.avatar" class="cu-avatar round lg" lazy-load />
 						<view class="content">
 							<view class="text-xl">{{item.name}}</view>
 							<view class="text-gray text-sm">

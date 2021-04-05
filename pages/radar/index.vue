@@ -17,15 +17,8 @@
 			:include-points="markers"
 			:scale="scale" 
 			@markertap="showCatList" 
-			show-location
-			@controltap="getLocation">
+			show-location>
 		</map>
-		<!-- 控制区域 -->
-		<view class="control flex align-center justify-between">
-			<image class="reset radius margin" src="/static/reset.png" @tap="getLocation"></image>
-			<image class="cu-avatar round lg margin" :src="baseInfo.avatar" @tap="showBase" v-if="hasBase"></image>
-			<navigator class="cu-avatar cuIcon-location round lg margin bg-gradual-blue" url="bases" v-else></navigator>
-		</view>
 		<!-- 猫咪列表 -->
 		<view class="cu-modal flex justify-center align-center" :class="catList.length?'show':''" @tap="hideCatList" v-if="catList.length">
 			<view class="list">
@@ -36,12 +29,20 @@
 				</view>
 			</view>
 		</view>
+		<!-- 控制区域 -->
+		<view class="control flex align-center justify-between">
+			<image class="reset radius margin" src="/static/reset.png" @tap="getLocation"></image>
+			<view v-if="hasBase" class="margin" @tap="showBase">
+				<image class="cu-avatar round lg" :src="baseInfo.avatar" v-if="baseInfo.avatar"></image>
+				<text class="cu-avatar round lg bg-gradual-blue" v-else-if="baseInfo.name">{{baseInfo.name[0]}}</text>
+			</view>
+			<navigator class="cu-avatar cuIcon-location round lg margin bg-gradual-blue" url="bases" v-else></navigator>
+		</view>
 	</view>
 </template>
 
 <script>
 	const db = uniCloud.database()
-	import locations from '@/static/locations.json'
 	export default {
 		data() {
 			return {
@@ -53,12 +54,13 @@
 			}
 		},
 		watch: {
-			baseInfo(newVal, oldVal) {
-				if(newVal._id !== oldVal._id) {
-					setTimeout(() => {
+			baseInfo: {
+				handler(newVal, oldVal) {
+					if(newVal || newVal._id !== oldVal._id) {
 						this.showBase()
-					},500)
-				}
+					}
+				},
+				immediate: true
 			}
 		},
 		onLoad() {
@@ -75,50 +77,57 @@
 						map.moveToLocation()
 					}
 				})
-				const map = uni.createMapContext('map')
-				map.moveToLocation()
 			},
 			async showBase() {
-				if(!this.hasBase) 
+				if(!this.hasBase) {
+					this.hideBase()
 					return
+				}
 
-				uni.showLoading()
-				
-				const map = uni.createMapContext('map')
-				map.moveToLocation(this.baseInfo)
-				
-				const { data: { data: list } } = await this.$request('list', 'getStat', {
-					key: 'location'
+				uni.showToast({
+					icon: "loading",
+					title: '加载中'
 				})
-				const markers = []
+				
+				const markers = [],
+					{ locations = [], _id } = this.baseInfo,
+					{ data: { data: list } } = await this.$request('list', 'getStat', {
+						base_id: _id,
+						key: 'location'
+					})
+					
 				list.forEach(item => {
-					if (item._id !== undefined && item._id !== null) {
+					if (item._id) {
+						const location = locations.find(v => v.id === item._id)
 						markers.push({
 							id: item._id,
 							iconPath: '/static/location.png',
 							width: 40,
 							height: 40,
-							latitude: locations[item._id].latitude,
-							longitude: locations[item._id].longitude
+							latitude: location.latitude,
+							longitude: location.longitude
 						})
 					}
 				})
+				const map = uni.createMapContext('map')
+				map.moveToLocation(this.baseInfo)
 				this.markers = markers
-				uni.hideLoading()
+				uni.hideToast()
 			},
 			hideBase() {
 				this.markers = []
 				this.getLocation()
 			},
 			async showCatList(e) {
-				const location = e.detail.markerId
+				const id = e.detail.markerId,
+					location = this.markers.find(v => v.id === id)
 				this.scale = 19
-				this.latitude = locations[location].latitude
-				this.longitude = locations[location].longitude
+				this.latitude = location.latitude
+				this.longitude = location.longitude
 				
 				const { result: { data } } = await db.collection('list').where({
 					state: 0,
-					location: parseInt(location)
+					location: location.id
 				}).get()
 
 				// #ifdef APP-PLUS
@@ -160,7 +169,7 @@
 		width: 100%;
 		height: 110vh;
 		mix-blend-mode: normal;
-		z-index: -1;
+		z-index: 0;
 	}
 	
 	.control {

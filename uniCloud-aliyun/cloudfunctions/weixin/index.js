@@ -50,7 +50,7 @@ async function sendMsg(params) {
 			accessToken,
 			touser: wx_openid['mp-weixin'],
 			template_id: '73TwwDG5U8hoQT_WCOC85kt7Rr5lr_v8aZb-a9M_hl8',
-			page: params.url,
+			page: '/pages/mine/notice',
 			data: {
 				thing5: {
 					value: params.subject,

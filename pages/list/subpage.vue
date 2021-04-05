@@ -39,6 +39,7 @@
 					title: this.$root.$options.filters.state(this.state)
 				})
 				const { result: { data } } = await db.collection('list').where({
+					base_id: this.baseInfo._id,
 					state: this.state
 				}).get()
 				this.list = data

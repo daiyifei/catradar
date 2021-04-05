@@ -1,10 +1,11 @@
 <template>
 	<view>
 		<!--列表-->
-		<unicloud-db ref="udb" v-slot:default="{data, loading}" collection="bases" @load="loaded">
+		<unicloud-db ref="udb" v-slot:default="{data, loading}" manual collection="bases" @load="loaded">
 			<view class="cu-list menu-avatar">
-				<view class="cu-item" v-for="(item,index) in data" :key="index" >
-					<image :src="item.avatar" class="cu-avatar round lg" @tap="toBaseDetail(item._id)"/>
+				<view class="cu-item" v-for="(item,index) in data" :key="index" :class="item._id==userInfo.base_id?'cuIcon-locationfill text-blue':''">
+					<image class="cu-avatar round lg" :src="item.avatar" v-if="item.avatar" @tap="toBaseDetail(item._id)"></image>
+					<text class="cu-avatar round lg" v-else @tap="toBaseDetail(item._id)">{{item.name[0]}}</text>
 					<view class="content" @tap="onSelect(item)">
 						<view class="text-grey">{{item.name}}</view>
 						<view class="text-gray text-sm flex">
@@ -13,7 +14,7 @@
 					</view>
 					<view class="action margin" style="width: auto">
 						<text class="cu-tag bg-orange light round" v-if="item.uid===userInfo._id || userInfo.role" @tap="onEdit(item)">编辑</text>
-						<text class="cu-tag round" @tap.stop.prevent="subscribe(item)" v-if="item.subscribed">退出</text>
+						<text class="cu-tag bg-gray round" @tap.stop.prevent="subscribe(item)" v-if="item.subscribed">退出</text>
 						<text class="cu-tag bg-blue light round" @tap.stop.prevent="subscribe(item)" v-else>加入</text>
 					</view>
 				</view>
@@ -69,25 +70,31 @@
 	export default {
 		data() {
 			return {
-				location: '',
 				form: {},
 				showModal: false
 			}
 		},
-		onLoad() {
+		onReady() {
 			uni.getLocation({
 				type:'gcj02',
 				success: res => {
 					this.location = res
+					this.$refs.udb.loadData()
 				}
 			})
 		},
 		methods: {
 			loaded(data) {
-				data.map(item => {
+				data.map((item, index) => {
 					const distance = this.getDistance(this.location, item)
 					item.distance = distance < 1 ? Math.ceil(distance*1000) + 'm' : Math.ceil(distance) + 'km'
-					item.subscribed = this.hasLogin && this.userInfo.subscribes.includes(item._id)
+					if(this.hasLogin) {
+						item.subscribed = this.userInfo.subscribes.includes(item._id)
+						if(item._id === this.userInfo.base_id) {
+							data.splice(index, 1)
+							data.splice(0, 0, item)
+						}
+					}
 				})
 			},
 			async subscribe(item) {
@@ -96,25 +103,34 @@
 					return
 				}
 				
-				const { subscribes = [] } = this.userInfo
-				const { _id: id } = item
-				if(~subscribes.indexOf(id)) {
-					subscribes.splice(subscribes.indexOf(id),1)
-					this.quit()
+				if(item.subscribed) {
+					// 退出
+					if(this.userInfo.base_id === item._id) {
+						this.userInfo.base_id = ''
+						this.exit()
+					}
+					this.userInfo.subscribes.splice(this.userInfo.subscribes.indexOf(item._id),1)
 				}else {
-					subscribes.push(id)
+					// 加入
+					this.userInfo.base_id = item._id
+					this.userInfo.subscribes.push(item._id)
 					this.enter(item)
 				}
 				await db.collection('uni-id-users').doc(this.userInfo._id).update({
-					subscribes 
+					subscribes: this.userInfo.subscribes,
+					base_id: this.userInfo.base_id
 				})
-				const target = this.$refs.udb.dataList.find(v => v._id === id)
-				target.subscribed = !item.subscribed
-				this.$u.toast(~subscribes.indexOf(id) ? '已加入' : '已退出')
+				item.subscribed = !item.subscribed
+				this.$u.toast(item.subscribed ? '已加入' : '已退出')
 			},
-			onSelect(item) {
+			async onSelect(item) {
 				if(item.subscribed) {
 					this.enter(item)
+					db.collection('uni-id-users').doc(this.userInfo._id).update({
+						base_id: item._id 
+					})
+					this.userInfo.base_id = item._id
+					this.login(this.userInfo)
 					uni.navigateBack()
 				}else {
 					this.$u.toast('请先加入')
@@ -145,7 +161,7 @@
 								const { locations = [] } = this.form,
 									{ name, latitude, longitude } = res
 								locations.push({
-									id: parseInt((latitude + '' + longitude).replace(/\./g,'')),
+									id: Date.now(),
 									name,
 									latitude,
 									longitude
