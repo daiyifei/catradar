@@ -1,8 +1,8 @@
 <template>
 	<view>
-		<picker :value="value" :range="range" @change="onChange">
+		<picker :value="index" :range="range" :range-key="rangeKey" @change="onChange">
 			<view class="picker">
-				{{value==undefined?placeholder:label}}
+				{{value===undefined?placeholder:label}}
 			</view>
 		</picker>
 	</view>
@@ -12,10 +12,9 @@
 	export default {
 		props: {
 			value: Number | undefined,
-			range: {
-				type: Array,
-				default: () => Array
-			},
+			range: Array | Object,
+			valueKey: String,
+			rangeKey: String,
 			placeholder: {
 				type: String,
 				default: '请选择'
@@ -27,16 +26,30 @@
 		},
 		data() {
 			return {
+				index: 0,
 				label: ''
 			}
 		},
 		created() {
-			this.label = this.range[this.value]
+			if(this.rangeKey) {
+				const index = this.range.findIndex(v => v[this.valueKey] === this.value) 
+				this.index = ~index ? index : 0
+				this.label = this.range[this.index][this.rangeKey]
+			}else {
+				this.index = this.value
+				this.label = this.range[this.value]
+			}
 		},
 		methods: {
 			onChange(e) {
-				this.label = this.range[e.detail.value]
-				this.$emit('change', parseInt(e.detail.value))
+				const index = e.detail.value
+				if(this.rangeKey) {
+					this.label = this.range[index][this.rangeKey]
+					this.$emit('change',this.range[index][this.valueKey])
+				}else {
+					this.label = this.range[index]
+					this.$emit('change', parseInt(e.detail.value))
+				}
 			}
 		}
 	}

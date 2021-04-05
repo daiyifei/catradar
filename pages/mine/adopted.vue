@@ -1,6 +1,6 @@
 <template>
 	<view>
-		<unicloud-db v-slot="{data, loading, error, options, hasMore}" collection="list" :where="condition" @load="loaded"> 
+		<unicloud-db ref="udb" v-slot="{data, loading, error, options, hasMore}" collection="list" :where="condition" @load="loaded"> 
 			<view class="cu-load loading text-gray" v-if="loading"></view>
 			<view class="cu-list menu-avatar no-padding" v-else>
 				<navigator class="cu-item" :url="'/pages/list/detail?id='+item._id" v-for="(item,index) in data" :key="index">
@@ -13,7 +13,7 @@
 						</view>
 					</view>
 					<view class="action margin-right-xs">
-						<view class="cu-tag round light bg-orange" @tap.stop.prevent="cancelFav(item._id)">取消</view>
+						<navigator class="cu-tag round light bg-blue" :url="'/pages/list/edit?id='+item._id">编辑</navigator>
 					</view>
 				</navigator>  
 				<view class="cu-load text-gray" v-if="!hasMore">没有更多了</view>
@@ -25,28 +25,15 @@
 <script>
 	const db = uniCloud.database()
 	export default {
-		data() {
-			return {
-			}
-		},
 		computed: {
 			condition() {
-				return `_id in ${JSON.stringify(this.userInfo.favs)}` 
+				return `uid=='${this.userInfo._id}'&&state==2` 
 			}
 		},
 		methods: {
 			loaded(data) {
 				data.map(item => {
 					item.birthday = this.$root.$options.filters.age(item.birthday)
-				})
-			},
-			cancelFav(id) {
-				const { _id, favs } = this.userInfo
-				favs.splice(favs.indexOf(id),1)
-				db.collection('uni-id-users').doc(_id).update({
-					favs
-				}).then(() => {
-					this.$u.toast('已取消')
 				})
 			}
 		}

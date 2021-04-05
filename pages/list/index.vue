@@ -20,8 +20,8 @@
 						<input placeholder="搜索" confirm-type="search" v-model="searchValue"></input>
 						<text class='cuIcon-close text-gray' v-if="searchValue" @tap="searchValue=''"></text>
 					</view>
-					<list-filter class="margin-right" v-model="condition" @change="onFilterChange" />
-					<statistics class="margin-right" />
+					<list-filter class="margin-right" v-model="condition" @change="onFilterChange" v-if="!searchValue"/>
+					<statistics class="margin-right" v-if="!searchValue" />
 				</view>
 			</u-navbar>
 			
@@ -62,24 +62,17 @@
 
 <script>
 	const db = uniCloud.database()
-	import {
-		mapState,
-		mapMutations
-	} from 'vuex'
 	export default {
 		data() {
 			return {
 				list: [],
 				loading: false,
-				condition: {
-					state: 0
-				},
+				condition: {},
 				scrollTop: 0,
 				offsetTop: 0,
 				searchValue: ''
 			}
 		},
-		computed: mapState(['hasLogin', 'userInfo', 'hasBase']),
 		watch: {
 			condition(val) {
 				this.fetchData()
@@ -94,6 +87,10 @@
 			})
 		},
 		onShow() {
+			this.condition = {
+				state: 0,
+				base_id: this.baseInfo._id
+			}
 			if(!this.loading && !this.list.length) {
 				this.fetchData()
 			}
@@ -113,17 +110,18 @@
 		methods: {
 			async fetchData() {
 				this.loading = true
-				const {result:{ data }} = await db.collection('list').field('_id,name,py,avatar,female,birthday,neuter').where(this.condition).orderBy('py','asc').get()
+				const { result: { data } } = await db.collection('list').where(this.condition)
+					.field('_id,name,py,avatar,female,birthday,neuter').orderBy('py','asc').get()
 				this.list = data
 				this.loading = false
 			},
 			onSearch() {
-				this.condition = this.searchValue ? db.command.or({
-					name: new RegExp('.*' + this.searchValue,'i')
-				},{
-					py: new RegExp('.*' + this.searchValue,'i')
+				const reg = new RegExp('.*' + this.searchValue,'i')
+				this.condition = this.searchValue ? db.command.or({name:reg},{py:reg}).and({
+					base_id: this.baseInfo._id
 				}) : {
-					state: 0
+					state: 0,
+					base_id: this.baseInfo._id
 				}
 			},
 			onFilterChange(e) {

@@ -50,7 +50,10 @@
 				uni.showLoading()
 				await Promise.all(
 					this.keys.map(async ({key}) => {
-						const { data: { data, total } } = await this.$request('list', 'getStat', { key })
+						const { data: { data, total } } = await this.$request('list', 'getStat', {
+							base_id: this.baseInfo._id,
+							key
+					  })
 						this.total = total
 						const series = []
 						data.map(item => {

@@ -74,7 +74,7 @@
 			"path": "pages/mine/comments",
 			"style": {
 				"navigationBarTitleText": "评论",
-				"enablePullDownRefresh": false
+				"enablePullDownRefresh": true
 			}
 
 		}, {
@@ -95,6 +95,13 @@
 			"path": "pages/radar/bases",
 			"style": {
 				"navigationBarTitleText": "猫区列表",
+				"enablePullDownRefresh": false
+			}
+
+		}, {
+			"path": "pages/mine/adopted",
+			"style": {
+				"navigationBarTitleText": "领养",
 				"enablePullDownRefresh": false
 			}
 
@@ -130,6 +137,7 @@
 	"globalStyle": {
 		"navigationBarTitleText": "猫雷达",
 		"backgroundColor": "#f1f1f1",
+		"onReachBottomDistance": 200,
 		"app-plus": {
 			"titleNView": {
 				"backgroundImage": "linear-gradient(to right, #0081ff, #1cbbb4)"

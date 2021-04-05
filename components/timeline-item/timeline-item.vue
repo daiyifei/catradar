@@ -1,5 +1,5 @@
 <template>
-	<view>
+	<view v-if="item">
 		<!-- 内容区域 -->
 		<view class="flex padding bg-white solid-bottom item">
 			<!-- 头像 -->
@@ -43,10 +43,6 @@
 
 <script>
 	const db = uniCloud.database()
-	import {
-		mapState,
-		mapMutations
-	} from 'vuex'
 	export default {
 		name: "timeline-item",
 		props: {
@@ -56,13 +52,8 @@
 		data() {
 			return {
 				show: false,
-				fullscreen: false
-			}
-		},
-		computed: {
-			...mapState(['hasLogin', 'userInfo']),
-			actions() {
-				const actions = [{
+				fullscreen: false,
+				actions: [{
 					text: '编辑',
 					action: 'edit'
 				}, {
@@ -70,13 +61,17 @@
 					color: 'red',
 					action: 'del'
 				}]
-				if((this.userInfo._id === this.item.cat_id[0].uid || this.userInfo.role) && !this.item.content_type) {
-					actions.unshift({
+			}
+		},
+		watch: {
+			item(val) {
+				const { _id, role } = this.userInfo
+				if(val && val.content_type === 0 && (_id === val.cat_id[0].uid || role)) {
+					this.actions.splice(0 ,0, {
 						text: '同步到相册',
 						action: 'sync'
 					})
 				}
-				return actions
 			}
 		},
 		methods: {

@@ -12,25 +12,25 @@
 			<image src="https://vkceyugu.cdn.bspapp.com/VKCEYUGU-6ee74e1a-9337-4754-92e2-f7b377cdd878/39d05c55-569f-4916-8ee3-59a12eeb5e3b.gif" mode="scaleToFill" class="gif-wave"></image>
 		  </view>
 		  <view class="padding flex text-center text-grey bg-white shadow-warp">
-		    <view class="flex flex-sub flex-direction solid-right" @tap="toDetail('comments?type=0')">
-		      <view class="text-xxl text-orange">{{appreciateTotal}}</view>
-		      <view class="margin-top-sm">
-		        <text class="cuIcon-appreciatefill"></text>
-						<text class="margin-left-xs">赞</text>
-					</view>
-		    </view>
-		    <view class="flex flex-sub flex-direction solid-right" @tap="toDetail('comments?type=1')">
+		    <view class="flex flex-sub flex-direction solid-right" @tap="toDetail('comments')">
 		      <view class="text-xxl text-green">{{commentTotal}}</view>
 		      <view class="margin-top-sm">
 		        <text class="cuIcon-commentfill"></text>
 						<text class="margin-left-xs">评论</text>
 					</view>
 		    </view>
-				<view class="flex flex-sub flex-direction" @tap="toDetail('favs')">
+				<view class="flex flex-sub flex-direction solid-right" @tap="toDetail('favs')">
 				  <view class="text-xxl text-blue">{{favTotal}}</view>
 				  <view class="margin-top-sm">
 				    <text class="cuIcon-favorfill"></text>
 						<text class="margin-left-xs">收藏</text>
+					</view>
+				</view>
+				<view class="flex flex-sub flex-direction" @tap="toDetail('adopted')">
+				  <view class="text-xxl text-orange">{{adoptedTotal}}</view>
+				  <view class="margin-top-sm">
+				    <text class="cuIcon-crownfill"></text>
+						<text class="margin-left-xs">领养</text>
 					</view>
 				</view>
 		  </view>
@@ -81,28 +81,23 @@
 
 <script>
 	const db = uniCloud.database()
-	import {
-		mapState,
-		mapMutations
-	} from 'vuex'
 	export default {
 		data() {
 			return {
 				uCenter: {},
-				appreciateTotal: 0,
 				commentTotal: 0,
-				favTotal: 0
+				favTotal: 0,
+				adoptedTotal: 0
 			}
 		},
-		computed: mapState(['hasLogin', 'userInfo']),
 		watch: {
 			hasLogin(val) {
 				if(val) {
 					this.fetchData()
 				}else {
-					this.appreciateTotal = 0
 					this.commentTotal = 0
 					this.favTotal = 0
+					this.adoptedTotal = 0
 				}
 			}
 		},
@@ -116,31 +111,33 @@
 				this.$refs.login.doLogout()
 			},
 			async fetchData() {
-				const that = this
-				const { result: { total: appreciateTotal } } = await db.collection('comments').where({
-					uid: this.userInfo._id,
-					comment_type: 0
-				}).count()
+				const { _id, favs } = this.userInfo
 				const { result: { total: commentTotal } } = await db.collection('comments').where({
-					uid: this.userInfo._id,
-					comment_type: 1
+					uid: _id
+				}).count()
+				const favTotal = favs.length
+				const { result: { total: adoptedTotal } } = await db.collection('list').where({
+					state: 2,
+					uid: _id
 				}).count()
 				
+				// 数字动画
+				const that = this
 				let i = 0
 				numAni()
 				function numAni() {
 					if (i < 20) {
-						setTimeout(function () {
-							that.appreciateTotal = i
+						setTimeout(() => {
 							that.commentTotal = i
 							that.favTotal = i
+							that.adoptedTotal = i
 							i++
 							numAni()
 						}, 20)
 					} else {
-						that.appreciateTotal = appreciateTotal
 						that.commentTotal = commentTotal
-						that.favTotal = that.userInfo.favs.length
+						that.favTotal = favTotal
+						that.adoptedTotal = adoptedTotal
 					}
 				}
 			},

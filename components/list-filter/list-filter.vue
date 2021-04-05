@@ -11,7 +11,7 @@
 							<view class="text-left padding-bottom-sm text-sm">{{filter.name}}</view>
 							<view class="bg-white text-left">
 								<view class="cu-tag padding radius light margin-right-xs margin-bottom-xs" :class="condition[filter.key]===filter.value[idx]?'bg-orange':''"
-								 v-for="(item,idx) in filter.value" :key="idx" @tap.stop="setFilter(filter.key,item)">{{$root.$options.filters[filter.key](item)}}</view>
+								 v-for="(item,idx) in filter.value" :key="idx" @tap.stop="setFilter(filter.key,item)">{{showLabel(filter.key, item)}}</view>
 							</view>
 						</view>
 						<view class="padding text-left">
@@ -48,11 +48,11 @@
 				}, {
 					key: 'color',
 					name: '花色',
-					value: Array.from(Array(8), (v, k) => k),
+					value: Array.from(this.$colors, (v, k) => k),
 				}, {
 					key: 'location',
 					name: '位置',
-					value: Array.from(Array(19), (v, k) => k),
+					value: []
 				}]
 			}
 		},
@@ -63,6 +63,23 @@
 				})
 			}
 		},
+		watch: {
+			baseInfo: {
+				handler(val) {
+					const { locations = [] } = val,
+						value = []
+					if(!locations.length)
+						return
+					this.$root.$options.filters.location = function(value) {
+						const location = locations.find(v => v.id == value)
+						return location.name
+					}
+					const target = this.filters.find(v => v.key == 'location')
+					this.$set(target, 'value', Array.from(locations,v => v.id))
+				},
+				immediate: true
+			}
+		},
 		methods: {
 			showDrawer() {
 				this.condition = this.$u.deepClone(this.value)
@@ -70,6 +87,12 @@
 			},
 			hideDrawer() {
 				this.show = false
+			},
+			showLabel(key, value) {
+				const { filters } = this.$root.$options
+				if(filters && (key in filters)) {
+					return this.$root.$options.filters[key](value)
+				}
 			},
 			setFilter(key, value) {
 				if (this.condition[key] === value) {

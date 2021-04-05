@@ -7,10 +7,13 @@ import moment from 'moment'
 import uView from 'uview-ui'
 Vue.use(uView)
 
-import { mapState, mapMutations } from 'vuex'
+import { mapState, mapMutations, mapActions } from 'vuex'
 Vue.mixin({
 	computed: mapState(['hasLogin', 'userInfo', 'hasBase', 'baseInfo']),
-	methods: mapMutations(['login','logout','enter','quit'])
+	methods: {
+		...mapMutations(['login','logout','enter','exit']),
+		...mapActions(['getBaseInfo'])
+	}
 })
 
 import radar from './pages/radar/index.vue'
@@ -24,9 +27,17 @@ Vue.component('mine', mine)
 
 Vue.config.productionTip = false
 
+Vue.prototype.$states = ['流浪中','失踪中','已领养','回喵星']
+Vue.prototype.$colors = ['三花', '橘猫', '奶牛', '白猫', '狸花', '玳瑁', '黑猫', '其他']
+
 Vue.filter('state', function (value) {
 	if (value === undefined) return '未知'
-	return ['流浪中','失踪中','已领养','回喵星'][value]
+	return Vue.prototype.$states[value]
+})
+
+Vue.filter('color', function (value) {
+  if (value === undefined) return '未知'
+  return Vue.prototype.$colors[value]
 })
 
 Vue.filter('age', function (value) {
@@ -44,16 +55,6 @@ Vue.filter('female', function (value) {
 Vue.filter('neuter', function (value) {
   if (value === undefined) return '未知'
   return value ? '已绝育' : '未绝育'
-})
-
-Vue.filter('color', function (value) {
-  if (value === undefined) return '未知'
-  return ['三花', '橘猫', '奶牛', '白猫', '狸花', '玳瑁', '黑猫', '其他'][value]
-})
-
-Vue.filter('location', function (value) {
-  if (value === undefined) return '未知'
-  return Array.from(Array(19),(v,k)=>k+17+'幢')[value]
 })
 
 Vue.prototype.$request = (name, action, params) => {

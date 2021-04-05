@@ -45,7 +45,8 @@ async function getStat(params) {
 		}).count()
 	const { data } = await db.collection('list').aggregate()
 		.match({
-			state: 0
+			state: 0,
+			base_id: params.base_id
 		})
 		.group({
 			_id: '$' + params.key,

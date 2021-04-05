@@ -12,6 +12,11 @@
 		"_id": {
 			"description": "ID，系统自动生成"
 		},
+		"base_id": {
+			"bsonType": "string",
+			"description": "猫区ID，参考`bases` 表",
+			"foreignKey": "bases._id"
+		},
 		"cat_id": {
 			"bsonType": "string",
 			"description": "猫咪ID，list 表中的`_id`字段",

@@ -87,6 +87,7 @@
 					{ selected } = this.$refs.remote
 				
 				try{
+					this.form.base_id = this.baseInfo._id
 					this.form.album = await this.$upload(this.form.album)
 					if(this.id) {
 						// 编辑

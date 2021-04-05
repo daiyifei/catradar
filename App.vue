@@ -1,42 +1,56 @@
 <script>
 	const db = uniCloud.database()
 	import Vue from 'vue'
-	import { mapState, mapMutations, mapActions } from 'vuex'
 	export default {
-		async onLaunch() {	
+		async onLaunch() {
 			this.checkUpdate()
 			this.autoLogin()
 		},
 		onShow: function() {},
 		onHide: function() {},
+		watch: {
+			hasLogin(val) {
+				if(val) {
+					this.getBaseInfo()
+				}
+			},
+			baseInfo(newVal, oldVal) {
+				if(newVal && newVal._id !== oldVal._id) {
+					this.getBaseInfo()
+				}
+			}
+		},
 		methods: {
-			...mapMutations(['login','logout']),
-			...mapActions(['getBaseInfo']),
 			async autoLogin() {
 				if(!uni.getStorageSync('uni_id_token'))
 					return
-				try{
-					uni.showLoading({
-						title: '登录中'
-					})
-					const { token, tokenExpired, userInfo } = await this.$request('user-center','checkToken')
-					if(token) {
-						uni.setStorage({
-							key: 'uni_id_token',
-							data: token
-						})
-						uni.setStorage({
-							key: 'uni_id_token',
-							data: tokenExpired
-						})
-					}
+				if(uni.getStorageSync('uni_id_token_expired') > Date.now()) {
+					const userInfo = uni.getStorageSync('user_info') || {}
 					this.login(userInfo)
-					this.getBaseInfo()
-					uni.hideLoading()
-				}catch(e){
-					uni.hideLoading()
-					console.log(e)
-					this.logout()
+					try {
+						const { token, tokenExpired, userInfo = {} } = await this.$request('user-center','checkToken')
+						if(token) {
+							uni.setStorageSync('uni_id_token', token)
+							uni.setStorageSync('uni_id_token_expired', tokenExpired)
+						}
+						this.login(userInfo)
+					}catch(e){
+						this.logout()
+					}
+				}
+			},
+			async getBaseInfo() {
+				if(this.userInfo.base_id) {
+					const baseInfo = uni.getStorageSync('base_info') || {}
+					this.enter(baseInfo)
+					try {
+						const { result: { data = {} } } = await db.collection('bases').doc(this.userInfo.base_id).get({
+							getOne: true
+						})
+						this.enter(data)
+					}catch(e){
+						this.exit()
+					}
 				}
 			},
 			checkUpdate() {

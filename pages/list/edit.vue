@@ -12,7 +12,7 @@
 			</view>
 			<view class="cu-form-group required">
 				<view class="title">花色</view>
-				<form-picker v-model="form.color" :range="['三花','橘猫','奶牛','白猫','狸花','玳瑁','黑猫','其他']"  @change="onChange('color', $event)" />
+				<form-picker v-model="form.color" :range="colors"  @change="onChange('color', $event)" />
 			</view>
 			<view class="cu-form-group">
 				<view class="title">性别</view>
@@ -20,11 +20,11 @@
 			</view>
 			<view class="cu-form-group">
 				<view class="title">状态</view>
-				<form-picker v-model="form.state" :range="['流浪中','失踪中','已领养','回喵星']" @change="onChange('state', $event)" />
+				<form-picker v-model="form.state" :range="states" @change="onChange('state', $event)" />
 			</view>
 			<view class="cu-form-group" v-if="form.state===0">
 				<view class="title">位置</view>
-				<form-picker v-model="form.location" :range="Array.from(Array(19),(v,k)=>k+17+'幢')" @change="onChange('location', $event)" />
+				<form-picker v-model="form.location" value-key="id" range-key="name" :range="baseInfo.locations" @change="onChange('location', $event)" />
 			</view>
 			<view class="cu-form-group">
 				<view class="title">生日</view>
@@ -59,10 +59,6 @@
 <script>
 	const db = uniCloud.database()
 	import pinyin from 'pinyin'
-	import {
-		mapState,
-		mapMutations
-	} from 'vuex'
 	export default {
 		data() {
 			return {
@@ -73,24 +69,16 @@
 					album: [],
 					relation: []
 				},
+				colors: this.$colors,
+				states: this.$states,
 				loading: false,
 				saving: false
 			}
 		},
-		computed: mapState(['hasLogin', 'userInfo']),
 		async onLoad(options) {
 			if(options.id) {
 				this.id = options.id
-				
-				this.loading = true
-				const { result: { data } } = await db.collection('list').doc(options.id).get()
-				this.form = data[0]
-				this.loading = false
-				
-				if(this.userInfo._id!==this.form.uid && !this.userInfo.scope) {
-					this.$u.toast('没有编辑权限')
-					uni.navigateBack()
-				}
+				this.fetchData()
 			}
 			
 			if(options.path) {
@@ -104,6 +92,14 @@
 			})
 		},
 		methods: {
+			async fetchData() {
+				this.loading = true
+				const { result: { data } } = await db.collection('list').doc(this.id).get({
+					getOne: true
+				})
+				this.form = data
+				this.loading = false
+			},
 			chooseAvatar() {
 				this.$u.route({
 					url: '/pages/cropper/cropper',
@@ -139,6 +135,7 @@
 					
 					this.form.avatar = await this.$upload(this.form.avatar)
 					this.form.album = await this.$upload(this.form.album)
+					this.form.base_id = this.baseInfo._id
 					
 					if(this.id) {
 						// 编辑

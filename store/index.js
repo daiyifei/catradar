@@ -11,36 +11,29 @@ const store = new Vuex.Store({
 	},  
 	mutations: {  
 		login(state, userInfo) {
-			state.hasLogin = true
 			state.userInfo = userInfo
+			uni.setStorageSync('user_info', userInfo)
+			state.hasLogin = true
 		},
 		logout(state) {
 			state.userInfo = {}
 			state.hasLogin = false
 			state.baseInfo = {}
 			state.hasBase = false
-			uni.clearStorage('uni_id_token')
-			uni.clearStorage('uni_id_token_expired')
+			uni.removeStorageSync('uni_id_token')
+			uni.removeStorageSync('uni_id_token_expired')
+			uni.removeStorageSync('user_info')
+			uni.removeStorageSync('base_info')
 		},
 		enter(state, baseInfo) {
-			state.hasBase = true
 			state.baseInfo = baseInfo
+			uni.setStorageSync('base_info', baseInfo)
+			state.hasBase = true
 		},
-		quit(state) {
+		exit(state) {
 			state.baseInfo = {}
 			state.hasBase = false
-		}
-	},
-	actions: {
-		async getBaseInfo({ commit, state }) {
-			const { subscribes } = state.userInfo
-			if(subscribes.length) {
-				uni.showLoading()
-				const db = uniCloud.database()
-				const { result: { data } } = await db.collection('bases').doc(subscribes[0]).get()
-				commit('enter', data[0])
-				uni.hideLoading()
-			}
+			uni.removeStorageSync('base_info')
 		}
 	}
 }) 
