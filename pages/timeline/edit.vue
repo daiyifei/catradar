@@ -37,6 +37,9 @@
 			}
 		},
 		async onLoad(options) {
+			if(options.cat_id) {
+				this.$set(this.form, 'cat_id', options.cat_id)
+			}
 			if(options.files) {
 				const files = JSON.parse(options.files)
 				if(files.type === 'video') {

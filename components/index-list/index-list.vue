@@ -34,10 +34,6 @@
 
 <script>	
 	const db = uniCloud.database()
-	import {
-		mapState,
-		mapMutations
-	} from 'vuex'
 	export default {
 		props: {
 			scrollTop: Number,
@@ -59,7 +55,6 @@
 				id: ''
 			}
 		},
-		computed: mapState(['hasLogin', 'userInfo']),
 		watch: {
 			list: {
 				handler(val) {

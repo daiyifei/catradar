@@ -71,13 +71,19 @@
 			}
 		},
 		watch: {
-			async value(val) {
-				if(val && !this.selected.name) {
-					this.loading = true
-					const { result: { data } } = await db.collection('list').doc(this.value).field('_id,name,avatar').get()
-					this.selected = data.length ? data[0] : {}
-					this.loading = false
-				}
+			value: {
+				handler(val) {
+					if(val && !this.selected.name) {
+						this.loading = true
+						db.collection('list').doc(this.value).field('_id,name,avatar').get({
+							getOne: true
+						}).then(res => {
+							this.selected = res.result.data || {}
+							this.loading = false
+						})
+					}
+				},
+				immediate: true
 			},
 			showCandidates(val) {
 				if(val) {
