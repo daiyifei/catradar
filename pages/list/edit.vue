@@ -78,18 +78,13 @@
 		async onLoad(options) {
 			if(options.id) {
 				this.id = options.id
-				this.fetchData()
+				await this.fetchData()
 			}
 			
 			if(options.path) {
-				JSON.parse(options.path).forEach(item => {
-					this.form.album.unshift(item)
-				})
+				const { album } = this.form
+				this.form.album.unshift(...JSON.parse(options.path))
 			}
-			
-			uni.$on('uAvatarCropper', path => {
-				this.$set(this.form, 'avatar', path)
-			})
 		},
 		methods: {
 			async fetchData() {
@@ -99,16 +94,6 @@
 				})
 				this.form = data
 				this.loading = false
-			},
-			chooseAvatar() {
-				this.$u.route({
-					url: '/pages/cropper/cropper',
-					params: {
-						destWidth: 300,
-						rectWidth: 200,
-						fileType: 'jpg',
-					}
-				})
 			},
 			onChange(key, value) {
 				this.$set(this.form, key, value)
@@ -125,7 +110,8 @@
 					// 重名检查
 					const { result: { data } } = await db.collection('list').where({
 						_id: db.command.neq(this.id),
-						name: this.form.name
+						name: this.form.name,
+						base_id: this.baseInfo._id
 					}).get()
 					if(data.length) {
 						throw({
