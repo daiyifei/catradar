@@ -204,16 +204,4 @@
   mix-blend-mode: screen;  
   height: 100rpx;   
 }
-
-map,.mapBox{
-  left: 0;
-  z-index: 99;
-  mix-blend-mode: screen;  
-  height: 100rpx;   
-}
-
-map,.mapBox{
-  width: 750rpx;
-  height: 300rpx;
-}
 </style>

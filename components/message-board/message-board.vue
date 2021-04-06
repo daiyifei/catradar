@@ -240,8 +240,8 @@
 			},
 			// 发送订阅消息
 			sendMsg() {
-				const toUser = this.form.reply_uid || this.timeline.uid[0]._id
-				if(toUser === this.userInfo._id)
+				const touser = this.form.reply_uid || this.timeline.uid[0]._id
+				if(touser === this.userInfo._id)
 					return
 				this.$request('weixin','sendMsg', {
 					touser,
