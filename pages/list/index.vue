@@ -52,10 +52,7 @@
 			</index-list>
 			
 			<!--新建按钮-->
-			<navigator 
-				class="btn-float cu-avatar round lg bg-gradual-blue cuIcon-add margin"
-				url="edit"
-				v-if="hasLogin"></navigator>
+			<view class="btn-float cu-avatar round lg bg-gradual-blue margin" :class="showBackToTop?'cuIcon-top':'cuIcon-add'" @tap="scrollTop?backTop():add()"v-if="hasLogin"></view>
 		</view>
 	</view>
 </template>
@@ -70,7 +67,8 @@
 				condition: {},
 				scrollTop: 0,
 				offsetTop: 0,
-				searchValue: ''
+				searchValue: '',
+				showBackToTop: false
 			}
 		},
 		watch: {
@@ -102,6 +100,11 @@
 		},
 		onPageScroll(e) {
 			this.scrollTop = e.scrollTop
+			if(e.scrollTop > 1000) {
+				this.showBackToTop = true
+			}else {
+				this.showBackToTop = false
+			}
 		},
 		async onPullDownRefresh() {
 			await this.fetchData()
@@ -127,6 +130,16 @@
 			onFilterChange(e) {
 				this.condition = e
 			},
+			backTop() {
+				uni.pageScrollTo({
+					scrollTop: 0
+				})
+			},
+			add() {
+				uni.navigateTo({
+					url: 'edit'
+				})
+			}
 		}
 	}
 </script>

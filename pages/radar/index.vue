@@ -56,7 +56,7 @@
 		watch: {
 			baseInfo: {
 				handler(newVal, oldVal) {
-					if(newVal || newVal._id !== oldVal._id) {
+					if(newVal&&!oldVal || newVal._id !== oldVal._id) {
 						this.showBase()
 					}
 				},

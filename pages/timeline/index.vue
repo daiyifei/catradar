@@ -43,7 +43,7 @@
 				</unicloud-db>
 				
 				<!--操作按钮-->
-				<view class="btn-float cu-avatar round lg bg-gradual-blue margin" :class="scrollTop?'cuIcon-top':'cuIcon-camera'" @tap="scrollTop?backTop():add()" ></view>
+				<view class="btn-float cu-avatar round lg bg-gradual-blue margin" :class="showBackToTop?'cuIcon-top':'cuIcon-camera'" @tap="scrollTop?backTop():add()"></view>
 			</view>
 		</view>
 	</view>
@@ -56,7 +56,7 @@
 				background: {
 					background: ''
 				},
-				scrollTop: false
+				showBackToTop: false
 			}
 		},
 		computed: {
@@ -70,6 +70,7 @@
 			}
 		},
 		async onPullDownRefresh() {
+			this.$refs.udb.dataList = []
 			this.$refs.udb.loadData({
 				clear: true
 			},() => {
@@ -80,9 +81,9 @@
 			const opacity = e.scrollTop / 100
 			this.background.background = `linear-gradient(45deg, rgba(57,181,74,${opacity}), rgba(141,198,63,${opacity}))`
 			if(e.scrollTop > 1000) {
-				this.scrollTop = true
+				this.showBackToTop = true
 			}else {
-				this.scrollTop = false
+				this.showBackToTop = false
 			}
 		},
 		onReachBottom() {
@@ -103,7 +104,6 @@
 						})
 					}
 				}
-				
 				// #ifdef MP-WEIXIN
 				uni.requestSubscribeMessage({
 					tmplIds: ['73TwwDG5U8hoQT_WCOC85kt7Rr5lr_v8aZb-a9M_hl8'],
