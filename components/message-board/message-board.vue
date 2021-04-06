@@ -153,10 +153,7 @@
 					await db.collection('comments').doc(this.likeId).remove()
 				}else {
 					// 点赞
-					await db.collection('comments').where({
-						timeline_id: this.timeline._id,
-						comment_type: 0
-					}).update({
+					await db.collection('comments').add({
 						timeline_id: this.timeline._id,
 						comment_type: 0
 					})
@@ -243,8 +240,11 @@
 			},
 			// 发送订阅消息
 			sendMsg() {
+				const toUser = this.form.reply_uid || this.timeline.uid[0]._id
+				if(toUser === this.userInfo._id)
+					return
 				this.$request('weixin','sendMsg', {
-					touser: this.form.reply_uid || this.timeline.uid[0]._id,
+					touser,
 					subject: this.timeline.cat_id[0].name,
 					content: this.form.content || '赞了您',
 					username: this.userInfo.nickname,

@@ -124,7 +124,7 @@
 						</view>
 					</view>
 					<unicloud-db 
-						ref="timeline"
+						ref="udb"
 						v-slot:default="{data, loading, hasMore}" 
 						collection="timeline"
 						manual
@@ -159,12 +159,12 @@
 					<button class="action" style="color:#666" open-type="share" @tap="share">
 						<view class="cuIcon-share"></view>分享
 					</button>
-					<navigator :url="'/pages/list/edit?id='+form._id" class="action" v-if="form.state>0&&(form.uid==userInfo._id||userInfo.role)">
+					<navigator :url="'/pages/list/edit?id='+form._id" class="action" v-if="form.uid==userInfo._id||userInfo.role">
 						<view class="cuIcon-edit"></view>编辑
 					</navigator>
 					<view class="btn-group margin-lr-sm">
 						<button class="cu-btn bg-gradual-orange round shadow-blur" @tap="addTimeline">发布动态</button>
-						<button class="cu-btn bg-gradual-blue round shadow-blur" v-if="form.state===0" @tap="goAdopt">我想领养</button>
+						<button class="cu-btn bg-gradual-blue round shadow-blur" v-if="form.state===0&&form.uid!==userInfo._id" @tap="goAdopt">我想领养</button>
 					</view>
 				</view>
 			</template>
@@ -229,7 +229,7 @@
 				if (res.intersectionRatio > 0) {
 					// 进入视口
 					observer.disconnect()
-					this.$refs.timeline.loadData({
+					this.$refs.udb.loadData({
 						clear: true
 					})
 				}
@@ -244,7 +244,7 @@
 				`linear-gradient(45deg, rgba(0,129,255,${opacity}), rgba(28,187,180,${opacity}))`
 		},
 		onReachBottom() {
-			this.$refs.timeline.loadMore()
+			this.$refs.udb.loadMore()
 		},
 		methods: {
 			location(value) {
