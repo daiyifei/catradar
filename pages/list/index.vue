@@ -52,7 +52,7 @@
 			</index-list>
 			
 			<!--新建按钮-->
-			<view class="btn-float cu-avatar round lg bg-gradual-blue margin" :class="showBackToTop?'cuIcon-top':'cuIcon-add'" @tap="scrollTop?backTop():add()"v-if="hasLogin"></view>
+			<view class="btn-float cu-avatar round lg bg-gradual-blue margin" :class="showBackToTop?'cuIcon-top':'cuIcon-add'" @tap="showBackToTop?backTop():add()"v-if="hasLogin"></view>
 		</view>
 	</view>
 </template>

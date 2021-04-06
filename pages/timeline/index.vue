@@ -43,7 +43,7 @@
 				</unicloud-db>
 				
 				<!--操作按钮-->
-				<view class="btn-float cu-avatar round lg bg-gradual-blue margin" :class="showBackToTop?'cuIcon-top':'cuIcon-camera'" @tap="scrollTop?backTop():add()"></view>
+				<view class="btn-float cu-avatar round lg bg-gradual-blue margin" :class="showBackToTop?'cuIcon-top':'cuIcon-camera'" @tap="showBackToTop?backTop():add()"></view>
 			</view>
 		</view>
 	</view>
