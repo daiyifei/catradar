@@ -43,8 +43,11 @@
 			this.list = this.value
 		},
 		watch: {
-			value(val) {
-				this.list = this.value
+			value: {
+				handler(val) {
+					this.list = val
+				},
+				immediate: true
 			},
 			list(val) {
 				this.$emit('change', this.list)
