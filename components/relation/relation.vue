@@ -28,7 +28,7 @@
 				<view class="form padding-xl">
 					<view class="cu-form-group">
 						<view class="title">猫咪</view>
-						<remote-input placeholder="请输入猫咪姓名" v-model="form._id" ref="remote" :limit="5" class="text-left response" @change="onChange('_id',$event)"/>
+						<remote-input placeholder="请输入猫咪姓名" v-model="form._id" collection="list" value-key="name" search-key="name,py" ref="remote" :limit="5" class="text-left response" @change="onChange('_id',$event)"/>
 					</view>
 					<view class="cu-form-group">
 						<view class="title">关系</view>

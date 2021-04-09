@@ -26,6 +26,18 @@
 				<view class="title">位置</view>
 				<form-picker v-model="form.location" value-key="id" range-key="name" :range="baseInfo.locations" @change="onChange('location', $event)" />
 			</view>
+			<view class="cu-form-group" v-if="form.state===1">
+				<view class="title">失踪时间</view>
+				<date-picker v-model="form.missing_date" @change="onChange('missing_date', $event)" />
+			</view>
+			<view class="cu-form-group" v-if="form.state===2">
+				<view class="title">主人</view>
+				<remote-input v-model="form.uid" collection="uni-id-users" value-key="nickname" search-key="nickname" @change="onChange('uid', $event)" />
+			</view>
+			<view class="cu-form-group" v-if="form.state===3">
+				<view class="title">死亡时间</view>
+				<date-picker v-model="form.death_date" @change="onChange('death_date', $event)" />
+			</view>
 			<view class="cu-form-group">
 				<view class="title">生日</view>
 				<date-picker v-model="form.birthday" @change="onChange('birthday', $event)" />

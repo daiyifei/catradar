@@ -196,23 +196,11 @@
 					: str.substring(0, str.length - 1)
 			},
 			comment() {
-				// #ifdef MP-WEIXIN
-				uni.requestSubscribeMessage({
-					tmplIds: ['73TwwDG5U8hoQT_WCOC85kt7Rr5lr_v8aZb-a9M_hl8'],
-					success: () => {
-						this.showInput = true
-						this.focus = true
-						this.$emit('focus')
-					}
-				})
-				// #endif
-				this.form.timeline_id = this.timeline._id
-				this.form.comment_type = 1
-				// #ifndef MP-WEIXIN
 				this.showInput = true
 				this.focus = true
 				this.$emit('focus')
-				// #endif
+				this.form.timeline_id = this.timeline._id
+				this.form.comment_type = 1
 			},
 			reply(item) {
 				const { _id, nickname, avatar } = item.uid[0]
@@ -231,12 +219,26 @@
 				this.showInput = false
 			},
 			async addComment() {
+				// #ifdef MP-WEIXIN
+				await this.requestMsg()
+				// #endif
 				this.commentLoading = true
 				await db.collection('comments').add(this.form)
 				this.refresh(() => {
 					this.hideInput()
 				})
 				this.sendMsg()
+			},
+			// 申请订阅
+			async requestMsg() {
+				return new Promise(resolve => {
+					uni.requestSubscribeMessage({
+						tmplIds: ['73TwwDG5U8hoQT_WCOC85kt7Rr5lr_v8aZb-a9M_hl8'],
+						success: () => {
+							resolve()
+						}
+					})
+				})
 			},
 			// 发送订阅消息
 			sendMsg() {
