@@ -14,7 +14,7 @@
 							<view class="text-xl">{{item.name}}</view>
 							<view class="text-gray text-sm">
 								<text class="gender margin-right-xs" :class="item.female ? 'cuIcon-female female' : 'cuIcon-male'"></text>
-								<text class="age">{{item.birthday|age}}</text>
+								<text class="age">{{item.birthday|age(item.death_date)}}</text>
 							</view>
 						</view>
 						<view class="action margin-right-xl">

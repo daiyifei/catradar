@@ -45,6 +45,14 @@
 			"bsonType": "number",
 			"description": "位置"
 		},
+		"missing_date": {
+			"bsonType": "string",
+			"description": "死亡日期"
+		},
+		"death_date": {
+			"bsonType": "string",
+			"description": "死亡日期"
+		},
 		"neuter": {
 			"bsonType": "bool",
 			"defaultValue": false,

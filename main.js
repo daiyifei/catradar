@@ -40,10 +40,10 @@ Vue.filter('color', function (value) {
   return Vue.prototype.$colors[value]
 })
 
-Vue.filter('age', function (value) {
-  if (!value) return '年龄不详'
-	const year = parseInt(moment().diff(value, 'year',true))
-	const month = moment().subtract(year, 'year').diff(value, 'month')
+Vue.filter('age', function (birthday, deathDate) {
+  if (!birthday) return '年龄不详'
+	const year = parseInt(moment(deathDate).diff(birthday, 'year', true))
+	const month = moment(deathDate).subtract(year, 'year').diff(birthday, 'month')
   return year ? year + '岁' : month + '个月'
 })
 

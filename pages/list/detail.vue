@@ -26,7 +26,7 @@
 						<view>
 							<text class="gender margin-right-xs"
 								:class="form.female ? 'cuIcon-female female' : 'cuIcon-male'"></text>
-							<text class="text-grey text-lg u-skeleton-rect">{{form.birthday | age}}</text>
+							<text class="text-grey text-lg u-skeleton-rect">{{form.birthday|age(form.death_date)}}</text>
 						</view>
 					</view>
 					<view class="action padding flex flex-direction justify-between align-end">
@@ -69,6 +69,14 @@
 						<view class="cu-item">
 							<view class="content text-grey">生日</view>
 							<view class="action">{{form.birthday?form.birthday:'未知'}}</view>
+						</view>
+						<view class="cu-item" v-if="form.state===1">
+							<view class="content text-grey">失踪时间</view>
+							<view class="action">{{form.missing_date?form.missing_date:'未知'}}</view>
+						</view>
+						<view class="cu-item" v-if="form.state===3">
+							<view class="content text-grey">死亡时间</view>
+							<view class="action">{{form.death_date?form.death_date:'未知'}}</view>
 						</view>
 						<view class="cu-item">
 							<view class="content text-grey">绝育</view>
@@ -163,8 +171,8 @@
 						<view class="cuIcon-edit"></view>编辑
 					</navigator>
 					<view class="btn-group margin-lr-sm">
-						<button class="cu-btn bg-gradual-orange round shadow-blur" @tap="addTimeline">发布动态</button>
-						<button class="cu-btn bg-gradual-blue round shadow-blur" v-if="form.state===0&&form.uid!==userInfo._id" @tap="goAdopt">我想领养</button>
+						<button class="cu-btn bg-gradual-orange round shadow-blur response" @tap="addTimeline">发布动态</button>
+						<button class="cu-btn bg-gradual-blue round shadow-blur response" v-if="form.state===0&&form.uid!==userInfo._id" @tap="goAdopt">我想领养</button>
 					</view>
 				</view>
 			</template>

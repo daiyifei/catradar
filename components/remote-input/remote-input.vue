@@ -1,9 +1,9 @@
 <template>
 	<view class="container">
-		<view class="selected flex justify-between align-center" v-if="selected.name">
+		<view class="selected flex justify-between align-center" v-if="selected[valueKey]">
 			<view class="content">
-				<image class="cu-avatar sm round" :src="selected.avatar"/>
-				<text class="text-grey margin-left-sm">{{selected.name}}</text>
+				<image class="cu-avatar sm round" :src="selected[picKey]"/>
+				<text class="text-grey margin-left-sm">{{selected[valueKey]}}</text>
 			</view>
 			<text class="cuIcon-roundclose text-gray padding-tb" @tap="onClear"></text>
 		</view>
@@ -13,7 +13,7 @@
 			<scroll-view scroll-y show-scrollbar style="max-height:500rpx">
 				<view class="cu-list menu sm-border">
 					<!-- 置顶 -->
-					<navigator class="cu-item" url="/pages/list/edit">
+					<navigator class="cu-item" url="/pages/list/edit" v-if="showAdd">
 						<view class="content">
 							<text class="cu-avatar sm round bg-gradual-blue">New</text>
 							<text class="margin-left-sm text-blue">新建档案</text>
@@ -22,8 +22,8 @@
 					<!-- 候选 -->
 					<view class="cu-item" v-for="(item,index) in candidates" :key="index" @tap="onSelect(item)">
 						<view class="content">
-							<image class="cu-avatar sm round" :src="item.avatar"></image>
-							<text class="text-grey margin-left-sm">{{item.name}}</text>
+							<image class="cu-avatar sm round" :src="item[picKey]"></image>
+							<text class="text-grey margin-left-sm">{{item[valueKey]}}</text>
 						</view>
 					</view>
 				</view>
@@ -43,6 +43,13 @@
 	export default {
 		behaviors: ['uni://form-field'],
 		props: {
+			collection: String,
+			valueKey: String,
+			searchKey: String,
+			picKey: {
+				type: String,
+				default: 'avatar'
+			},
 			value: {
 				type: String,
 				default: ''
@@ -54,6 +61,10 @@
 			limit: {
 				type: Number,
 				default: 10
+			},
+			showAdd: {
+				type: Boolean,
+				default: false
 			}
 		},
 		model: {
@@ -73,9 +84,9 @@
 		watch: {
 			value: {
 				handler(val) {
-					if(val && !this.selected.name) {
+					if(val && !this.selected[this.valueKey]) {
 						this.loading = true
-						db.collection('list').doc(this.value).field('_id,name,avatar').get({
+						db.collection(this.collection).doc(this.value).field(this.valueKey + ',avatar').get({
 							getOne: true
 						}).then(res => {
 							this.selected = res.result.data || {}
@@ -92,7 +103,7 @@
 			},
 			searchValue(val) {
 				if(val && this.showCandidates) {
-					this.fetchCandidates()
+					this.$u.debounce(this.fetchCandidates, 500)
 				}
 			}
 		},
@@ -100,16 +111,18 @@
 			fetchCandidates() {
 				this.loadingCandidates = true
 				const reg = new RegExp('.*'+ this.searchValue, 'i')
-				db.collection('list')
-					.where(
-						db.command.or([{
-							name: reg,
-						},{
-							py: reg
-						}])
-					)
+				const condition = []
+				this.searchKey.split(',').forEach(item => {
+					condition.push({
+						[item]: reg
+					})
+				})
+				
+				db.collection(this.collection)
+					.where(db.command.or(condition))
+					.field(this.valueKey + ',avatar')
 					.limit(this.limit)
-					.orderBy('py asc')
+					.orderBy(this.valueKey + ' asc')
 					.get()
 					.then(res => {
 						this.candidates = res.result.data
@@ -128,8 +141,8 @@
 				}, 100)
 			},
 			onSelect(item) {
-				this.$set(this.selected, 'name', item.name)
-				this.$set(this.selected, 'avatar', item.avatar)
+				this.$set(this.selected, this.valueKey, item[this.valueKey])
+				this.$set(this.selected, this.picKey, item[this.picKey])
 				this.$emit('change', item._id)
 				this.showCandidates = false
 			}
@@ -140,6 +153,8 @@
 <style>
 	.container {
 		position: relative;
+		width: 100%;
+		z-index: 99;
 	}
 	
 	.candidates {
