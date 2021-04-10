@@ -170,9 +170,9 @@
 					<navigator :url="'/pages/list/edit?id='+form._id" class="action" v-if="form.uid==userInfo._id||userInfo.role">
 						<view class="cuIcon-edit"></view>编辑
 					</navigator>
-					<view class="btn-group margin-lr-sm">
-						<button class="cu-btn bg-gradual-orange round shadow-blur response" @tap="addTimeline">发布动态</button>
-						<button class="cu-btn bg-gradual-blue round shadow-blur response" v-if="form.state===0&&form.uid!==userInfo._id" @tap="goAdopt">我想领养</button>
+					<view class="btn-group margin-lr-xs">
+						<button class="cu-btn bg-gradual-orange round shadow-blur flex-sub margin-lr-xs" @tap="addTimeline">发布动态</button>
+						<button class="cu-btn bg-gradual-blue round shadow-blur flex-sub margin-lr-xs" v-if="form.state===0&&form.uid!==userInfo._id" @tap="goAdopt">我想领养</button>
 					</view>
 				</view>
 			</template>

@@ -22,22 +22,51 @@
 		},
 		methods: {
 			async autoLogin() {
-				if(!uni.getStorageSync('uni_id_token'))
-					return
-				if(uni.getStorageSync('uni_id_token_expired') > Date.now()) {
-					const userInfo = uni.getStorageSync('user_info') || {}
-					this.login(userInfo)
-					try {
-						const { token, tokenExpired, userInfo = {} } = await this.$request('user-center','checkToken')
-						if(token) {
-							uni.setStorageSync('uni_id_token', token)
-							uni.setStorageSync('uni_id_token_expired', tokenExpired)
-						}
+				// #ifdef MP-WEIXIN
+				try{
+					uni.showLoading({
+						title: '登录中'
+					})
+					
+					const code = await new Promise(resolve => {
+						uni.login({
+							provider: 'weixin',
+							success: ({code}) => {
+								resolve(code)
+							},
+							fail: err => {
+								this.$u.toast(err)
+							}
+						})
+					})
+					const { userInfo, token, tokenExpired } = await this.$request('user-center','loginByWeixin', { code })
+					uni.setStorageSync('uni_id_token', token)
+					uni.setStorageSync('uni_id_token_expired', tokenExpired)
+					if(userInfo.gender) {
 						this.login(userInfo)
-					}catch(e){
-						this.logout()
 					}
+					uni.hideLoading()
+				}catch(msg) {
+					this.logout()
+					uni.showToast({
+						title: msg,
+						icon: 'none'
+					})
 				}
+				// #endif
+				
+				// #ifndef MP-WEIXIN
+				try {
+					const { token, tokenExpired, userInfo = {} } = await this.$request('user-center','checkToken')
+					if(token) {
+						uni.setStorageSync('uni_id_token', token)
+						uni.setStorageSync('uni_id_token_expired', tokenExpired)
+					}
+					this.login(userInfo)
+				}catch(e){
+					this.logout()
+				}
+				// #endif
 			},
 			async getBaseInfo() {
 				if(this.userInfo.base_id) {
