@@ -87,7 +87,7 @@
 		}, {
 			"path": "pages/radar/detail",
 			"style": {
-				"navigationBarTitleText": "详情",
+				"navigationBarTitleText": "成员列表",
 				"enablePullDownRefresh": false
 			}
 
@@ -102,6 +102,14 @@
 			"path": "pages/mine/adopted",
 			"style": {
 				"navigationBarTitleText": "领养",
+				"enablePullDownRefresh": false
+			}
+
+		}, {
+			"path": "pages/mine/homepage",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "",
 				"enablePullDownRefresh": false
 			}
 

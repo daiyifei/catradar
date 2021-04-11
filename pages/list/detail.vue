@@ -2,9 +2,9 @@
 	<view>
 		<u-skeleton :loading="loading" animation bgColor="#FFF"></u-skeleton>
 		<u-navbar :back-icon-name="isSingle?'home':'nav-back'" :custom-back="customBack" :background="background"
-			:title="title" back-icon-color="#fff" :title-color="titleColor">
+			:title="title" back-icon-color="#fff" :title-color="titleColor" immersive>
 		</u-navbar>
-		<view class="container u-skeleton">
+		<view class="u-skeleton">
 			<!-- 封面 -->
 			<swiper class="swiper screen-swiper square-dot u-skeleton-rect" :indicator-dots="true" :circular="true"
 				@change="imgChange">
@@ -31,7 +31,7 @@
 					</view>
 					<view class="action padding flex flex-direction justify-between align-end">
 						<!-- 主人信息 -->
-						<view class="flex align-center u-skeleton-rect" v-if="form.state<3">
+						<view class="flex align-center u-skeleton-rect" v-if="form.state<3" @tap="owner?toUser():''">
 							<view class="cu-avatar round" :class="form.state===1?'bg-gradual-green shadow-blur':''" 
 								:style="{backgroundImage: form.state===2? 'url('+owner.avatar+')':''}">
 								<text v-if="form.state===0">?</text>
@@ -136,6 +136,7 @@
 						v-slot:default="{data, loading, hasMore}" 
 						collection="timeline"
 						manual
+						:page-size="5"
 						:where="condition"
 						orderby="create_date desc" 
 						@load="timelineLoaded">
@@ -145,7 +146,7 @@
 								<view class="content">
 									<view class="text-content">{{item.text}}</view>
 									<video-item :src="item.album[0]" v-if="item.content_type" />
-									<view class="grid grid-square col-3 margin-top-sm" v-else>
+									<view class="grid grid-square margin-top-sm" :class="item.album.length>1?'col-3':'col-2'" v-else>
 										<view class="bg-img" v-for="(pic,idx) in item.album" :key="idx">
 											<image :src="pic" mode="aspectFill" @tap.stop="preview(item.album, idx)">
 											</image>
@@ -303,6 +304,13 @@
 					uni.navigateBack()
 				}
 			},
+			toUser() {
+				if(this.owner) {
+					uni.navigateTo({
+						url: '/pages/mine/homepage?uid=' + this.owner._id
+					})
+				}
+			},
 			fav() {
 				const {
 					_id,
@@ -399,11 +407,6 @@
 </script>
 
 <style>
-	.container {
-		position: absolute;
-		top: 0;
-	}
-	
 	.action-bar {
 		position: sticky;
 		bottom: 0;

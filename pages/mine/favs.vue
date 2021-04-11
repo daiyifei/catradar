@@ -1,8 +1,7 @@
 <template>
 	<view>
-		<unicloud-db v-slot="{data, loading, error, options, hasMore}" collection="list" :where="condition" @load="loaded"> 
-			<view class="cu-load loading text-gray" v-if="loading"></view>
-			<view class="cu-list menu-avatar no-padding" v-else>
+		<unicloud-db ref="udb" v-slot="{data, loading, hasMore}" collection="list" :where="condition" manual @load="loaded">
+			<view class="cu-list menu-avatar no-padding">
 				<navigator class="cu-item" :url="'/pages/list/detail?id='+item._id" v-for="(item,index) in data" :key="index">
 					<image :src="item.avatar" mode="aspectFill" lazy-load class="cu-avatar round lg"></image>
 					<view class="content">
@@ -12,12 +11,13 @@
 							<text class="age">{{item.birthday}}</text>
 						</view>
 					</view>
-					<view class="action margin-right-xs">
+					<view class="action margin-right-xs" v-if="userInfo._id===user._id">
 						<view class="cu-tag round light bg-orange" @tap.stop.prevent="cancelFav(item._id)">取消</view>
 					</view>
 				</navigator>  
-				<view class="cu-load text-gray" v-if="!hasMore">没有更多了</view>
 			</view>
+			<view class="cu-load loading text-gray" v-if="loading"></view>
+			<view class="cu-load text-gray text-sm" v-else-if="!hasMore">没有更多了</view>
 		</unicloud-db>
 	</view>
 </template>
@@ -27,12 +27,17 @@
 	export default {
 		data() {
 			return {
+				user: '',
+				condition: ''
 			}
 		},
-		computed: {
-			condition() {
-				return `_id in ${JSON.stringify(this.userInfo.favs)}` 
-			}
+		onLoad(options) {
+			db.collection('uni-id-users').doc(options.uid).field('favs').get({
+				getOne: true
+			}).then(res => {
+				this.user = res.result.data
+				this.condition = `_id in ${JSON.stringify(this.user.favs)}`
+			})
 		},
 		methods: {
 			loaded(data) {
@@ -41,7 +46,7 @@
 				})
 			},
 			cancelFav(id) {
-				const { _id, favs } = this.userInfo
+				const { _id, favs } = this.user
 				favs.splice(favs.indexOf(id),1)
 				db.collection('uni-id-users').doc(_id).update({
 					favs
