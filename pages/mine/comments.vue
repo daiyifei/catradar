@@ -20,7 +20,7 @@
 					<view class="content">
 						<view class="text-grey">
 							<text>{{item.uid[0].nickname}}</text>
-							<text class="text-xs margin-left-xs">{{item.time}}</text>
+							<text class="text-xs margin-left-xs">{{item.create_date}}</text>
 						</view>
 						<view class="text-gray text-sm flex">
 							<view class="text-cut">
@@ -92,7 +92,7 @@
 		methods: {
 			loaded(data) {
 				data.map(item => {
-					item.time = this.$u.timeFrom(item.create_date)
+					item.create_date = this.$u.timeFrom(item.create_date)
 				})
 			},
 			switchTab(index) {

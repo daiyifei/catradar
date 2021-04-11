@@ -5,6 +5,15 @@
 			
 		<!-- 菜单 -->
 		<view class="cu-list menu card-menu margin-top-xl margin-bottom-xl shadow-lg radius" v-if="hasLogin">
+			<navigator class="cu-item" url="messages">
+				<view class="content">
+					<text class="cuIcon-message text-grey"></text>
+					<text class="text-grey">消息通知</text>
+				</view>
+				<view class="action" v-if="totalMsg">
+					<view class="cu-tag round bg-red sm">{{totalMsg}}</view>
+				</view>
+			</navigator>
 			<navigator class="cu-item" :url="`/pages/radar/detail?id=${baseInfo._id}`" v-if="hasBase">
 				<view class="content">
 					<text class="cuIcon-group text-grey"></text>
@@ -55,8 +64,22 @@
 </template>
 
 <script>
+	const db = uniCloud.database()
 	export default {
+		data() {
+			return {
+				totalMsg: 0
+			}
+		},
+		onLoad() {
+			uni.removeTabBarBadge({
+				index: 3
+			})
+		},
 		onShow() {
+			db.collection('messages').where(`touids=='${this.userInfo._id}'&&is_read==false`).count().then(res => {
+				this.totalMsg = res.result.total
+			})
 			if(this.$refs.userInfo) {
 				this.$refs.userInfo.fetchData()
 			}

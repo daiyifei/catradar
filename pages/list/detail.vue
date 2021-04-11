@@ -31,7 +31,7 @@
 					</view>
 					<view class="action padding flex flex-direction justify-between align-end">
 						<!-- 主人信息 -->
-						<view class="flex align-center u-skeleton-rect" v-if="form.state<3" @tap="owner?toUser():''">
+						<view class="flex align-center u-skeleton-rect" v-if="form.state<3" @tap="owner.avatar?toUser():''">
 							<view class="cu-avatar round" :class="form.state===1?'bg-gradual-green shadow-blur':''" 
 								:style="{backgroundImage: form.state===2? 'url('+owner.avatar+')':''}">
 								<text v-if="form.state===0">?</text>

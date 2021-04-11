@@ -95,7 +95,7 @@
 			"path": "pages/radar/bases",
 			"style": {
 				"navigationBarTitleText": "猫区列表",
-				"enablePullDownRefresh": false
+				"enablePullDownRefresh": true
 			}
 
 		}, {
@@ -111,6 +111,13 @@
 				"navigationStyle": "custom",
 				"navigationBarTitleText": "",
 				"enablePullDownRefresh": false
+			}
+
+		}, {
+			"path": "pages/mine/messages",
+			"style": {
+				"navigationBarTitleText": "消息通知",
+				"enablePullDownRefresh": true
 			}
 
 		}

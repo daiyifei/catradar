@@ -14,8 +14,11 @@
 							<text class="text-cut cuIcon-locationfill">距离{{item.distance}}</text>
 							<view class="text-gray text-sm">
 								<text class="cu-tag bg-orange light round" v-if="item.uid===userInfo._id||userInfo.role" @tap.stop.prevent="onEdit(item)">编辑</text>
-								<text class="cu-tag bg-blue light round" @tap.stop.prevent="toBaseDetail(item._id)" v-if="item.subscribed">成员</text>
-								<text class="cu-tag round light" :class="item.subscribed?'bg-gray':'bg-blue'" @tap.stop.prevent="subscribe(item)">{{item.subscribed?'退出':'加入'}}</text>
+								<template v-if="item.subscribed">
+									<text class="cu-tag bg-blue light round" @tap.stop.prevent="toBaseDetail(item._id)">成员</text>
+									<text class="cu-tag round light bg-gray" @tap.stop.prevent="unSubscribe(item._id)">退出</text>
+								</template>
+								<text class="cu-tag round light bg-blue" @tap.stop.prevent="subscribe(item)" v-else>加入</text>
 							</view>
 						</view>
 					</view>
@@ -64,6 +67,13 @@
 				</view>
 			</view>
 		</view>
+	
+		<!--验证-->
+		<u-modal v-model="showVerify" title="验证申请" confirm-text="发送" show-cancel-button @confirm="sendVerifyMsg">
+			<view class="cu-form-group">
+				<input placeholder="请输入验证消息，等待管理员审核" :focus="showVerify" v-model="form.content"></input>
+			</view>
+		</u-modal>
 	</view>
 </template>
 
@@ -73,7 +83,9 @@
 		data() {
 			return {
 				form: {},
-				showModal: false
+				showModal: false,
+				showVerify: false,
+				verifyMsg: ''
 			}
 		},
 		onReady() {
@@ -84,6 +96,16 @@
 					this.$refs.udb.loadData()
 				}
 			})
+		},
+		onPullDownRefresh() {
+			this.$refs.udb.loadData({
+				clear: true
+			},() => {
+				uni.stopPullDownRefresh()
+			})
+		},
+		onReachBottom() {
+			this.$refs.udb.loadMore()
 		},
 		methods: {
 			loaded(data) {
@@ -104,30 +126,26 @@
 					this.$u.toast('请先登录')
 					return
 				}
-				
-				if(item.subscribed) {
-					// 退出
-					await new Promise(resolve => {
-						uni.showModal({
-							content: '是否退出？',
-							success: res => {
-								if(res.confirm) {
-									resolve()
-								}
+				this.form.base_id = item._id 
+				this.form.touids = [item.uid]
+				this.showVerify = true
+			},
+			async unSubscribe(id) {
+				await new Promise(resolve => {
+					uni.showModal({
+						content: '退出后需要重新申请，是否退出？',
+						success: res => {
+							if(res.confirm) {
+								resolve()
 							}
-						})
+						}
 					})
-					if(this.userInfo.base_id === item._id) {
-						this.userInfo.base_id = ''
-						this.exit()
-					}
-					this.userInfo.subscribes.splice(this.userInfo.subscribes.indexOf(item._id),1)
-				}else {
-					// 加入
-					this.userInfo.base_id = item._id
-					this.userInfo.subscribes.push(item._id)
-					this.enter(item)
+				})
+				if(this.userInfo.base_id === id) {
+					this.userInfo.base_id = ''
+					this.exit()
 				}
+				this.userInfo.subscribes.splice(this.userInfo.subscribes.indexOf(id),1)
 				db.collection('uni-id-users').doc(this.userInfo._id).update({
 					subscribes: this.userInfo.subscribes,
 					base_id: this.userInfo.base_id
@@ -135,6 +153,26 @@
 				this.$refs.udb.loadData({
 					clear: true
 				})
+			},
+			async sendVerifyMsg() {
+				if(!this.form.content) {
+					this.$u.toast('请输入内容')
+					return
+				}
+				
+				// #ifdef MP-WEIXIN
+				await new Promise(resolve => {
+					uni.requestSubscribeMessage({
+						tmplIds: ['xY6bQVGDtKb7JSHYdBHhVwoFKQCViQb0pPFnXZgkRaI'],
+						success: () => {
+							resolve()
+						}
+					})
+				})
+				// #endif
+				
+				await db.collection('messages').add(this.form)
+				this.$u.toast('已发送')
 			},
 			async onSelect(item) {
 				if(item.subscribed) {
