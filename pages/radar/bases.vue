@@ -14,7 +14,7 @@
 							<text class="text-cut cuIcon-locationfill">距离{{item.distance}}</text>
 							<view class="text-gray text-sm">
 								<text class="cu-tag bg-orange light round" v-if="item.uid===userInfo._id||userInfo.role" @tap.stop.prevent="onEdit(item)">编辑</text>
-								<text class="cu-tag bg-blue light round" @tap.stop.prevent="toBaseDetail(item._id)" v-if="item.subscribed">详情</text>
+								<text class="cu-tag bg-blue light round" @tap.stop.prevent="toBaseDetail(item._id)" v-if="item.subscribed">成员</text>
 								<text class="cu-tag round light" :class="item.subscribed?'bg-gray':'bg-blue'" @tap.stop.prevent="subscribe(item)">{{item.subscribed?'退出':'加入'}}</text>
 							</view>
 						</view>

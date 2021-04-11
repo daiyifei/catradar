@@ -43,7 +43,7 @@
 					</navigator>
 				</navigator>
 				<view class="cu-load loading text-gray" v-if="loading"></view>
-				<view class="cu-load text-gray" v-else-if="!hasMore">没有更多了</view>
+				<view class="cu-load text-gray text-sm" v-else-if="!hasMore">没有更多了</view> 
 			</view>
 		</unicloud-db>
 	</view>
@@ -53,15 +53,19 @@
 	export default {
 		data() {
 			return {
+				uid: '',
 				currTab: 0
 			}
 		},
 		computed: {
 			condition() {
-				const { _id } = this.userInfo
-				return this.currTab === 0 ? `uid._id!='${_id}'&&(timeline_id.uid._id=='${_id}'||reply_uid.id=='${_id}')`
-					: `uid._id=='${_id}'`
+				const { uid } = this
+				return this.currTab === 0 ? `uid._id!='${uid}'&&(timeline_id.uid._id=='${uid}'||reply_uid.id=='${uid}')`
+						: `uid._id=='${uid}'`
 			}
+		},
+		onLoad(options) {
+			this.uid = options.uid
 		},
 		onReady() {
 			if(this.hasLogin) {

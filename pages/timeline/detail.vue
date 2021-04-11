@@ -30,6 +30,11 @@
 			onDel(id) {
 				this.$refs.udb.remove(id)
 			}
+		},
+		onShareAppMessage(e) {
+			if(e.from === "button") {
+				return e.target.dataset.shareinfo
+			}
 		}
 	}
 </script>

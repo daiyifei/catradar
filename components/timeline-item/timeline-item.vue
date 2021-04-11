@@ -28,10 +28,12 @@
 					</view>
 				</view>
 				<!-- 作者信息 -->
-				<image :src="item.uid[0].avatar" mode="aspectFill" class="cu-avatar sm round margin-right-xs" />
-				<text class="text-gray">{{item.uid[0].nickname}}</text>
+				<navigator :url="`/pages/mine/homepage?uid=${item.uid[0]._id}`">
+					<image :src="item.uid[0].avatar" mode="aspectFill" class="cu-avatar sm round margin-right-xs" />
+					<text class="text-gray">{{item.uid[0].nickname}}</text>
+				</navigator>
 				<!-- 留言区域 -->
-				<message-board :timeline="item" :list="item.comments" @focus="onFocus" />
+				<message-board :timeline="item" :list="item.comments" @focus="onFocus" v-if="hasLogin"/>
 			</view>
 		</view>
 	</view>

@@ -13,7 +13,7 @@
 						</view>
 					</view>
 				</view>
-				<view class="cu-item" v-for="(item, index) in data" :key="item._id" @longpress="showMenu(item)">
+				<view class="cu-item" v-for="(item, index) in data" :key="item._id" @tap="toUser(item._id)" @longpress="showMenu(item)">
 					<view class="cu-avatar lg round" :style="{backgroundImage: 'url('+item.avatar+')'}">
 						<view class="cu-tag badge light" :class="item.gender===2?'cuIcon-female bg-pink':'cuIcon-male bg-blue'"></view>
 					</view>
@@ -51,10 +51,16 @@
 		},
 		methods: {
 			loaded(data) {
-				const admin = data.filter(v => v._id === this.base.uid || v.role)
-				admin.map(item => {
-					data.splice(data.findIndex(v => v._id === item._id), 1)
-					data.unshift(item)
+				data.map((item,index) => {
+					if(item._id === this.base.uid || item.role) {
+						data.splice(index, 1)
+						data.unshift(item)
+					}
+				})
+			},
+			toUser(id) {
+				uni.navigateTo({
+					url: `/pages/mine/homepage?uid=${id}`
 				})
 			},
 			showMenu(item) {
