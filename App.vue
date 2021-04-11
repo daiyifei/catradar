@@ -12,6 +12,7 @@
 			hasLogin(val) {
 				if(val) {
 					this.getBaseInfo()
+					this.checkMsg()
 				}
 			},
 			baseInfo(newVal, oldVal) {
@@ -91,6 +92,17 @@
 						this.exit()
 					}
 				}
+			},
+			checkMsg() {
+				db.collection('messages').where(`touids=='${this.userInfo._id}'&&is_read==false`).count().then(res => {
+					const { total } = res.result
+					if(total > 0) {
+						uni.setTabBarBadge({
+						  index: 3,
+						  text: total + ''
+						})
+					}
+				})
 			},
 			checkUpdate() {
 				// #ifdef MP

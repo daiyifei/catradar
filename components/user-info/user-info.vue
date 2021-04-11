@@ -1,8 +1,7 @@
 <template>
 	<view>
 		<view class="UCenter-bg">
-			<button class="btn-transparent" open-type="getvalue" @tap="updateUser"></button>
-			<image v-if="value.avatar" :src="value.avatar" class="avatar"/>
+			<image v-if="value.avatar" :src="value.avatar" class="avatar" @tap="updateUser"/>
 			<view class="avatar cuIcon-my text-white" v-else></view>
 			<view class="text-xl">{{value.nickname?value.nickname:'请登录'}}</view>
 			<view class="margin-top-sm" v-if="value.role">
