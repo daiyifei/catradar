@@ -4,7 +4,7 @@
 		<form @submit="onSubmit" v-else>
 			<view class="cu-form-group required">
 				<view class="title">头像</view>
-				<avatar-cropper v-model="form.avatar" class="response" @change="onChange('avatar', $event)" />
+				<avatar-cropper v-model="form.avatar" class="response" />
 			</view>
 			<view class="cu-form-group required">
 				<view class="title">名字</view>
@@ -12,43 +12,43 @@
 			</view>
 			<view class="cu-form-group required">
 				<view class="title">花色</view>
-				<form-picker v-model="form.color" :range="colors"  @change="onChange('color', $event)" />
+				<form-picker v-model="form.color" :range="colors" />
 			</view>
 			<view class="cu-form-group">
 				<view class="title">性别</view>
-				<form-switch custom-class="switch-sex" v-model="form.female" @change="onChange('female', $event)" />
+				<form-switch custom-class="switch-sex" v-model="form.female" />
 			</view>
 			<view class="cu-form-group">
 				<view class="title">状态</view>
-				<form-picker v-model="form.state" :range="states" @change="onChange('state', $event)" />
+				<form-picker v-model="form.state" :range="states" />
 			</view>
 			<view class="cu-form-group" v-if="form.state===0">
 				<view class="title">位置</view>
-				<form-picker v-model="form.location" value-key="id" range-key="name" :range="baseInfo.locations" @change="onChange('location', $event)" />
+				<form-picker v-model="form.location" value-key="id" range-key="name" :range="baseInfo.locations" />
 			</view>
 			<view class="cu-form-group" v-if="form.state===1">
 				<view class="title">失踪时间</view>
-				<date-picker v-model="form.missing_date" @change="onChange('missing_date', $event)" />
+				<date-picker v-model="form.missing_date" />
 			</view>
 			<view class="cu-form-group" v-if="form.state===2">
 				<view class="title">主人</view>
-				<remote-input v-model="form.uid" collection="uni-id-users" value-key="nickname" search-key="nickname" @change="onChange('uid', $event)" />
+				<remote-input v-model="form.uid" collection="uni-id-users" value-key="nickname" search-key="nickname" class="response" />
 			</view>
 			<view class="cu-form-group" v-if="form.state===3">
 				<view class="title">死亡时间</view>
-				<date-picker v-model="form.death_date" @change="onChange('death_date', $event)" />
+				<date-picker v-model="form.death_date" />
 			</view>
 			<view class="cu-form-group">
 				<view class="title">生日</view>
-				<date-picker v-model="form.birthday" @change="onChange('birthday', $event)" />
+				<date-picker v-model="form.birthday" />
 			</view>
 			<view class="cu-form-group">
 				<view class="title">绝育</view>
-				<form-switch v-model="form.neuter" @change="onChange('neuter', $event)" />
+				<form-switch v-model="form.neuter" />
 			</view>
 			<view class="cu-form-group" v-if="form.neuter">
 				<view class="title">绝育时间</view>
-				<date-picker v-model="form.neuterDate" @change="onChange('neuterDate', $event)" />
+				<date-picker v-model="form.neuterDate" />
 			</view>
 			<view class="cu-form-group">
 				<view class="title">简介</view>
@@ -56,11 +56,11 @@
 			</view>
 			<view class="cu-form-group margin-top">
 				<view class="title">相册</view>
-				<drag-album v-model="form.album" class="response" @change="onChange('album', $event)"></drag-album>
+				<drag-album v-model="form.album" class="response" />
 			</view>
 			<view class="cu-form-group margin-top">
 				<view class="title">关系</view>
-				<relation v-model="form.relation" class="response" @change="onChange('relation', $event)"></relation>
+				<relation v-model="form.relation" class="response" />
 			</view>
 			<button form-type="submit" class="cu-btn block bg-blue margin lg" :disabled="!form.name" :loading="saving">保存</button>
 			<button class="cu-btn block bg-red margin lg" v-if="id" @tap="onDelete">删除</button>
@@ -77,9 +77,7 @@
 				id: '',
 				form: {
 					name: '',
-					state: 0,
-					album: [],
-					relation: []
+					state: 0
 				},
 				colors: this.$colors,
 				states: this.$states,
@@ -107,10 +105,10 @@
 				this.form = data
 				this.loading = false
 			},
-			onChange(key, value) {
-				this.$set(this.form, key, value)
-			},
 			async onSubmit(e) {
+				console.log(this.form)
+					return
+				
 				this.saving = true
 				
 				// 拼音

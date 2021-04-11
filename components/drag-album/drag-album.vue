@@ -30,17 +30,13 @@
 			},
 			custom: Boolean
 		},
-		model: {
-			prop: 'value',
-			event: 'change'
-		},
 		data() {
 			return {
 				list: []
 			}
 		},
 		created() {
-			this.list = this.value
+			this.list = this.value || []
 		},
 		watch: {
 			value: {
@@ -50,7 +46,7 @@
 				immediate: true
 			},
 			list(val) {
-				this.$emit('change', this.list)
+				this.$emit('input', this.list)
 			}
 		},
 		methods: {

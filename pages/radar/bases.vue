@@ -39,7 +39,7 @@
 				<view class="padding text-left">
 					<view class="cu-form-group">
 						<view class="title">logo</view>
-						<avatar-cropper v-model="form.avatar" class="response" @change="onChange('avatar', $event)" />
+						<avatar-cropper v-model="form.avatar" class="response" />
 					</view>
 					<view class="cu-form-group required">
 						<view class="title">地址</view>
@@ -98,9 +98,6 @@
 						}
 					}
 				})
-			},
-			onChange(key, value) {
-				this.$set(this.form, key, value)
 			},
 			async subscribe(item) {
 				if(!this.hasLogin) {

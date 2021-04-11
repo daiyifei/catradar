@@ -131,7 +131,7 @@
 			setTimeout(() => {
 				const observer = uni.createIntersectionObserver(this)
 				observer.relativeToViewport({
-					bottom: 100,
+					bottom: 500,
 				}).observe('#comments', res => {
 					if (res.intersectionRatio > 0) {
 						observer.disconnect()

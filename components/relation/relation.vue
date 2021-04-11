@@ -28,7 +28,7 @@
 				<view class="form padding-xl">
 					<view class="cu-form-group">
 						<view class="title">猫咪</view>
-						<remote-input placeholder="请输入猫咪姓名" v-model="form._id" collection="list" value-key="name" search-key="name,py" ref="remote" :limit="5" class="text-left response" @change="onChange('_id',$event)"/>
+						<remote-input placeholder="请输入猫咪姓名" v-model="form._id" collection="list" value-key="name" search-key="name,py" ref="remote" :limit="5" class="text-left response" />
 					</view>
 					<view class="cu-form-group">
 						<view class="title">关系</view>
@@ -59,10 +59,6 @@
 				default: () => []
 			}
 		},
-		model: {
-			prop: 'value',
-			event: 'change'
-		},
 		data() {
 			return {
 				list: [],
@@ -76,7 +72,7 @@
 		},
 		watch: {
 			list(val) {
-				this.$emit('change', this.list)
+				this.$emit('input', this.list)
 			}
 		},
 		methods: {
@@ -97,9 +93,6 @@
 			hideModal() {
 				this.index = -1
 				this.show = false
-			},
-			onChange(key, value) {
-				this.$set(this.form,key,value)
 			},
 			onConfirm() {
 				const form = Object.assign(this.form, this.$refs.remote.selected)

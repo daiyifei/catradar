@@ -1,8 +1,8 @@
 <template>
 	<view>
-		<picker mode="date" @change="onChange" :value="value">
+		<picker mode="date" @change="onChange" :value="date">
 			<view class="picker">
-				{{value?value:placeholder}}
+				{{date?date:placeholder}}
 			</view>
 		</picker>
 	</view>
@@ -17,18 +17,18 @@
 				default: '选择日期'
 			}
 		},
-		model: {
-			prop: 'value',
-			event: 'change'
-		},
 		data() {
 			return {
-				
+				date: ''
 			}
+		},
+		created() {
+			this.date = this.value || ''
 		},
 		methods: {
 			onChange(e) {
-				this.$emit('change',e.detail.value)
+				this.date = e.detail.value
+				this.$emit('input',e.detail.value)
 			}
 		}
 	}

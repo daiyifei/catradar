@@ -22,12 +22,11 @@
 		},
 		methods: {
 			async autoLogin() {
-				uni.showLoading({
-					title: '登录中'
-				})
-				
 				// #ifdef MP-WEIXIN
 				try{
+					uni.showLoading({
+						title: '登录中'
+					})
 					const code = await new Promise(resolve => {
 						uni.login({
 							provider: 'weixin',
@@ -59,6 +58,9 @@
 				if(!uni.getStorageSync('uni_id_token'))
 					return
 				try {
+					uni.showLoading({
+						title: '登录中'
+					})
 					const { token, tokenExpired, userInfo = {} } = await this.$request('user-center','checkToken')
 					if(token) {
 						uni.setStorageSync('uni_id_token', token)

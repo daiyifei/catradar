@@ -67,10 +67,6 @@
 				default: false
 			}
 		},
-		model: {
-			prop: 'value',
-			event: 'change'
-		},
 		data() {
 			return {
 				showCandidates: false,
@@ -132,7 +128,7 @@
 			onClear() {
 				this.selected = {}
 				this.searchValue = ''
-				this.$emit('change', '')
+				this.$emit('input', '')
 			},
 			onBlur() {
 				setTimeout(() => {
@@ -143,7 +139,7 @@
 			onSelect(item) {
 				this.$set(this.selected, this.valueKey, item[this.valueKey])
 				this.$set(this.selected, this.picKey, item[this.picKey])
-				this.$emit('change', item._id)
+				this.$emit('input', item._id)
 				this.showCandidates = false
 			}
 		}

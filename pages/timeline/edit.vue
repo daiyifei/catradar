@@ -2,14 +2,14 @@
 	<view>
 		<view class="cu-load loading text-gray" v-if="loading"></view>
 		<view class="cu-form-group" v-else>
-			<remote-input collection="list" value-key="name" search-key="name,py" :placeholder="(form.content_type?'视频':'照片')+'中的是谁？'" ref="remote" v-model="form.cat_id" class="response" @change="onChange('cat_id', $event)" />
+			<remote-input collection="list" value-key="name" search-key="name,py" :placeholder="(form.content_type?'视频':'照片')+'中的是谁？'" ref="remote" v-model="form.cat_id" class="response" />
 		</view>
 		<view class="cu-form-group">
-			<textarea name="text" placeholder="写点什么吧..." maxlength="140" v-model="form.text" @change="onChange('text', $event)"></textarea>
+			<textarea placeholder="写点什么吧..." maxlength="140" v-model="form.text" ></textarea>
 		</view>
 		<view class="cu-form-group">
 			<video-item :src="form.album[0]" v-if="form.content_type" style="width: 60%;"/>
-			<drag-album name="album" v-model="form.album" class="response" @change="onChange('album', $event)" v-else />
+			<drag-album v-model="form.album" class="response" v-else />
 		</view>
 		<button class="cu-btn block bg-blue margin lg" :loading="saving" :disabled="disabled" @tap="onSubmit">{{id?'保存':'发布'}}</button>
 	</view>
@@ -79,9 +79,6 @@
 			}
 		},
 		methods: {
-			onChange(key, value) {
-				this.$set(this.form, key, value)
-			},
 			async onSubmit() {
 				this.saving = true
 				const pages = getCurrentPages(),
