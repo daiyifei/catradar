@@ -1,22 +1,18 @@
 <template>
 	<view>
-		<unicloud-db ref="udb" v-slot:default="{data, loading, pagination}" collection="uni-id-users" :where="condition2"
+		<unicloud-db ref="users" v-slot:default="{data, loading, pagination, options}" :options="base" collection="uni-id-users" :where="condition"
 			field="_id,avatar,nickname,subscribes" getcount manual>
-			<unicloud-db v-slot:default="{data, loading, options}" :options="pagination" collection="bases" getone :where="condition1" orderby="desc">
-				<view class="cu-list menu-avatar" v-if="!loading">
-					<view class="cu-item">
-						<image class="cu-avatar round lg" :src="data.avatar" v-if="data.avatar"/>
-						<text class="cu-avatar round lg" v-else>{{data.name[0]}}</text>
-						<view class="content">
-							<view class="text-grey">{{data.name}}</view>
-							<view class="text-gray text-sm flex">
-								<view class="text-cut">成员: {{options.count}}</view>
-							</view>
+			<view class="cu-list menu-avatar">
+				<view class="cu-item">
+					<image class="cu-avatar round lg" :src="options.avatar" v-if="options.avatar"/>
+					<text class="cu-avatar round lg" v-else>{{options.name[0]}}</text>
+					<view class="content">
+						<view class="text-grey">{{options.name}}</view>
+						<view class="text-gray text-sm flex">
+							<view class="text-cut">成员: {{pagination.count}}</view>
 						</view>
 					</view>
 				</view>
-			</unicloud-db>
-			<view class="cu-list menu-avatar">
 				<view class="cu-item" v-for="(item, index) in data" :key="index">
 					<image :src="item.avatar" class="cu-avatar round lg" />
 					<view class="content">
@@ -31,22 +27,27 @@
 </template>
 
 <script>
+	const db = uniCloud.database()
 	export default {
 		data() {
 			return {
-				condition1: '',
-				condition2: ''
+				base: {},
+				condition: '',
 			}
 		},
 		onLoad(options) {
-			this.condition1 = `_id=='${options.id}'`
-			this.condition2 = `subscribes=='${options.id}'`
+			this.condition = `subscribes=='${options.id}'`
+			db.collection('bases').doc(options.id).get({
+				getOne: true
+			}).then(res => {
+				this.base = res.result.data
+			})
 		},
 		onReady() {
-			this.$refs.udb.loadData()
+			this.$refs.users.loadData()
 		},
 		onReachBottom() {
-			this.$refs.udb.loadMore()
+			this.$refs.users.loadMore()
 		}
 	}
 </script>

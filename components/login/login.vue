@@ -20,9 +20,9 @@
 			
 			<!-- 微信登录 -->
 			<!-- #ifdef APP-PLUS || MP-WEIXIN -->
-			<button class="margin-xl cu-btn bg-green block lg" @getuserinfo="loginByWeixin" open-type="getUserInfo">
+			<button class="margin-xl cu-btn bg-green block lg" @tap="updateUser">
 				<text class="cuIcon-weixin margin-right-xs"></text>
-				<text>微信登录</text>
+				<text>微信一键授权</text>
 			</button>
 			<!-- #endif -->
 		</template>
@@ -78,36 +78,10 @@
 						})
 					})
 			},
-			async loginByWeixin(e) {
-				uni.showLoading({
-					title: '登录中'
-				})
-				// #ifdef MP-WEIXIN
-				if(!e.detail.userInfo) {
-					uni.hideLoading()
-					return
-				}
-				// #endif
-				
-				try{
-					const code = await this.getWeixinCode()
-					const { userInfo, token, tokenExpired } = await this.$request('user-center','loginByWeixin', { code })
-					uni.setStorageSync('uni_id_token', token)
-					uni.setStorageSync('uni_id_token_expired', tokenExpired)
-					if(userInfo.nickname && userInfo.avatar) {
-						this.login(userInfo)
-					}else {
-						await this.updateUser()
-					}
-					uni.hideLoading()
-				}catch(msg) {
-					uni.hideLoading()
-					this.logout()
-					uni.showToast({
-						title: msg,
-						icon: 'none'
-					})
-				}
+			async refresh() {
+				const { userInfo } = await this.$request('user-center','getUserInfo')
+				this.login(userInfo)
+				uni.hideLoading()
 			},
 			getWeixinCode() {
 				return new Promise((resolve, reject) => {
@@ -154,45 +128,44 @@
 					this.refresh()
 				})
 			},
-			async refresh() {
-				const { userInfo } = await this.$request('user-center','getUserInfo')
-				this.login(userInfo)
-				uni.hideLoading()
-			},
 			async updateUser() {
-				// #ifdef APP-PLUS || MP-WEIXIN
-				uni.showLoading()
-				const userInfo = await new Promise((resolve,reject) => {
-					uni.login({
-					  provider: 'weixin',
-					  success: res => {
-							// 获取用户信息
-							uni.getUserInfo({
-							  provider: 'weixin',
-							  success: ({userInfo}) => {
-									resolve(userInfo)
-							  },
-								fail: err => {
-									reject(err)
-								}
-							})
-						},
-						fail: err => {
-							reject(err)
-						}
+				// #ifdef MP-WEIXIN
+				try{
+					const userInfo = await new Promise((resolve,reject) => {
+						uni.getUserProfile({
+						  desc: '用于完善会员资料',
+						  success: ({userInfo}) => {
+								resolve(userInfo)
+						  },
+							fail: err => {
+								reject(err)
+							}
+						})
 					})
-				})
-				const { nickName, avatarUrl, gender } = userInfo
-				await	this.$request('user-center','updateUser', {
-					nickname: nickName,
-					avatar: avatarUrl,
-					gender
-				})
-				await this.refresh()
-				uni.showToast({
-					title: '用户信息已同步',
-					icon: 'none'
-				})
+					uni.showLoading({
+						title: '更新中'
+					})
+					if(!this.hasLogin) {
+						const code = await this.getWeixinCode()
+						const { userInfo, token, tokenExpired } = await this.$request('user-center','loginByWeixin', { code })
+						uni.setStorageSync('uni_id_token', token)
+						uni.setStorageSync('uni_id_token_expired', tokenExpired)
+					}
+					const { nickName, avatarUrl, gender } = userInfo
+					await	this.$request('user-center','updateUser', {
+						nickname: nickName,
+						avatar: avatarUrl,
+						gender
+					})
+					await this.refresh()
+					uni.showToast({
+						title: '用户信息已同步',
+						icon: 'none'
+					})
+				}catch(e){
+					this.$u.toast(e.msg)
+					return
+				}
 				// #endif
 			},
 			doLogout() {

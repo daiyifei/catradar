@@ -26,9 +26,6 @@
 			<!-- 计数 -->
 			<view class="cu-load text-gray" v-if="list.length">共{{list.length}}只</view>
 		</u-index-list>
-		
-		<!-- 操作菜单 -->
-		<u-action-sheet :list="actions" @click="click" v-model="show"></u-action-sheet>
 	</view>
 </template>
 
@@ -47,12 +44,7 @@
 			return {
 				indexList: [],
 				indexData: [],
-				total: 0,
-				actions: [{
-					text: '编辑',
-				}],
-				show: false,
-				id: ''
+				total: 0
 			}
 		},
 		watch: {
@@ -90,14 +82,15 @@
 					
 				if(this.userInfo._id === item.uid || this.userInfo.role) {
 					uni.vibrateShort()
-					this.show = true
-					this.id = item._id
+					uni.showActionSheet({
+						itemList: ['编辑'],
+						success: ({tapIndex}) => {
+							uni.navigateTo({
+								url: "edit?id=" + item._id
+							})
+						}
+					})
 				}
-			},
-			click(index) {
-				uni.navigateTo({
-					url: "edit?id=" + this.id
-				})
 			}
 		}
 	}

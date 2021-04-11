@@ -8,8 +8,7 @@
 		</view>
 		<view class="fullscreen" v-else-if="!hasBase">
 			<u-empty text="未加入猫区" mode="list">
-				<navigator url="/pages/radar/bases" class="cu-btn bg-blue margin radius" slot="bottom"
-					open-type="switchTab">去选择</navigator>
+				<navigator url="/pages/radar/bases" class="cu-btn bg-blue margin radius" slot="bottom">去选择</navigator>
 			</u-empty>
 		</view>
 		<view v-else>
@@ -128,6 +127,11 @@
 			},
 			onDel(id) {
 				this.$refs.udb.remove(id)
+			}
+		},
+		onShareAppMessage(e) {
+			if(e.from === "button") {
+				return e.target.dataset.shareinfo
 			}
 		}
 	}

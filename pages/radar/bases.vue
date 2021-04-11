@@ -60,7 +60,7 @@
 						</view>
 					</view>
 					<button class="cu-btn block bg-blue margin-top lg" :disabled="!form.name" @tap="onSubmit">保存</button>
-					<button class="cu-btn block bg-red margin-top lg" v-if="form.uid===userInfo._id" @tap="onDelete(form._id)">删除</button>
+					<button class="cu-btn block bg-red margin-top lg" v-if="form.uid===userInfo._id||userInfo.role" @tap="onDelete(form._id)">删除</button>
 				</view>
 			</view>
 		</view>

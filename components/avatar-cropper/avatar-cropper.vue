@@ -22,21 +22,21 @@
 					</view>
 				</view>
 				<view class="content">
-					<view class="cropper-wrapper" :style="{ height: cropperOpt.height + 'px' }">
+					<view class="cropper-wrapper" :style="{ height: cropperOpt.height + 'px' }" v-if="show">
 						<canvas
 							class="cropper"
-							:disable-scroll="true"
+							disable-scroll
 							@touchstart="touchStart"
 							@touchmove="touchMove"
 							@touchend="touchEnd"
 							:style="{ width: cropperOpt.width, height: cropperOpt.height, backgroundColor: 'rgba(0, 0, 0, 0.8)' }"
 							canvas-id="cropper"
 							id="cropper"
-							v-if="show"
 						></canvas>
 						<canvas
 							class="cropper"
-							:disable-scroll="true"
+							type="2d"
+							disable-scroll
 							:style="{
 								position: 'fixed',
 								top: `-${cropperOpt.width * cropperOpt.pixelRatio}px`,
@@ -46,7 +46,6 @@
 							}"
 							canvas-id="targetId"
 							id="targetId"
-							v-if="show"
 						></canvas>
 					</view>
 				</view>
@@ -186,6 +185,10 @@ export default {
 <style>
 	.container {
 		width: 100%;
+	}
+	
+	.cu-modal {
+		transition: none;
 	}
 
 	.cropper-wrapper {

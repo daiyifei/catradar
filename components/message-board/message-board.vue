@@ -1,10 +1,14 @@
 <template>
 	<view style="margin-top: -50rpx;">
 		<!-- 功能按钮 -->
-		<view class="text-right text-grey" id="comments">
+		<view class="flex justify-end text-grey" id="comments">
 			<text class="padding-lr like-loading cu-load load-cuIcon loading" v-if="likeLoading"></text>
-			<text class="padding" :class="'cuIcon-like'+(likeId?'fill':'')" @tap="like" v-else>{{(likeId?'取消':'赞')}}</text>
-			<text class="padding-tb cuIcon-message" @tap="comment">评论</text>
+			<text class="padding-lr" :class="'cuIcon-like'+(likeId?'fill':'')" @tap="like" v-else>{{(likeId?'取消':'赞')}}</text>
+			<text class="cuIcon-message" @tap="comment">评论</text>
+			<view style="position: relative;" class="padding-left">
+				<button class="btn-transparent" open-type="share" :data-shareInfo="shareInfo"></button>
+				<text class="cuIcon-share" @tap="comment">分享</text>
+			</view>
 		</view>
 		
 		<view class="bg-gray radius margin-top-sm">
@@ -104,7 +108,12 @@
 				reply_nickname: '',
 				form: {},
 				keyboardHeight: 0,
-				condition: `timeline_id=='${this.timeline._id}'`
+				condition: `timeline_id=='${this.timeline._id}'`,
+				shareInfo: {
+					title: this.timeline.text,
+					path: '/pages/timeline/detail?id=' + this.timeline._id,
+					imageUrl: this.timeline.album.shift()
+				}
 			}
 		},
 		watch: {
