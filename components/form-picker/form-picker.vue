@@ -2,7 +2,7 @@
 	<view>
 		<picker :value="index" :range="range" :range-key="rangeKey" @change="onChange">
 			<view class="picker">
-				{{value===undefined?placeholder:label}}
+				{{label?label:placeholder}}
 			</view>
 		</picker>
 	</view>
@@ -19,10 +19,6 @@
 				type: String,
 				default: '请选择'
 			}
-		},
-		model: {
-			prop: 'value',
-			event: 'change'
 		},
 		data() {
 			return {
@@ -45,10 +41,10 @@
 				const index = e.detail.value
 				if(this.rangeKey) {
 					this.label = this.range[index][this.rangeKey]
-					this.$emit('change',this.range[index][this.valueKey])
+					this.$emit('input',this.range[index][this.valueKey])
 				}else {
 					this.label = this.range[index]
-					this.$emit('change', parseInt(e.detail.value))
+					this.$emit('input', parseInt(e.detail.value))
 				}
 			}
 		}

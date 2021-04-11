@@ -98,10 +98,6 @@ export default {
 			default: 1
 		}
 	},
-	model: {
-		prop: 'value',
-		event: 'change'
-	},
 	data() {
 		return {
 			show: false,
@@ -174,7 +170,7 @@ export default {
 				} else {
 					this.show = false
 					this.src = path
-					this.$emit('change', path)
+					this.$emit('input', path)
 				}
 			})
 		}

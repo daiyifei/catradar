@@ -106,5 +106,9 @@
 </script>
 
 <style>
-
+	.nav {
+		position: sticky;
+		top: 0;
+		z-index: 9;
+	}
 </style>

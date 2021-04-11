@@ -22,10 +22,10 @@
 			setTimeout(() => {
 				const observer = uni.createIntersectionObserver(this)
 				observer.relativeToViewport({
-					top: -100,
-					bottom: -100,
-				}).observe('#video', res => {
-					if (res.intersectionRatio > 0) {
+					top: -200,
+					bottom: -200,
+				}).observe('#video', ({intersectionRatio}) => {
+					if (intersectionRatio > 0) {
 						// 进入视口
 						this.videoCtx.play()
 					}else {

@@ -13,10 +13,6 @@
 			color: String,
 			customClass: String
 		},
-		model: {
-			prop: 'value',
-			event: 'change'
-		},
 		data() {
 			return {
 				checked: false
@@ -28,7 +24,7 @@
 		methods: {
 			onChange(e) {
 				this.checked = e.detail.value
-				this.$emit('change',e.detail.value)
+				this.$emit('input',e.detail.value)
 			}
 		}
 	}
