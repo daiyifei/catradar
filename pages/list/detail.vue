@@ -215,7 +215,7 @@
 				return `cat_id=='${this.id}'`
 			},
 			isFav() {
-				if (this.hasLogin && ~this.userInfo.favs.indexOf(this.form._id)) {
+				if (this.userInfo.favs.includes(this.form._id)) {
 					return true
 				} else {
 					return false
@@ -306,7 +306,7 @@
 			fav() {
 				const {
 					_id,
-					favs = []
+					favs
 				} = this.userInfo
 				if (this.isFav) {
 					favs.splice(favs.indexOf(this.form._id), 1)

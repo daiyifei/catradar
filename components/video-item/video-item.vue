@@ -1,16 +1,7 @@
 <template>
 	<view>
-		<video id="video" ref="video" :src="src" :objectFit="fullscreen?'contain':'cover'" :controls="false" loop :muted="!fullscreen" class="margin-tb-sm video radius" :direction="0" @fullscreenchange="fullscreenchange" @play="onPlay" @pause="onPause"
+		<video id="video" ref="video" :src="src" :objectFit="fullscreen?'contain':'cover'" :controls="false" loop :muted="!fullscreen" class="margin-tb-sm video radius" :direction="0" @fullscreenchange="onFullscreenchange" @play="onPlay" @pause="onPause"
 			@tap.stop.prevent="onTap" @longpress.stop.prevent="onLongpress"></video>
-		<!-- 操作菜单 -->
-		<view class="cu-modal bottom-modal" :class="show?'show':''" @tap="show=false">
-			<view class="cu-dialog">
-				<view class="cu-list menu">
-					<view class="cu-item margin-bottom-sm" @tap="saveVideo">保存视频</view>
-					<view class="cu-item" @tap="show=false">取消</view>
-				</view>
-			</view>
-		</view>
 	</view>
 </template>
 
@@ -24,8 +15,7 @@
 			return {
 				videoCtx: uni.createVideoContext('video', this),
 				playing: false,
-				fullscreen: false,
-				show: false
+				fullscreen: false
 			}
 		},
 		mounted() {
@@ -52,6 +42,9 @@
 			onPause() {
 				this.playing = false
 			},
+			onFullscreenchange(e) {
+				this.fullscreen = e.detail.fullscreen
+			},
 			onTap() {
 				if (this.playing) {
 					this.fullscreen ? this.videoCtx.exitFullScreen() : this.videoCtx.requestFullScreen()
@@ -60,17 +53,18 @@
 				}
 			},
 			onLongpress() {
-				if(this.fullscreen)
-					return
-				this.show = true
-			},
-			fullscreenchange(e) {
-				this.fullscreen = e.detail.fullscreen
+				if(this.fullscreen) {
+					uni.vibrateShort()
+					uni.showActionSheet({
+						itemList: ['保存视频'],
+						success: ({tapIndex}) => {
+							this.saveVideo()
+						}
+					})
+				}
 			},
 			async saveVideo(index) {
 				// #ifndef H5
-				this.show = false
-				
 				uni.getSetting({
 					success: ({authSetting}) => {
 						if(authSetting['scope.writePhotosAlbum']) {

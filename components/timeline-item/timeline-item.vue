@@ -22,9 +22,9 @@
 				<view class="flex" v-if="item.content_type" @tap="toDetail">
 					<video-item :src="item.album[0]" class="basis-lg" @tap.stop />
 				</view>
-				<view class="grid grid-square col-3 margin-top-sm" @tap="toDetail" v-else>
+				<view class="grid grid-square margin-top-sm" :class="item.album.length>1?'col-3':'col-2'" @tap="toDetail" v-else>
 					<view v-for="(pic,idx) in item.album" :key="idx" @tap.stop.prevent="preview(item.album,idx)">
-						<u-lazy-load :image="pic" img-mode="aspectFill" height="200rpx" border-radius="6"></u-lazy-load>
+						<u-lazy-load :image="pic" img-mode="aspectFill" :height="item.album.length>1?'200rpx':'300rpx'" border-radius="6"></u-lazy-load>
 					</view>
 				</view>
 				<!-- 作者信息 -->
@@ -34,9 +34,6 @@
 				<message-board :timeline="item" :list="item.comments" @focus="onFocus" />
 			</view>
 		</view>
-
-		<!--操作菜单-->
-		<u-action-sheet :list="actions" @click="click" v-model="show"></u-action-sheet>
 	</view>
 </template>
 
@@ -47,32 +44,6 @@
 		props: {
 			item: Object,
 			isLink: Boolean
-		},
-		data() {
-			return {
-				show: false,
-				fullscreen: false
-			}
-		},
-		computed: {
-			actions() {
-				const actions = [{
-					text: '编辑',
-					action: 'edit'
-				}, {
-					text: '删除',
-					color: 'red',
-					action: 'del'
-				}]
-				const { _id, role } = this.userInfo
-				if (this.item.content_type === 0 && (_id === this.item.cat_id[0].uid || role)) {
-					actions.unshift({
-						text: '同步到相册',
-						action: 'sync'
-					})
-				}
-				return actions
-			}
 		},
 		methods: {
 			onFocus() {
@@ -94,26 +65,37 @@
 				}
 			},
 			showMenu() {
-				this.show = true
-			},
-			click(index) {
-				switch (this.actions[index].action) {
-					case 'edit':
-						uni.navigateTo({
-							url: 'edit?id=' + this.item._id
-						})
-						break
-					case 'sync':
-						uni.navigateTo({
-							url: `/pages/list/edit?id=${this.item.cat_id[0]._id}&path=${JSON.stringify(this.item.album)}`
-						})
-						break
-					case 'del':
-						this.$emit('del', this.item._id)
-						break
-					default:
-						break
+				const itemList = ['编辑','删除']
+				if (this.item.content_type === 0 && 
+					(this.userInfo._id === this.item.cat_id[0].uid || this.userInfo.role)) {
+					itemList.push('同步到相册')
 				}
+				uni.vibrateShort()
+				uni.showActionSheet({
+					itemList,
+					success: ({tapIndex}) => {
+						switch (tapIndex) {
+							case 0:
+								uni.navigateTo({
+									url: '/pages/timeline/edit?id=' + this.item._id
+								})
+								break
+							case 1:
+								this.$emit('del', this.item._id)
+								break
+							case 2:
+								uni.navigateTo({
+									url: `/pages/list/edit?id=${this.item.cat_id[0]._id}&path=${JSON.stringify(this.item.album)}`
+								})
+								break
+							default:
+								break
+						}
+					}
+				})
+			},
+			onShareAppMessage() {
+				return this.shareObj
 			}
 		}
 	}

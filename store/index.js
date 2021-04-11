@@ -11,6 +11,8 @@ const store = new Vuex.Store({
 	},  
 	mutations: {  
 		login(state, userInfo) {
+			userInfo.favs = userInfo.favs || []
+			userInfo.subscribes = userInfo.subscribes || []
 			state.userInfo = userInfo
 			uni.setStorageSync('user_info', userInfo)
 			state.hasLogin = true
@@ -20,10 +22,7 @@ const store = new Vuex.Store({
 			state.hasLogin = false
 			state.baseInfo = {}
 			state.hasBase = false
-			uni.removeStorageSync('uni_id_token')
-			uni.removeStorageSync('uni_id_token_expired')
-			uni.removeStorageSync('user_info')
-			uni.removeStorageSync('base_info')
+			uni.clearStorage()
 		},
 		enter(state, baseInfo) {
 			state.baseInfo = baseInfo
