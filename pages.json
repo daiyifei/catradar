@@ -41,8 +41,7 @@
 				"navigationBarTitleText": "情报",
 				"enablePullDownRefresh": true,
 				"navigationStyle": "custom",
-				"navigationBarTextStyle": "white",
-				"titleNView": false
+				"navigationBarTextStyle": "white"
 			}
 		}, {
 			"path": "pages/mine/index",
@@ -109,6 +108,7 @@
 			"path": "pages/mine/homepage",
 			"style": {
 				"navigationStyle": "custom",
+				"titleNView": false,
 				"navigationBarTitleText": "",
 				"enablePullDownRefresh": false
 			}
@@ -153,11 +153,6 @@
 		"navigationBarTitleText": "猫雷达",
 		"backgroundColor": "#f1f1f1",
 		"onReachBottomDistance": 200,
-		"app-plus": {
-			"titleNView": {
-				"backgroundImage": "linear-gradient(to right, #0081ff, #1cbbb4)"
-			}
-		},
 		"navigationBarBackgroundColor": "#0081FF",
 		"mp-alipay": {
 			/* 支付宝小程序特有相关 */

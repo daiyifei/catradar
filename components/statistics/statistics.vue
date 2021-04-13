@@ -6,7 +6,7 @@
 		</view>
 		<view class="cu-modal drawer-modal justify-end" :class="show ? 'show' : ''" @tap.stop="hideDrawer" @touchmove.stop.prevent>
 			<view class="cu-dialog bg-white basis-lg" @tap.stop="">
-				<scroll-view scroll-y @touchmove.stop.prevent style="height: 100vh;">
+				<scroll-view scroll-y @touchmove.stop.prevent class="scroll-wrp">
 					<view class="solid-bottom" v-for="(item,index) in keys" :key="index" v-show="show">
 						<view class="padding text-left padding-bottom-sm text-sm">{{item.label}}</view>
 						<pie-chart :width="450" :series="charts[item.key]"/>
@@ -73,5 +73,11 @@
 <style>
 	.cu-dialog {
 		padding-top: var(--status-bar-height);
+	}
+	
+	.scroll-wrp {
+		position: absolute;
+		top: var(--status-bar-height);
+		bottom: var(--window-bottom);
 	}
 </style>

@@ -24,7 +24,7 @@
 			</view>
 			<view class="cu-form-group" v-if="form.state===0">
 				<view class="title">位置</view>
-				<form-picker v-model="form.location" value-key="id" range-key="name" :range="baseInfo.locations" />
+				<form-picker v-model="form.location" value-key="id" range-key="name" :range="baseInfo.locations || []" />
 			</view>
 			<view class="cu-form-group" v-if="form.state===1">
 				<view class="title">失踪时间</view>
@@ -54,7 +54,7 @@
 				<view class="title">简介</view>
 				<textarea placeholder="请输入猫咪简介" v-model="form.intro"></textarea>
 			</view>
-			<view class="cu-form-group margin-top">
+			<view class="cu-form-group margin-to">
 				<view class="title">相册</view>
 				<drag-album v-model="form.album" class="response" />
 			</view>
@@ -77,7 +77,9 @@
 				id: '',
 				form: {
 					name: '',
-					state: 0
+					state: 0,
+					female: false,
+					neuter: false
 				},
 				colors: this.$colors,
 				states: this.$states,
@@ -106,9 +108,6 @@
 				this.loading = false
 			},
 			async onSubmit(e) {
-				console.log(this.form)
-					return
-				
 				this.saving = true
 				
 				// 拼音

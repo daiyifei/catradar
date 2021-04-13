@@ -1,7 +1,7 @@
 <template>
 	<view>
-		<video id="video" ref="video" :src="src" :objectFit="fullscreen?'contain':'cover'" :controls="false" loop :muted="!fullscreen" class="margin-tb-sm video radius" :direction="0" @fullscreenchange="onFullscreenchange" @play="onPlay" @pause="onPause"
-			@tap.stop.prevent="onTap" @longpress.stop.prevent="onLongpress"></video>
+		<video id="video" :class="guid" :src="src" :objectFit="fullscreen?'contain':'cover'" :controls="false" loop :muted="!fullscreen" class="margin-tb-sm video radius" :direction="0" @fullscreenchange="onFullscreenchange" @play="onPlay" @pause="onPause"
+			@tap.stop.prevent="onTap" @longpress="onLongpress"></video>
 	</view>
 </template>
 
@@ -13,6 +13,7 @@
 		},
 		data() {
 			return {
+				guid: this.$u.guid(),
 				videoCtx: uni.createVideoContext('video', this),
 				playing: false,
 				fullscreen: false
@@ -24,7 +25,7 @@
 				observer.relativeToViewport({
 					top: -200,
 					bottom: -200,
-				}).observe('#video', ({intersectionRatio}) => {
+				}).observe('.'+this.guid, ({intersectionRatio}) => {
 					if (intersectionRatio > 0) {
 						// 进入视口
 						this.videoCtx.play()

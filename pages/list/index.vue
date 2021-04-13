@@ -136,6 +136,10 @@
 				})
 			},
 			add() {
+				if(!this.baseInfo.allow_publish) {
+					this.$u.toast('暂停使用')
+					return
+				}
 				uni.navigateTo({
 					url: 'edit'
 				})

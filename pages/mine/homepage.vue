@@ -3,7 +3,7 @@
 		<u-navbar :background="background" back-icon-color="#fff" title-color="#fff" immersive :title="title" :title-color="titleColor"></u-navbar>
 		
 		<!-- 头部 -->
-		<user-info @update-user="updateUser" :value="user" class="user-info"></user-info>
+		<user-info :value="user" class="user-info"></user-info>
 		
 		<!-- 时间轴 -->
 		<view class="padding">
@@ -26,13 +26,7 @@
 						</navigator>
 						<navigator class="content" :url="`/pages/timeline/detail?id=${item._id}`">
 							<view class="text-content">{{item.text}}</view>
-							<video-item :src="item.album[0]" v-if="item.content_type" />
-							<view class="grid grid-square margin-top-sm" :class="item.album.length>1?'col-3':'col-2'" v-else>
-								<view class="bg-img" v-for="(pic,idx) in item.album" :key="idx">
-									<image :src="pic" mode="aspectFill" @tap.stop="preview(item.album, idx)">
-									</image>
-								</view>
-							</view>
+							<album :urls="item.album" />
 						</navigator>
 					</view>
 				</view>

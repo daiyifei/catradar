@@ -27,6 +27,9 @@
 			}
 		},
 		created() {
+			if(this.value === undefined)
+				return
+			
 			if(this.rangeKey) {
 				const index = this.range.findIndex(v => v[this.valueKey] === this.value) 
 				this.index = ~index ? index : 0

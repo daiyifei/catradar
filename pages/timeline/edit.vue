@@ -1,5 +1,5 @@
 <template>
-	<view>
+	<view v-if="baseInfo.allow_publish">
 		<view class="cu-load loading text-gray" v-if="loading"></view>
 		<view class="cu-form-group" v-else>
 			<remote-input collection="list" value-key="name" search-key="name,py" :placeholder="(form.content_type?'视频':'照片')+'中的是谁？'" ref="remote" v-model="form.cat_id" class="response" />
@@ -13,6 +13,7 @@
 		</view>
 		<button class="cu-btn block bg-blue margin lg" :loading="saving" :disabled="disabled" @tap="onSubmit">{{id?'保存':'发布'}}</button>
 	</view>
+	<u-empty text="暂停使用" v-else class="padding-xl"></u-empty>
 </template>
 
 <script>

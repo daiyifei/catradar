@@ -5,8 +5,8 @@
 	"permission": {
 		"read": true,
 		"create": true,
-		"update": "doc.uid == auth.uid",
-		"delete": "doc.uid == auth.uid"
+		"update": "doc.uid == auth.uid || doc.touid == auth.uid",
+		"delete": "doc.uid == auth.uid || doc.touid == auth.uid"
 	},
 	"properties": {
 		"_id": {
@@ -20,8 +20,8 @@
 			},
 			"foreignKey": "uni-id-users._id"
 		},
-		"touids": {
-			"bsonType": "array",
+		"touid": {
+			"bsonType": "string",
 			"description": "接收者ID，参考`uni-id-users` 表",
 			"foreignKey": "uni-id-users._id"
 		},
@@ -35,15 +35,20 @@
 			"description": "消息内容",
 			"trim": "both"
 		},
+		"type": {
+			"bsonType": "number",
+			"description": "类别 1 私信 2 加入申请 3 开通申请 4 申请通过",
+			"defaultValue": 1
+		},
 		"is_read": {
 			"bsonType": "bool",
 			"description": "是否已读",
-			"forceDefaultValue": false
+			"defaultValue": false
 		},
 		"is_reply": {
 			"bsonType": "bool",
-			"description": "是否已回",
-			"forceDefaultValue": false
+			"description": "是否已回复",
+			"defaultValue": false
 		},
 		"create_date": {
 			"bsonType": "timestamp",

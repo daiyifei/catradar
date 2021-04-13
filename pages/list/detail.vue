@@ -1,18 +1,16 @@
 <template>
 	<view>
 		<u-skeleton :loading="loading" animation bgColor="#FFF"></u-skeleton>
-		<u-navbar :back-icon-name="isSingle?'home':'nav-back'" :custom-back="customBack" :background="background"
-			:title="title" back-icon-color="#fff" :title-color="titleColor" immersive>
+		<u-navbar :back-icon-name="isSingle?'home':'nav-back'" :custom-back="customBack" :background="navBackground"
+			:title="title" back-icon-color="#fff" :title-color="titleColor" :immersive="immersive">
 		</u-navbar>
 		<view class="u-skeleton">
 			<!-- 封面 -->
 			<swiper class="swiper screen-swiper square-dot u-skeleton-rect" :indicator-dots="true" :circular="true"
-				@change="imgChange">
+				@change="imgChange" v-if="immersive">
 				<swiper-item v-for="(item,index) in form.album" :key="index">
 					<view class="swiper-item" @tap="preview(form.album, index)">
-						<video :src="item" autoplay loop :show-play-btn="false" :controls="false" objectFit="cover"
-							v-if="item.split('.').pop()=='mp4'" />
-						<image :src="item" mode="aspectFill" v-else />
+						<u-image :src="item" height="100%" />
 					</view>
 				</swiper-item>
 			</swiper>
@@ -20,7 +18,7 @@
 			<template v-if="hasLogin">
 				<!-- 头部 -->
 				<view class="header padding flex align-center bg-white margin-sm radius shadow shadow-blur">
-					<image :src="form.avatar" class="cu-avatar xl round margin-right-sm u-skeleton-circle" ></image>
+					<image class="cu-avatar xl round margin-right-sm u-skeleton-circle" :src="form.avatar">
 					<view>
 						<view class="text-xxl u-skeleton-circle">{{form.name}}</view>
 						<view>
@@ -145,13 +143,7 @@
 							<view class="cu-item" :class="index?'':'text-blue'">
 								<view class="content">
 									<view class="text-content">{{item.text}}</view>
-									<video-item :src="item.album[0]" v-if="item.content_type" />
-									<view class="grid grid-square margin-top-sm" :class="item.album.length>1?'col-3':'col-2'" v-else>
-										<view class="bg-img" v-for="(pic,idx) in item.album" :key="idx">
-											<image :src="pic" mode="aspectFill" @tap.stop="preview(item.album, idx)">
-											</image>
-										</view>
-									</view>
+									<album :urls="item.album" />
 								</view>
 							</view>
 						</view>
@@ -160,7 +152,7 @@
 				</view>
 				
 				<!-- 操作条 -->
-				<view class="action-bar cu-bar bg-white tabbar shop border">
+				<view class="action-bar cu-bar bg-white tabbar border shop">
 					<view class="action" @tap="fav">
 						<view :class="isFav?'cuIcon-favorfill text-orange':'cuIcon-favor'"></view>
 						<text :class="isFav?'text-orange':''">{{isFav?'已':''}}收藏</text>
@@ -172,8 +164,8 @@
 						<view class="cuIcon-edit"></view>编辑
 					</navigator>
 					<view class="btn-group margin-lr-xs">
-						<button class="cu-btn bg-gradual-orange round shadow-blur flex-sub margin-lr-xs" @tap="addTimeline">发布动态</button>
-						<button class="cu-btn bg-gradual-blue round shadow-blur flex-sub margin-lr-xs" v-if="form.state===0&&form.uid!==userInfo._id" @tap="goAdopt">我想领养</button>
+						<button class="cu-btn bg-gradual-orange round margin-lr-xs shadow-blur" @tap="addTimeline">发布动态</button>
+						<button class="cu-btn bg-gradual-blue round  margin-lr-xs shadow-blur" v-if="form.state===0&&form.uid!==userInfo._id" @tap="goAdopt">我想领养</button>
 					</view>
 				</view>
 			</template>
@@ -199,12 +191,14 @@
 				form: {},
 				base: {},
 				owner: {},
-				loading: true,
-				background: {
+				immersive: true,
+				navBackground: {
 					background: ''
 				},
-				title: '',
-				titleColor: ''
+				titleColor: '#fff',
+				opacity: 0,
+				loading: true,
+				title: ''
 			}
 		},
 		computed: {
@@ -222,6 +216,13 @@
 					return false
 				}
 			},
+		},
+		watch: {
+			opacity(opacity) {
+				this.titleColor = `rgba(255,255,255,${opacity})`
+				this.navBackground.background = this.form.female ? `linear-gradient(45deg, rgba(236,0,140,${opacity}), rgba(103,57,182,${opacity}))` :
+					`linear-gradient(45deg, rgba(0,129,255,${opacity}), rgba(28,187,180,${opacity}))`
+			}
 		},
 		onLoad(option) {
 			this.id = option.id
@@ -245,33 +246,42 @@
 			})
 		},
 		onPageScroll(e) {
-			const opacity = e.scrollTop / 100
+			if(!this.immersive) 
+				return
+			this.opacity = e.scrollTop / 100
 			this.title = this.form.name
-			this.titleColor = `rgba(255,255,255,${opacity})`
-			this.background.background = this.form.female ?
-				`linear-gradient(45deg, rgba(236,0,140,${opacity}), rgba(103,57,182,${opacity}))` :
-				`linear-gradient(45deg, rgba(0,129,255,${opacity}), rgba(28,187,180,${opacity}))`
 		},
 		onReachBottom() {
 			this.$refs.udb.loadMore()
 		},
 		methods: {
 			location(value) {
-				if (typeof value === undefined) return '未知'
+				if (!value) return '未知'
 				const location = this.base.locations.find(v => v.id == value)
 				return location.name
 			},
 			async fetchData() {
+				// 猫咪信息
 				const {result: {data: form}} = await db.collection('list').doc(this.id).get({
 					getOne: true
 				})
+				
+				if(!form.album || !form.album.length) {
+					this.immersive = false
+					this.opacity = 1
+					this.title = form.name
+				}
+				
+				// 猫区信息
 				const {result: {data: base}} = await db.collection('bases').doc(form.base_id).get({
 					getOne: true
 				})
+				// 主人信息
 				if(form.state === 2) {
-					const {result: {data: owner}} = await db.collection('uni-id-users').doc(form.uid).field('nickname,avatar').get({
-						getOne: true
-					})
+					const {result: {data: owner}} = await db.collection('uni-id-users')
+						.doc(form.uid).field('nickname,avatar').get({
+							getOne: true
+						})
 					this.owner = owner
 				}
 				this.form = form
@@ -345,7 +355,12 @@
 				})
 				// #endif
 			},
-			addTimeline() {
+			async addTimeline() {
+				if(!this.baseInfo.allow_publish) {
+					this.$u.toast('暂停使用')
+					return
+				}
+				
 				const option = {
 					sizeType: ['compressed'],
 					success: res => {
@@ -356,12 +371,8 @@
 				}
 				
 				// #ifdef MP-WEIXIN
-				uni.requestSubscribeMessage({
-					tmplIds: ['73TwwDG5U8hoQT_WCOC85kt7Rr5lr_v8aZb-a9M_hl8'],
-					success: () => {
-						uni.chooseMedia(option)
-					}
-				})
+				await this.$requestMsg()
+				uni.chooseMedia(option)
 				// #endif
 				// #ifndef MP-WEIXIN
 				uni.chooseImage(option)
@@ -385,7 +396,7 @@
 							provider: "weixin",
 							scene: "WXSceneSession",
 							type: 2,
-							imageUrl: this.form.album[this.current],
+							imageUrl: this.immersive ? this.form.album[this.current] : this.form.avatar,
 							fail(err) {
 								this.$u.toast(err.message)
 							}
@@ -400,7 +411,7 @@
 			return {
 				title: this.form.name,
 				path: '/pages/list/detail?id=' + this.form._id,
-				imageUrl: this.form.album[this.current]
+				imageUrl: this.immersive ? this.form.album[this.current] : this.form.avatar
 			}
 		}
 	}
@@ -411,6 +422,14 @@
 		position: sticky;
 		bottom: 0;
 		z-index: 9;
+	}
+	
+	.action-bar .action {
+		width: 110rpx !important;
+	}
+	
+	.btn-group .cu-btn {
+		flex: 1;
 	}
 
 	/* swiper */
