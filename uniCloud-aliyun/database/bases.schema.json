@@ -51,6 +51,19 @@
     	},
     	"foreignKey": "uni-id-users._id"
     },
+		"allow_publish": {
+			"bsonType": "bool",
+			"description": "允许发布"
+		},
+		"need_verify": {
+			"bsonType": "bool",
+			"description": "加入验证"
+		},
+		"available": {
+			"bsonType": "bool",
+			"description": "是否激活",
+			"defaultValue": false
+		},
     "create_date": {
       "bsonType": "timestamp",
       "description": "创建时间",

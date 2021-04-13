@@ -20,7 +20,7 @@
 			
 			<!-- 微信登录 -->
 			<!-- #ifdef APP-PLUS || MP-WEIXIN -->
-			<button class="margin-xl cu-btn bg-green block lg" @tap="updateUser">
+			<button class="margin-xl cu-btn bg-green block lg" @tap="loginByWeixin">
 				<text class="cuIcon-weixin margin-right-xs"></text>
 				<text>微信一键授权</text>
 			</button>
@@ -55,6 +55,11 @@
 			// #endif	
 		},
 		methods: {
+			async refresh() {
+				const { userInfo } = await this.$request('user-center','getUserInfo')
+				this.login(userInfo)
+				uni.hideLoading()
+			},
 			register(e) {
 				this.$request('user-center','register',e.detail.value)
 			},
@@ -78,10 +83,31 @@
 						})
 					})
 			},
-			async refresh() {
-				const { userInfo } = await this.$request('user-center','getUserInfo')
-				this.login(userInfo)
-				uni.hideLoading()
+			async loginByWeixin() {
+				// #ifdef APP-PLUS
+				try{
+					uni.showLoading({
+						title: '登录中'
+					})
+					const code = await this.getWeixinCode()
+					const { userInfo, token, tokenExpired } = await this.$request('user-center','loginByWeixin', { code })
+					uni.setStorageSync('uni_id_token', token)
+					uni.setStorageSync('uni_id_token_expired', tokenExpired)
+					this.login(userInfo)
+				}catch(msg) {
+					uni.hideLoading()
+					uni.hideLoading()
+					this.logout()
+					uni.showToast({
+						title: msg,
+						icon: 'none'
+					})
+				}
+				// #endif
+				
+				// #ifdef MP-WEIXIN
+				this.updateUser()
+				// #endif
 			},
 			getWeixinCode() {
 				return new Promise((resolve, reject) => {
@@ -89,7 +115,6 @@
 					weixinAuthService.authorize(function(res) {
 						resolve(res.code)
 					}, function(err) {
-						console.log(err)
 						reject(new Error('微信登录失败'))
 					});
 					// #endif
@@ -128,7 +153,7 @@
 					this.refresh()
 				})
 			},
-			async updateUser() {
+			async updateUser(e) {
 				// #ifdef MP-WEIXIN
 				try{
 					const userInfo = await new Promise((resolve,reject) => {

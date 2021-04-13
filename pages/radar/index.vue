@@ -1,6 +1,6 @@
 <template>
 	<view>
-		<u-navbar :is-back="false" ref="navbar" :background="{background:`linear-gradient(45deg, rgba(0,129,255,1), rgba(28,187,180,1))`}">
+		<u-navbar :is-back="false" ref="navbar" :background="{background:`linear-gradient(45deg, rgba(0,129,255,1), rgba(28,187,180,1))`}" class="navbar">
 			<navigator class="padding text-white" url="bases">
 				<text class="cuIcon-locationfill margin-right-xs"></text>
 				<text>{{hasBase?baseInfo.name:'选择猫区'}}</text>
@@ -10,13 +10,15 @@
 		<map 
 			id="map" 
 			ref="map" 
-			class="map" 
+			class="map"
 			:latitude="latitude" 
 			:longitude="longitude" 
 			:markers="markers"
 			:include-points="markers"
-			:scale="scale" 
-			@markertap="showCatList" 
+			:scale="scale"
+			:controls="controls"
+			@controltap="onControl"
+			@markertap="showCatList"
 			show-location>
 		</map>
 		<!-- 猫咪列表 -->
@@ -46,10 +48,12 @@
 	export default {
 		data() {
 			return {
+				windowHeight: 0,
 				latitude: '',
 				longitude: '',
 				scale: 17,
 				markers: [],
+				controls: [],
 				catList: []
 			}
 		},
@@ -66,7 +70,32 @@
 		onLoad() {
 			this.getLocation()
 		},
+		async onReady() {
+			// #ifdef APP-PLUS
+			const { windowHeight } = this.$u.sys()
+			const { height } = await this.$u.getRect('.navbar')
+			this.windowHeight = windowHeight - height
+			this.controls.push({
+				id: 0,
+				iconPath: '/static/reset.png',
+				position: {
+					top: this.windowHeight - 50,
+					left: 15,
+					width: 35,
+					height: 35
+				},
+				clickable: true
+			})
+			
+			const map = uni.createMapContext('map')
+			const appMap = map.$getAppMap()
+			appMap.showUserLocation(true)
+			// #endif
+		},
 		methods: {
+			onControl({detail: {controlId}}) {
+				controlId === 0 ? this.getLocation() : this.showBase()
+			},
 			getLocation() {
 				uni.getLocation({
 					type:'gcj02',
@@ -134,9 +163,9 @@
 					const modal = uni.getSubNVueById('modal')
 					modal.show('fade-in', 500)
 					uni.$emit('modal-popup', data)
-					uni.$on('modal-hide', () => {
-						modal.hide()
-						this.getLocation()
+					uni.$once('modal-hide', () => {
+						modal.hide('fade-out', 500)
+						this.hideCatList()
 					})
 					return
 				// #endif
@@ -165,9 +194,8 @@
 <style>
 	.map {
 		position: fixed;
-		bottom: -10vh;
 		width: 100%;
-		height: 110vh;
+		height: 100vh;
 		mix-blend-mode: normal;
 		z-index: 0;
 	}

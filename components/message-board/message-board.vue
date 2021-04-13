@@ -1,13 +1,13 @@
 <template>
 	<view style="margin-top: -50rpx;">
 		<!-- 功能按钮 -->
-		<view class="flex justify-end text-grey" id="comments">
-			<text class="padding-lr like-loading cu-load load-cuIcon loading" v-if="likeLoading"></text>
-			<text class="padding-lr" :class="'cuIcon-like'+(likeId?'fill':'')" @tap="like" v-else>{{(likeId?'取消':'赞')}}</text>
-			<text class="cuIcon-message" @tap="comment">评论</text>
-			<view style="position: relative;" class="padding-left">
+		<view class="flex justify-end align-center text-grey" id="comments">
+			<view class="padding-lr like-loading cu-load load-cuIcon loading" v-if="likeLoading"></view>
+			<view class="padding-lr" :class="'cuIcon-like'+(likeId?'fill':'')" @tap="like" v-else>{{(likeId?'取消':'赞')}}</view>
+			<view class="cuIcon-message" @tap="comment">评论</view>
+			<view style="position: relative;" class="padding-left" @tap="share">
 				<button class="btn-transparent" open-type="share" :data-shareInfo="shareInfo"></button>
-				<text class="cuIcon-share" @tap="comment">分享</text>
+				<text class="cuIcon-share">分享</text>
 			</view>
 		</view>
 		
@@ -112,7 +112,7 @@
 				shareInfo: {
 					title: this.timeline.text,
 					path: '/pages/timeline/detail?id=' + this.timeline._id,
-					imageUrl: this.timeline.album.shift()
+					imageUrl: this.timeline.album[0]
 				}
 			}
 		},
@@ -176,10 +176,12 @@
 				const { height } = e.detail
 				const { screenHeight, windowHeight } = uni.getSystemInfoSync()
 				const bottom = screenHeight - windowHeight
-				if(getCurrentPages().length > 1) {
-					this.keyboardHeight = height
-				}else {
+				const pages = getCurrentPages()
+				const { route } = pages[pages.length - 1]
+				if(route.split('/').pop() === 'index') {
 					this.keyboardHeight = height - (bottom > 0 ? bottom : 0)
+				}else {
+					this.keyboardHeight = height
 				}
 				this.showEmoji = false
 			},
@@ -211,6 +213,9 @@
 				this.form.timeline_id = this.timeline._id
 				this.form.comment_type = 1
 			},
+			share() {
+				this.$emit('focus')
+			},
 			reply(item) {
 				const { _id, nickname, avatar } = item.uid[0]
 				this.form.reply_uid = _id
@@ -228,38 +233,33 @@
 				this.showInput = false
 			},
 			async addComment() {
-				// #ifdef MP-WEIXIN
-				await this.requestMsg()
-				// #endif
 				this.commentLoading = true
+				await this.$requestMsg()
+				try{
+					await this.$request('weixin', 'msgCheck', {
+						content: this.form.content
+					})
+				}catch(e){
+					this.hideInput()
+					this.$u.toast('包含敏感内容')
+					return
+				}
+				
 				await db.collection('comments').add(this.form)
 				this.refresh(() => {
 					this.hideInput()
 				})
 				this.sendMsg()
 			},
-			// 申请订阅
-			async requestMsg() {
-				return new Promise(resolve => {
-					uni.requestSubscribeMessage({
-						tmplIds: ['73TwwDG5U8hoQT_WCOC85kt7Rr5lr_v8aZb-a9M_hl8'],
-						success: () => {
-							resolve()
-						}
-					})
-				})
-			},
-			// 发送订阅消息
 			sendMsg() {
-				const touser = this.form.reply_uid || this.timeline.uid[0]._id
-				if(touser === this.userInfo._id)
-					return
-				this.$request('weixin','sendMsg', {
-					touser,
-					subject: this.timeline.cat_id[0].name,
-					content: this.form.content || '赞了您',
-					username: this.userInfo.nickname,
-					date: this.$u.timeFormat(Date.now(), 'yyyy-mm-dd hh:MM')
+				this.$sendMsg({
+					type: 'comment',
+					touid: this.form.reply_uid || this.timeline.uid[0]._id,
+					data: [
+						this.timeline.cat_id[0].name,
+						this.form.content || '赞了您',
+						this.userInfo.nickname
+					]
 				})
 			},
 			remove(id) {

@@ -22,6 +22,9 @@
 		},
 		onLoad(options) {
 			this.condition = `_id=='${options.id}'`
+			// #ifdef MP-WEIXIN
+			uni.hideShareMenu()
+			// #endif
 		},
 		onReady() {
 			this.$refs.udb.loadData()
@@ -32,9 +35,7 @@
 			}
 		},
 		onShareAppMessage(e) {
-			if(e.from === "button") {
-				return e.target.dataset.shareinfo
-			}
+			return e.target.dataset.shareinfo
 		}
 	}
 </script>

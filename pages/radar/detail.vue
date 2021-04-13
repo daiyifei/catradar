@@ -21,7 +21,7 @@
 						<text>{{item.nickname}}</text>
 					</view>
 					<view class="actions padding-right">
-						<text class="cu-tag bg-orange light round" v-if="item._id===options.uid||item.role">管理员</text>
+						<text class="cu-tag bg-orange light round" v-if="item._id===options.uid">管理员</text>
 					</view>
 				</view>
 				<view class="cu-load loading text-gray" v-if="loading"></view>
@@ -46,13 +46,15 @@
 				getOne: true
 			}).then(res => {
 				this.base = res.result.data
-				this.$refs.users.loadData()
+				this.$nextTick(() => {
+					this.$refs.users.loadData()
+				})
 			})
 		},
 		methods: {
 			loaded(data) {
 				data.map((item,index) => {
-					if(item._id === this.base.uid || item.role) {
+					if(item._id === this.base.uid) {
 						data.splice(index, 1)
 						data.unshift(item)
 					}

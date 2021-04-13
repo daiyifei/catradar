@@ -3,7 +3,7 @@
 		<view class="UCenter-bg">
 			<image v-if="value.avatar" :src="value.avatar" class="avatar" @tap="updateUser"/>
 			<view class="avatar cuIcon-my text-white" v-else></view>
-			<view class="text-xl">{{value.nickname?value.nickname:'请登录'}}</view>
+			<view class="text-xl">{{value.nickname}}</view>
 			<view class="margin-top-sm" v-if="value.role">
 				<text>猫司令</text>
 			</view>
@@ -43,10 +43,12 @@
 			value: Object
 		},
 		watch: {
-			value(val) {
-				if(val) {
+			value: {
+				handler(val) {
 					this.fetchData()
-				}
+				},
+				deep: true,
+				immediate: true
 			}
 		},
 		data() {
@@ -58,6 +60,13 @@
 		},
 		methods: {
 			async fetchData() {
+				if(!this.hasLogin) {
+					this.commentTotal = 0
+					this.favTotal = 0
+					this.adoptedTotal = 0
+					return
+				}
+				
 				const { _id, favs = [] } = this.value
 				const { result: { total: commentTotal } } = await db.collection('comments').where({
 					uid: _id

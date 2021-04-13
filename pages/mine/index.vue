@@ -14,12 +14,6 @@
 					<view class="cu-tag round bg-red sm">{{totalMsg}}</view>
 				</view>
 			</navigator>
-			<navigator class="cu-item" :url="`/pages/radar/detail?id=${baseInfo._id}`" v-if="hasBase">
-				<view class="content">
-					<text class="cuIcon-group text-grey"></text>
-					<text class="text-grey">成员列表</text>
-				</view>
-			</navigator>
 			<!-- #ifdef APP-PLUS -->
 			<view class="cu-item" @tap="bindWeixin" v-if="!userInfo.wx_openid">
 				<button class="cu-btn content">
@@ -71,13 +65,11 @@
 				totalMsg: 0
 			}
 		},
-		onLoad() {
+		onShow() {
 			uni.removeTabBarBadge({
 				index: 3
 			})
-		},
-		onShow() {
-			db.collection('messages').where(`touids=='${this.userInfo._id}'&&is_read==false`).count().then(res => {
+			db.collection('messages').where(`touid=='${this.userInfo._id}'&&is_read==false`).count().then(res => {
 				this.totalMsg = res.result.total
 			})
 			if(this.$refs.userInfo) {
@@ -96,8 +88,7 @@
 			},
 			updateUser() {
 				this.$refs.login.updateUser()
-			},
-			
+			}
 		}
 	}
 </script>

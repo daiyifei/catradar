@@ -24,7 +24,7 @@
 		methods: {
 			onChange(e) {
 				this.checked = e.detail.value
-				this.$emit('input',e.detail.value)
+				this.$emit('input', e.detail.value)
 			}
 		}
 	}

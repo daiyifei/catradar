@@ -94,7 +94,7 @@
 				}
 			},
 			checkMsg() {
-				db.collection('messages').where(`touids=='${this.userInfo._id}'&&is_read==false`).count().then(res => {
+				db.collection('messages').where(`touid=='${this.userInfo._id}'&&is_read==false`).count().then(res => {
 					const { total } = res.result
 					if(total > 0) {
 						uni.setTabBarBadge({
@@ -121,8 +121,7 @@
 				// #endif
 				
 				// #ifdef APP-PLUS
-				plus.runtime.getProperty(plus.runtime.appid, ({
-     0  				}) => {
+				plus.runtime.getProperty(plus.runtime.appid, ({version}) => {
 					this.$request('check-update', '', {
 						version
 					}).then(res => {
@@ -176,8 +175,6 @@
 	/* #ifndef APP-PLUS-NVUE */
 	@import "colorui/main.css";
 	@import "colorui/icon.css";
-	/* #endif */
-	
 	.fullscreen {
 		width: 100vw;
 		height: calc(100vh - var(--window-bottom));
@@ -218,4 +215,5 @@
 		color: #e54d42;
 		font-size: 34rpx;
 	}
+	/* #endif */
 </style>
