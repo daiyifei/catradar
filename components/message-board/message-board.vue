@@ -1,11 +1,11 @@
 <template>
 	<view style="margin-top: -50rpx;">
 		<!-- 功能按钮 -->
-		<view class="flex justify-end align-center text-grey" id="comments">
+		<view class="flex justify-end align-center text-grey comments" id="comments" @tap.stop>
 			<view class="padding-lr like-loading cu-load load-cuIcon loading" v-if="likeLoading"></view>
 			<view class="padding-lr" :class="'cuIcon-like'+(likeId?'fill':'')" @tap="like" v-else>{{(likeId?'取消':'赞')}}</view>
 			<view class="cuIcon-message" @tap="comment">评论</view>
-			<view style="position: relative;" class="padding-left" @tap="share">
+			<view style="position: relative;" class="padding-left">
 				<button class="btn-transparent" open-type="share" :data-shareInfo="shareInfo"></button>
 				<text class="cuIcon-share">分享</text>
 			</view>
@@ -64,7 +64,6 @@
 						confirm-type="send"
 						:focus="focus"
 						:adjust-position="false"
-						hold-keyboard
 						:placeholder="reply_nickname?'回复'+reply_nickname:'评论'" 
 						:value="form.content"
 						cursor-spacing="10" 
@@ -78,7 +77,7 @@
 					</view>
 					<button class="cu-btn bg-blue round" :disabled="!form.content" :loading="commentLoading" @tap="addComment">发送</button>
 				</view>
-				<view :style="{'height': keyboardHeight +'px'}"></view>
+				<view :style="{bottom: 0,height: keyboardHeight + 'px'}"></view>
 				<emoji ref="emoji" v-if="showEmoji" class="text-left" background-color="#f0f0f0" @insertemoji="insertemoji" @delemoji="onDel" @send="addComment"/>
 			</view>
 		</view>
@@ -184,6 +183,7 @@
 					this.keyboardHeight = height
 				}
 				this.showEmoji = false
+				this.$emit('focus', this.keyboardHeight)
 			},
 			onInput(e) {
 				const { value } = e.detail
@@ -206,15 +206,11 @@
 				this.form.content = matchs ? str.substring(0, str.lastIndexOf(matchs[0]))
 					: str.substring(0, str.length - 1)
 			},
-			comment() {
+			comment(e) {
 				this.showInput = true
 				this.focus = true
-				this.$emit('focus')
 				this.form.timeline_id = this.timeline._id
 				this.form.comment_type = 1
-			},
-			share() {
-				this.$emit('focus')
 			},
 			reply(item) {
 				const { _id, nickname, avatar } = item.uid[0]
@@ -233,6 +229,9 @@
 				this.showInput = false
 			},
 			async addComment() {
+				if(!this.form.content)
+					return
+					
 				this.commentLoading = true
 				await this.$requestMsg()
 				try{
@@ -295,7 +294,7 @@
 		display: inline-block;
 		line-height: 1em;
 	}
-
+	
 	.emoji-wrp {
 		display: inline-block;
 	  width: 24px;

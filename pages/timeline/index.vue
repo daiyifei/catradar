@@ -12,7 +12,7 @@
 			</u-empty>
 		</view>
 		<view v-else>
-			<u-navbar :is-back="false" :background="background" title="情报" back-icon-color="#fff" title-color="#fff" class="navbar" :immersive="immersive"></u-navbar>
+			<u-navbar :is-back="false" :background="background" title="情报" back-icon-color="#fff" title-color="#fff" class="navbar" immersive />
 			<view class="container">
 				<view class="header-bg">
 					<image
@@ -51,16 +51,18 @@
 	export default {
 		data() {
 			return {
-				background: {
-					background: ''
-				},
-				showBackToTop: false,
-				immersive: true
+				opacity: 0,
+				showBackToTop: false
 			}
 		},
 		computed: {
 			condition() {
 				return `base_id=='${this.baseInfo._id}'`
+			},
+			background() {
+				return {
+					background: `linear-gradient(45deg, rgba(57,181,74,${this.opacity}), rgba(141,198,63,${this.opacity}))`
+				}
 			}
 		},
 		onLoad() {
@@ -82,15 +84,8 @@
 			})
 		},
 		onPageScroll(e) {
-			const opacity = e.scrollTop / 100
-			this.background.background = `linear-gradient(45deg, rgba(57,181,74,${opacity}), rgba(141,198,63,${opacity}))`
-			this.immersive = opacity < 1
-			
-			if(e.scrollTop > 1000) {
-				this.showBackToTop = true
-			}else {
-				this.showBackToTop = false
-			}
+			this.opacity = e.scrollTop / 100
+			this.showBackToTop = e.scrollTop > 1000
 		},
 		onReachBottom() {
 			this.$refs.udb.loadMore()
@@ -98,6 +93,7 @@
 		methods: {
 			backTop() {
 				uni.pageScrollTo({
+					duration: 0,
 					scrollTop: 0
 				})
 			},
@@ -124,15 +120,15 @@
 				uni.chooseImage(option)
 				// #endif
 			},
-			onFocus(e) {
-				if(this.immersive)
-					return
-				uni.createSelectorQuery().select('.container').boundingClientRect(({top}) => {
-					uni.pageScrollTo({
-						duration: 0,
-						scrollTop: e.top - top
-					})
-				}).exec()
+			async onFocus(e) {
+				const { height } = await this.$u.getRect('.navbar')
+				const { top } = await this.$u.getRect('.container')
+				const { windowHeight } = this.$u.sys()
+				console.log(e.keyboardHeight)
+				uni.pageScrollTo({
+					duration: 0,
+					scrollTop: e.top - top - (windowHeight - e.height) + 55 + e.keyboardHeight
+				})
 			},
 			onDel(id) {
 				this.$refs.udb.remove(id)

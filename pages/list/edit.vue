@@ -1,5 +1,5 @@
 <template>
-	<view>
+	<view v-if="baseInfo.allow_publish">
 		<view class="cu-load loading text-gray" v-if="loading"></view>
 		<form @submit="onSubmit" v-else>
 			<view class="cu-form-group required">
@@ -66,6 +66,8 @@
 			<button class="cu-btn block bg-red margin lg" v-if="id" @tap="onDelete">删除</button>
 		</form>
 	</view>
+	
+	<u-empty text="暂停使用" v-else class="padding-xl"></u-empty>
 </template>
 
 <script>
