@@ -31,6 +31,15 @@
 				"navigationStyle": "custom",
 				"titleNView": false,
 				"navigationBarTextStyle": "white"
+				// #ifdef APP-PLUS  
+				,"titleNView": {
+					"type": "transparent",
+					"backgroundImage": "linear-gradient(to bottom right, #0081ff, #1cbbb4)",
+					"buttons": [{
+						"type": "share"
+					}]
+				}
+				// #endif
 			}
 		}, {
 			"path": "pages/list/edit",
@@ -40,8 +49,16 @@
 			"style": {
 				"navigationBarTitleText": "情报",
 				"enablePullDownRefresh": true,
-				"navigationStyle": "custom",
-				"navigationBarTextStyle": "white"
+				"navigationBarTextStyle": "white",
+				"navigationStyle": "custom"
+				// #ifdef APP-PLUS  
+				,"app-plus": {
+					"titleNView": {
+						"type": "transparent",
+						"backgroundImage": "linear-gradient(to bottom right, #39b54a, #8dc63f)"
+					}
+				}
+				// #endif
 			}
 		}, {
 			"path": "pages/mine/index",

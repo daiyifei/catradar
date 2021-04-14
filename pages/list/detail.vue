@@ -2,7 +2,7 @@
 	<view>
 		<u-skeleton :loading="loading" animation bgColor="#FFF"></u-skeleton>
 		<u-navbar :back-icon-name="isSingle?'home':'nav-back'" :custom-back="customBack" :background="navBackground"
-			:title="title" back-icon-color="#fff" :title-color="titleColor" :immersive="immersive">
+			:title="title" back-icon-color="#fff" :title-color="titleColor" :immersive="immersive" :is-back="isBack">
 		</u-navbar>
 		<view class="u-skeleton">
 			<!-- 封面 -->
@@ -198,7 +198,13 @@
 				titleColor: '#fff',
 				opacity: 0,
 				loading: true,
-				title: ''
+				title: '',
+				// #ifndef APP-PLUS
+				isBack: true
+				// #endif
+				// #ifdef APP-PLUS
+				isBack: false
+				// #endif
 			}
 		},
 		computed: {
@@ -425,7 +431,7 @@
 	}
 	
 	.action-bar .action {
-		width: 110rpx !important;
+		width: 100rpx !important;
 	}
 	
 	.btn-group .cu-btn {

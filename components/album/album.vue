@@ -1,8 +1,6 @@
 <template>
 	<view>
-		<view class="flex" v-if="isVideo">
-			<video-item :src="urls[0]" class="basis-lg"></video-item>
-		</view>
+		<video-item :src="urls[0]" v-if="isVideo"></video-item>
 		<view class="grid grid-square margin-top-sm" :class="urls.length>1?'col-3':'col-2'" v-else>
 			<view class="bg-img" v-for="(pic,idx) in urls" :key="idx" @tap.stop.prevent="preview(urls,idx)">
 				<u-image :src="pic" :height="urls.length>1?'200rpx':'300rpx'" />

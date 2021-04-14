@@ -16,7 +16,7 @@
 								<text class="cu-tag bg-orange light round" v-if="item.uid===userInfo._id||userInfo.role" @tap.stop.prevent="onEdit(item)">编辑</text>
 								<template v-if="item.subscribed">
 									<text class="cu-tag bg-blue light round" @tap.stop.prevent="toBaseDetail(item._id)">成员</text>
-									<text class="cu-tag round light bg-gray" @tap.stop.prevent="unSubscribe(item._id)">退出</text>
+									<text class="cu-tag round light bg-gray" @tap.stop.prevent="unSubscribe(item._id)">已加入</text>
 								</template>
 								<text class="cu-tag round light bg-blue" @tap.stop.prevent="subscribe(item)" v-else>加入</text>
 							</view>

@@ -80,7 +80,7 @@
 				// #endif
 			},
 			async getBaseInfo() {
-				if(this.userInfo.base_id) {
+				if(this.userInfo.base_id && this.userInfo.subscribes.includes(this.userInfo.base_id)) {
 					const baseInfo = uni.getStorageSync('base_info') || {}
 					this.enter(baseInfo)
 					try {

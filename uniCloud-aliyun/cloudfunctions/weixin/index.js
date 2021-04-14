@@ -114,7 +114,7 @@ async function sendMsg(params) {
 			template_id,
 			page: params.page || page,
 			data,
-			miniprogram_state: 'developer'
+			// miniprogram_state: 'developer'
 		})
 		return {
 			code: 0,

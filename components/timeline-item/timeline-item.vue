@@ -21,10 +21,12 @@
 				<view class="text-content text-lg" @tap="toDetail">{{item.text}}</view>
 				<album :urls="item.album" @tap="toDetail"></album>
 				<!-- 作者信息 -->
-				<navigator :url="`/pages/mine/homepage?uid=${item.uid[0]._id}`" v-if="hasLogin">
-					<image :src="item.uid[0].avatar" mode="aspectFill" class="cu-avatar sm round margin-right-xs" />
+				<view class="flex align-center" v-if="hasLogin">
+					<navigator :url="`/pages/mine/homepage?uid=${item.uid[0]._id}`">
+						<image :src="item.uid[0].avatar" mode="aspectFill" class="cu-avatar sm round margin-right-xs" />
+					</navigator>
 					<text class="text-gray">{{item.uid[0].nickname}}</text>
-				</navigator>
+				</view>
 				<!-- 留言区域 -->
 				<message-board :timeline="item" :list="item.comments" @focus="onFocus" v-if="hasLogin"/>
 			</view>
@@ -41,9 +43,12 @@
 			isLink: Boolean
 		},
 		methods: {
-			onFocus() {
+			onFocus(keyboardHeight) {
 				uni.createSelectorQuery().in(this).select('.item').boundingClientRect(data => {
-					this.$emit('focus', data)
+					this.$emit('focus', {
+						...data,
+						keyboardHeight
+					})
 				}).exec()
 			},
 			toDetail() {
