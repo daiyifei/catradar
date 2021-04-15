@@ -31,8 +31,9 @@
 				"navigationStyle": "custom",
 				"titleNView": false,
 				"navigationBarTextStyle": "white"
-				// #ifdef APP-PLUS  
-				,"titleNView": {
+					// #ifdef APP-PLUS  
+					,
+				"titleNView": {
 					"type": "transparent",
 					"backgroundImage": "linear-gradient(to bottom right, #0081ff, #1cbbb4)",
 					"buttons": [{
@@ -51,8 +52,9 @@
 				"enablePullDownRefresh": true,
 				"navigationBarTextStyle": "white",
 				"navigationStyle": "custom"
-				// #ifdef APP-PLUS  
-				,"app-plus": {
+					// #ifdef APP-PLUS  
+					,
+				"app-plus": {
 					"titleNView": {
 						"type": "transparent",
 						"backgroundImage": "linear-gradient(to bottom right, #39b54a, #8dc63f)"
@@ -135,6 +137,14 @@
 			"style": {
 				"navigationBarTitleText": "消息通知",
 				"enablePullDownRefresh": true
+			}
+
+		}, {
+			"path": "pages/mine/about",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationStyle": "custom",
+				"enablePullDownRefresh": false
 			}
 
 		}

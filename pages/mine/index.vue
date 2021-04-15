@@ -44,6 +44,18 @@
 				</button>
 			</view>
 			<!-- #endif -->
+			<navigator class="cu-item" url="about">
+				<button class="cu-btn content">
+					<text class="cuIcon-question text-grey"></text>
+					<text class="text-grey">使用帮助</text>
+				</button>
+			</navigator>
+			<view class="cu-item" @tap="donate">
+				<button class="cu-btn content">
+					<text class="cuIcon-appreciate text-orange"></text>
+					<text class="text-orange">赞赏支持</text>
+				</button>
+			</view>
 			<view class="cu-item">
 				<button class="cu-btn content" @tap="logout">
 					<text class="cuIcon-exit text-red"></text>
@@ -77,6 +89,11 @@
 			}
 		},
 		methods: {
+			donate() {
+				uni.previewImage({
+					urls: ['https://static-6ee74e1a-9337-4754-92e2-f7b377cdd878.bspapp.com/img/donate.jpg']
+				})
+			},
 			logout() {
 				this.$refs.login.doLogout()
 			},
