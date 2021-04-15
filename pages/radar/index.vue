@@ -31,6 +31,7 @@
 				</view>
 			</view>
 		</view>
+		
 		<!-- 控制区域 -->
 		<view class="control flex align-center justify-between">
 			<image class="reset radius margin" src="/static/reset.png" @tap="getLocation"></image>
@@ -40,6 +41,10 @@
 			</view>
 			<navigator class="cu-avatar cuIcon-location round lg margin bg-gradual-blue" url="bases" v-else></navigator>
 		</view>
+		
+		<!-- #ifdef APP-PLUS -->
+		<circle-img :value="baseInfo.avatar" />>
+		<!-- #endif -->
 	</view>
 </template>
 
@@ -79,7 +84,7 @@
 				id: 0,
 				iconPath: '/static/reset.png',
 				position: {
-					top: this.windowHeight - 50,
+					top: this.windowHeight - 55,
 					left: 15,
 					width: 35,
 					height: 35
@@ -87,9 +92,24 @@
 				clickable: true
 			})
 			
+			uni.$on('circle-img', path => {
+				this.controls.push({
+					id: 1,
+					iconPath: path,
+					position: {
+						top: this.windowHeight - 70,
+						left: this.$u.sys().windowWidth - 70,
+						width: 55,
+						height: 55
+					},
+					clickable: true
+				})
+			})
+			
 			const map = uni.createMapContext('map')
 			const appMap = map.$getAppMap()
 			appMap.showUserLocation(true)
+			this.scale = 18
 			// #endif
 		},
 		methods: {
@@ -145,12 +165,13 @@
 			},
 			hideBase() {
 				this.markers = []
+				this.controls.pop()
 				this.getLocation()
 			},
 			async showCatList(e) {
 				const id = e.detail.markerId,
 					location = this.markers.find(v => v.id === id)
-				this.scale = 19
+				this.scale += 2
 				this.latitude = location.latitude
 				this.longitude = location.longitude
 				
@@ -160,21 +181,21 @@
 				}).get()
 
 				// #ifdef APP-PLUS
-					const modal = uni.getSubNVueById('modal')
-					modal.show('fade-in', 500)
-					uni.$emit('modal-popup', data)
-					uni.$once('modal-hide', () => {
-						modal.hide('fade-out', 500)
-						this.hideCatList()
-					})
-					return
+				const modal = uni.getSubNVueById('modal')
+				modal.show('fade-in', 500)
+				uni.$emit('modal-popup', data)
+				uni.$once('modal-hide', () => {
+					this.hideCatList()
+					modal.hide()
+				})
+				return
 				// #endif
 				this.showModal = true
 				this.catList = data
 			},
 			hideCatList() {
 				this.catList = []
-				this.scale = 17
+				this.scale -= 2
 			},
 			toCatDetail(id) {
 				uni.navigateTo({

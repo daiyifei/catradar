@@ -2,7 +2,7 @@
 	<view class="response">
 		<view class="margin-tb-sm radius response" :class="guid">
 			<video id="video" class="video radius" :src="src" :objectFit="fullscreen?'contain':'cover'"
-				:controls="showControls" loop :muted="!fullscreen" :direction="0" @fullscreenchange="onFullscreenchange"
+				:controls="false" loop :muted="!fullscreen" :direction="0" @fullscreenchange="onFullscreenchange"
 				:show-loading="false" @play="onPlay" @pause="onPause" @tap.stop.prevent="onTap" @longpress="onLongpress"
 				v-if="show"></video>
 			<view class="video placeholder radius" v-else>
@@ -23,13 +23,7 @@
 				show: false,
 				guid: this.$u.guid(),
 				playing: false,
-				fullscreen: false,
-				// #ifdef APP-PLUS
-				showControls: true
-				// #endif
-				// #ifndef APP-PLUS
-				showControls: false
-				// #endif
+				fullscreen: false
 			}
 		},
 		computed: {
@@ -41,8 +35,8 @@
 			setTimeout(() => {
 				const observer = uni.createIntersectionObserver(this)
 				observer.relativeToViewport({
-					top: -200,
-					bottom: 200,
+					top: -300,
+					bottom: 0,
 				}).observe('.' + this.guid, ({
 					intersectionRatio
 				}) => {

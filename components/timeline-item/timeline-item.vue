@@ -28,7 +28,7 @@
 					<text class="text-gray">{{item.uid[0].nickname}}</text>
 				</view>
 				<!-- 留言区域 -->
-				<message-board :timeline="item" :list="item.comments" @focus="onFocus" v-if="hasLogin"/>
+				<message-board :timeline="item" :list="item.comments" @focus="onFocus" v-if="baseInfo.allow_comment"/>
 			</view>
 		</view>
 	</view>

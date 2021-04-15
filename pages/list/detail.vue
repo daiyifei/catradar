@@ -15,7 +15,7 @@
 				</swiper-item>
 			</swiper>
 
-			<template v-if="hasLogin">
+			<template v-if="hasLogin&&userInfo.subscribes.includes(baseInfo._id)">
 				<!-- 头部 -->
 				<view class="header padding flex align-center bg-white margin-sm radius shadow shadow-blur">
 					<image class="cu-avatar xl round margin-right-sm u-skeleton-circle" :src="form.avatar">
@@ -172,9 +172,12 @@
 			
 			<!-- 未登录 -->
 			<view class="need-auth" v-else>
-				<u-empty text="请先登录" mode="data">
+				<u-empty text="请先登录" mode="data" v-if="!hasLogin">
 					<navigator url="/pages/mine/index" class="cu-btn bg-blue margin radius" slot="bottom"
 						open-type="switchTab">去登录</navigator>
+				</u-empty>
+				<u-empty text="未加入猫区" mode="list" else>
+					<navigator url="/pages/radar/bases" class="cu-btn bg-blue margin radius" slot="bottom">去选择</navigator>
 				</u-empty>
 			</view>
 		</view>

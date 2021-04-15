@@ -1,8 +1,8 @@
 <template>
-	<view class="modal" v-if="list.length" @tap.stop.prevent="onHide">
+	<view class="modal" v-if="list.length" @tap.stop="onHide">
 		<view class="list">
 			<navigator class="list-item" :url="`/pages/list/detail?id=${item._id}`"
-				v-for="(item,index) in list" :key="index" @tap.stop="toDetail(item._id)">
+				v-for="(item,index) in list" :key="index">
 				<image :src="item.avatar" class="avatar" />
 				<text class="name">{{item.name}}</text>
 			</navigator>
