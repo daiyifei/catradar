@@ -53,11 +53,18 @@
     },
 		"allow_publish": {
 			"bsonType": "bool",
-			"description": "允许发布"
+			"description": "允许发布",
+			"defaultValue": true
+		},
+		"allow_comment": {
+			"bsonType": "bool",
+			"description": "允许评论",
+			"defaultValue": true
 		},
 		"need_verify": {
 			"bsonType": "bool",
-			"description": "加入验证"
+			"description": "加入验证",
+			"defaultValue": true
 		},
 		"available": {
 			"bsonType": "bool",

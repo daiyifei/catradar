@@ -59,7 +59,7 @@
 				getOne: true
 			}).then(res => {
 				this.user = res.result.data
-				this.condition = `base_id=='${this.baseInfo._id}'uid=='${options.uid}'`
+				this.condition = `base_id=='${this.baseInfo._id}'&&uid=='${options.uid}'`
 			})
 		},
 		onPageScroll(e) {

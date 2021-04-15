@@ -115,7 +115,6 @@ Vue.prototype.$requestMsg = () => {
 }
 
 Vue.prototype.$sendMsg = async params => {
-	// #ifdef MP-WEIXIN
 	const { type, touid, data, page } = params
 	// 不发送给自己
 	if(touid === store.state.userInfo._id)
@@ -135,7 +134,6 @@ Vue.prototype.$sendMsg = async params => {
 			reject(e)
 		})
 	})
-	// #endif
 }
 
 App.mpType = 'app'

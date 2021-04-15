@@ -35,14 +35,14 @@
 		<view class="cu-modal" :class="showModal?'show':''">
 			<view class="cu-dialog" v-if="showModal">
 				<view class="cu-bar bg-white justify-end">
-					<view class="content">{{form._id?'编辑':'申请开通'}}</view>
+					<view class="content">{{form.available?'编辑':'申请开通'}}</view>
 					<view class="action" @tap="hideModal">
 						<text class="cuIcon-close text-red"></text>
 					</view>
 				</view>
 				<view class="padding text-left">
 					<!-- 申请 -->
-					<template v-if="!form._id">
+					<template v-if="!form.available">
 						<view class="cu-form-group required">
 							<view class="title">地址</view>
 							<input placeholder="请输入地址" v-model="form.name" :disabled="!form.latitude" @tap="form.latitude?'':chooseAddress()"></input>
@@ -80,6 +80,10 @@
 						<view class="cu-form-group">
 							<view class="title">允许发布</view>
 							<form-switch v-model="form.allow_publish"></form-switch>
+						</view>
+						<view class="cu-form-group">
+							<view class="title">允许评论</view>
+							<form-switch v-model="form.allow_comment"></form-switch>
 						</view>
 						<view class="cu-form-group">
 							<view class="title">加入验证</view>
@@ -204,7 +208,9 @@
 					})
 					this.userInfo.base_id = item._id
 					this.login(this.userInfo)
-					uni.navigateBack()
+					uni.reLaunch({
+						url: '/pages/radar/index'
+					})
 				}else {
 					this.$u.toast('请先加入')
 				}
@@ -217,6 +223,7 @@
 				})
 			},
 			onAdd() {
+				this.form = {}
 				this.$set(this.form, 'reason', '')
 				this.showModal = true
 			},
@@ -225,7 +232,6 @@
 				this.showModal = true
 			},
 			hideModal() {
-				this.form = {}
 				this.showModal = false
 			},
 			addLocation() {
