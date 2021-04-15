@@ -17,3 +17,4 @@ node_modules/
 .project
 unpackage/
 /.hbuilderx/
+manifest.json
