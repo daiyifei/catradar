@@ -3,7 +3,7 @@
 		<!-- 内容区域 -->
 		<view class="flex padding bg-white solid-bottom item">
 			<!-- 头像 -->
-			<view v-if="hasLogin">
+			<view>
 				<navigator :url="'/pages/list/detail?id='+item.cat_id[0]._id" class="margin-right-sm">
 					<u-image :src="item.cat_id[0].avatar" :width="80" :height="80" :border-radius="8" />
 				</navigator>
