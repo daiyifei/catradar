@@ -1,0 +1,131 @@
+{
+    "name" : "猫雷达",
+    "appid" : "__UNI__C1D167C",
+    "description" : "发现身边的猫",
+    "versionName" : "1.0.0",
+    "versionCode" : 100,
+    "transformPx" : false,
+    "app-plus" : {
+        "capatible" : {
+            "ignoreVersion" : true
+        },
+        /* 5+App特有相关 */
+        "modules" : {
+            "Geolocation" : {},
+            "OAuth" : {},
+            "Share" : {},
+            "VideoPlayer" : {},
+            "Maps" : {}
+        },
+        /* 模块配置 */
+        "distribute" : {
+            /* 应用发布信息 */
+            "android" : {
+                /* android打包配置 */
+                "permissions" : [
+                    "<uses-permission android:name=\"android.permission.ACCESS_COARSE_LOCATION\"/>",
+                    "<uses-permission android:name=\"android.permission.ACCESS_FINE_LOCATION\"/>",
+                    "<uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\"/>",
+                    "<uses-permission android:name=\"android.permission.ACCESS_WIFI_STATE\"/>",
+                    "<uses-permission android:name=\"android.permission.CHANGE_WIFI_STATE\"/>",
+                    "<uses-permission android:name=\"android.permission.GET_ACCOUNTS\"/>",
+                    "<uses-permission android:name=\"android.permission.INTERNET\"/>",
+                    "<uses-permission android:name=\"android.permission.MODIFY_AUDIO_SETTINGS\"/>",
+                    "<uses-permission android:name=\"android.permission.MOUNT_UNMOUNT_FILESYSTEMS\"/>",
+                    "<uses-permission android:name=\"android.permission.READ_LOGS\"/>",
+                    "<uses-permission android:name=\"android.permission.READ_PHONE_STATE\"/>",
+                    "<uses-permission android:name=\"android.permission.READ_SMS\"/>",
+                    "<uses-permission android:name=\"android.permission.SEND_SMS\"/>",
+                    "<uses-permission android:name=\"android.permission.VIBRATE\"/>",
+                    "<uses-permission android:name=\"android.permission.WAKE_LOCK\"/>",
+                    "<uses-permission android:name=\"android.permission.WRITE_EXTERNAL_STORAGE\"/>",
+                    "<uses-permission android:name=\"android.permission.WRITE_SETTINGS\"/>",
+                    "<uses-permission android:name=\"android.permission.WRITE_SMS\"/>"
+                ]
+            },
+            "ios" : {
+                "idfa" : false,
+                "privacyDescription" : {
+                    "NSPhotoLibraryUsageDescription" : "选取照片",
+                    "NSPhotoLibraryAddUsageDescription" : "保存照片",
+                    "NSCameraUsageDescription" : "拍摄照片",
+                    "NSLocationWhenInUseUsageDescription" : "获取定位"
+                }
+            },
+            /* ios打包配置 */
+            "sdkConfigs" : {
+                "ad" : {},
+                "maps" : {
+                    "baidu" : {
+                        "appkey_ios" : "",
+                        "appkey_android" : ""
+                    }
+                },
+                "geolocation" : {
+                    "baidu" : {
+                        "__platform__" : [ "android" ],
+                        "appkey_ios" : "",
+                        "appkey_android" : ""
+                    }
+                },
+                "share" : {
+                    "weixin" : {
+                        "appid" : "wx8834217bd9666010",
+                        "UniversalLinks" : ""
+                    }
+                },
+                "oauth" : {
+                    "univerify" : {},
+                    "weixin" : {
+                        "appid" : "wx8834217bd9666010",
+                        "appsecret" : "",
+                        "UniversalLinks" : ""
+                    }
+                },
+                "payment" : {},
+                "push" : {}
+            },
+            "splashscreen" : {
+                "androidStyle" : "common",
+                "iosStyle" : "common"
+            }
+        },
+        "nvueLaunchMode" : "",
+        "splashscreen" : {
+            "waiting" : true,
+            "autoclose" : true
+        }
+    },
+    /* SDK配置 */
+    "quickapp" : {},
+    /* 快应用特有相关 */
+    "mp-weixin" : {
+        /* 小程序特有相关 */
+        "appid" : "wxbc23bad197c8cb97",
+        "setting" : {
+            "urlCheck" : false,
+            "es6" : false,
+            "minified" : true
+        },
+        "permission" : {
+            "scope.userLocation" : {
+                "desc" : "显示您的当前位置"
+            }
+        },
+        "usingComponents" : true
+    },
+    "h5" : {
+        "title" : "猫雷达",
+        "domain" : "",
+        "sdkConfigs" : {
+            "maps" : {
+                "qqmap" : {
+                    "key" : ""
+                }
+            }
+        }
+    },
+    "mp-alipay" : {
+        "appid" : "2021001189618407"
+    }
+}
